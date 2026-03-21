@@ -2374,6 +2374,7 @@
   updated_at timestamptz default now()
 );
 alter table iad_appstate enable row level security;
+drop policy if exists "allow all" on iad_appstate;
 create policy "allow all" on iad_appstate
   for all using (true) with check (true);</div>
         <button onclick="copySetupSQL()" class="btn btn-ghost btn-sm" style="margin-top:8px">⎘ Copy SQL</button>
@@ -2596,32 +2597,27 @@ const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 // ---- Supabase REST helper ----
 async function supaFetch(table, method='GET', body=null, query='') {
   const url = `${SUPA_URL}/rest/v1/${table}${query}`;
+  const prefer = method === 'POST' ? 'return=minimal,resolution=merge-duplicates' : '';
   const headers = {
     'apikey': SUPA_KEY,
     'Authorization': 'Bearer ' + SUPA_KEY,
     'Content-Type': 'application/json',
-    'Prefer': method === 'POST' ? 'return=representation' : method === 'PATCH' ? 'return=representation' : '',
   };
-  try {
-    const res = await fetch(url, {
-      method,
-      headers,
-      mode: 'cors',
-      body: body ? JSON.stringify(body) : null,
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(()=>({message: res.statusText}));
-      throw new Error(`Supabase ${method} ${table}: ${err.message||res.status}`);
-    }
-    if (method === 'DELETE') return true;
-    const text = await res.text();
-    return text ? JSON.parse(text) : null;
-  } catch(e) {
-    if (e.name === 'TypeError' && e.message.includes('fetch')) {
-      throw new Error('Network blocked — check Supabase CORS settings or GitHub Pages CSP');
-    }
-    throw e;
+  if (prefer) headers['Prefer'] = prefer;
+
+  const res = await fetch(url, {
+    method,
+    headers,
+    mode: 'cors',
+    body: body ? JSON.stringify(body) : null,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({message: res.statusText}));
+    throw new Error(`Supabase ${method} ${table}: ${err.message||res.status}`);
   }
+  if (method === 'DELETE' || method === 'PATCH') return true;
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 // ---- Table names ----
@@ -2723,16 +2719,15 @@ async function persist() {
 // Store entire array as a single JSON blob per "table" using iad_appstate
 async function syncBlobToSupabase(key, data) {
   const payload = JSON.stringify(data || []);
-  // Upsert into iad_appstate: id=key, value=JSON string
-  await supaFetch(TABLES.appstate, 'DELETE', null, `?id=eq.${key}`);
+  // Single upsert — ON CONFLICT (id) DO UPDATE — no DELETE needed
   await supaFetch(TABLES.appstate, 'POST', [{ id: key, value: payload, updated_at: new Date().toISOString() }]);
 }
 
 async function loadBlobFromSupabase(key) {
   try {
-    const rows = await supaFetch(TABLES.appstate, 'GET', null, `?id=eq.${key}`);
+    const rows = await supaFetch(TABLES.appstate, 'GET', null, `?id=eq.${encodeURIComponent(key)}&select=id,value`);
     if (rows && rows.length && rows[0].value) return JSON.parse(rows[0].value);
-  } catch(e) {}
+  } catch(e) { console.warn('loadBlob', key, e.message); }
   return null;
 }
 
@@ -5075,8 +5070,13 @@ function showConfirm(title, msg, color, cb) {
   btn.textContent = 'OK';
   document.getElementById('confirm-overlay').classList.add('open');
 }
-function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('open'); _confirmCallback=null; }
-function executeConfirm() { closeConfirm(); if(_confirmCallback) _confirmCallback(); }
+function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('open'); _confirmCallback = null; }
+function executeConfirm() {
+  const cb = _confirmCallback;
+  _confirmCallback = null;
+  document.getElementById('confirm-overlay').classList.remove('open');
+  if (cb) cb();
+}
 
 // ---- TASK ACTIONS ----
 function deleteTask(id) {
