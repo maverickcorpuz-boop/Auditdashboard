@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;">
 <title>M.C. Precision — Internal Audit</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -854,10 +855,6 @@
         </div>
       </div>
     </div>
-    <div style="text-align:center;margin-top:18px;font-size:10px;color:var(--muted)">
-      Admin: <strong style="color:var(--text)">admin</strong> / <strong style="color:var(--accent)">0000</strong>
-      &nbsp;·&nbsp; Others: <strong style="color:var(--text)">[username]</strong> / <strong style="color:var(--text)">1234</strong>
-    </div>
   </div>
 </div>
 
@@ -895,6 +892,7 @@
   <div class="topbar-right">
     <span id="save-indicator" class="save-indicator" style="color:var(--ok)">✓ Saved</span>
     <span class="badge-live" id="cloud-status-badge" onclick="openSetupGuide()" style="cursor:pointer" title="Cloud sync status — click for setup guide">💾 Local</span>
+    <button class="btn btn-ghost btn-sm" onclick="openExportModal()" style="font-size:11px;padding:5px 12px" title="Export Data">⬇ Export</button>
     <div class="notif" style="cursor:pointer;" onclick="showPage('audittrail',null);document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.textContent.includes('Audit Trail')))">🔔<span class="notif-dot" id="trail-notif-dot"></span></div>
     <!-- SESSION USER -->
     <div class="session-user" onclick="toggleSessionDropdown()">
@@ -2201,7 +2199,7 @@ create policy "allow all" on iad_appstate
     </div>
 
     <!-- Step 3 -->
-    <div style="display:flex;gap:14px;margin-bottom:20px;padding:16px;background:var(--bg2);border-radius:12px;border:1px solid var(--border2);box-shadow:0 0 0 2px rgba(201,168,76,0.2)">
+    <div style="display:flex;gap:14px;margin-bottom:20px;padding:16px;background:var(--bg2);border-radius:12px;border:2px solid rgba(201,168,76,0.3)">
       <div style="width:32px;height:32px;border-radius:50%;background:var(--gold);color:#000;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
       <div style="flex:1">
         <div style="font-weight:700;font-size:13px;color:var(--gold);margin-bottom:8px">📋 Copy your API credentials — HERE IS HOW:</div>
@@ -2225,8 +2223,21 @@ create policy "allow all" on iad_appstate
             <div style="font-size:10px;color:var(--muted);margin-top:6px">Click the copy icon on that row</div>
           </div>
         </div>
+        <div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:11px;color:var(--rose)">
+          ⚠ <strong>IMPORTANT:</strong> The anon key must start with <code style="background:var(--bg);padding:1px 5px;border-radius:3px">eyJ...</code> — if you see <code style="background:var(--bg);padding:1px 5px;border-radius:3px">sb_publishable_...</code> that is the wrong key and will not work. Look for the <strong>JWT / anon</strong> key in the API settings page.
+        </div>
         <div style="font-size:11px;color:var(--warn);background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:6px;padding:8px 10px">
           ⚠ Copy the <strong>anon</strong> key only — NOT the <strong>service_role</strong> key
+        </div>
+        <!-- Key tester -->
+        <div style="margin-top:12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">🔧 Test your connection</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input type="text" id="test-supa-url" placeholder="https://xxxx.supabase.co" style="flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--font-mono);font-size:11px;padding:7px 10px;outline:none">
+            <input type="text" id="test-supa-key" placeholder="eyJ..." style="flex:2;min-width:200px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--font-mono);font-size:11px;padding:7px 10px;outline:none">
+            <button class="btn btn-ghost btn-sm" onclick="testSupabaseConnection()">Test</button>
+          </div>
+          <div id="test-supa-result" style="font-size:11px;margin-top:8px;color:var(--muted)"></div>
         </div>
       </div>
     </div>
@@ -2277,6 +2288,74 @@ create policy "allow all" on iad_appstate
   </div>
 </div>
 
+<!-- MODAL: Export Data -->
+<div class="modal-overlay" id="modal-export">
+  <div class="modal" style="width:680px;max-width:97vw;max-height:92vh;overflow-y:auto">
+    <div class="modal-head" style="position:sticky;top:0;background:var(--surface);z-index:5;padding-bottom:14px;margin-bottom:4px">
+      <div>
+        <div class="modal-title">⬇ Export Data</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px">Select modules, format and date range</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('export')">✕</button>
+    </div>
+
+    <!-- Format selector -->
+    <div style="display:flex;gap:10px;margin-bottom:20px">
+      <button id="exp-fmt-csv" onclick="setExportFormat('csv',this)"
+        style="flex:1;padding:12px;border-radius:10px;border:2px solid var(--gold);background:var(--gold-glow);color:var(--gold);font-family:var(--font-head);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s">
+        📄 CSV<div style="font-size:10px;font-weight:400;margin-top:3px;opacity:0.8">Opens in Excel / Sheets</div>
+      </button>
+      <button id="exp-fmt-json" onclick="setExportFormat('json',this)"
+        style="flex:1;padding:12px;border-radius:10px;border:2px solid var(--border2);background:transparent;color:var(--text2);font-family:var(--font-head);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s">
+        📋 JSON<div style="font-size:10px;font-weight:400;margin-top:3px;opacity:0.8">Full structured data</div>
+      </button>
+      <button id="exp-fmt-xlsx" onclick="setExportFormat('xlsx',this)"
+        style="flex:1;padding:12px;border-radius:10px;border:2px solid var(--border2);background:transparent;color:var(--text2);font-family:var(--font-head);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s">
+        📊 Excel (XLSX)<div style="font-size:10px;font-weight:400;margin-top:3px;opacity:0.8">Multi-sheet workbook</div>
+      </button>
+    </div>
+
+    <!-- Date range filter -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:20px">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Date Range Filter <span style="color:var(--muted);font-weight:400">(optional — leave blank for all data)</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end">
+        <div class="form-group" style="margin:0"><label>From</label><input type="date" id="exp-date-from"></div>
+        <div class="form-group" style="margin:0"><label>To</label><input type="date" id="exp-date-to"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="setExportDatePreset('today')">Today</button>
+          <button class="btn btn-ghost btn-sm" onclick="setExportDatePreset('week')">This Week</button>
+          <button class="btn btn-ghost btn-sm" onclick="setExportDatePreset('month')">This Month</button>
+          <button class="btn btn-ghost btn-sm" onclick="setExportDatePreset('year')">This Year</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--muted)" onclick="setExportDatePreset('clear')">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module checkboxes -->
+    <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+      <span>Select Modules to Export</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="toggleAllExport(true)">Select All</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleAllExport(false)">Deselect All</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px" id="exp-modules-grid">
+      <!-- injected by JS -->
+    </div>
+
+    <!-- Preview count -->
+    <div id="exp-preview" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--text2);min-height:44px">
+      <!-- injected by JS -->
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--surface);padding-top:14px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" onclick="closeModal('export')">Cancel</button>
+      <button class="btn btn-primary" onclick="runExport()" id="exp-download-btn">⬇ Download Selected</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /app-shell -->
 
 <input type="file" id="attach-file-hidden" style="display:none" accept=".pdf,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.txt,.csv" onchange="handleAttachFile(this)">
@@ -2310,28 +2389,37 @@ const DEFAULT_AUDITOR_PROFILES = [
 // 4. In Supabase → SQL Editor → run the SQL in the setup guide (see app)
 // ================================================================
 const SUPA_URL  = 'https://ieeffiwzbajftevutpnu.supabase.co';
-const SUPA_KEY  = 'sb_publishable_MEj9HAFrra9TvkAm65nBFg_obQskrzd';
+const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllZWZmaXd6YmFqZnRldnV0cG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDUxNDgsImV4cCI6MjA4OTY4MTE0OH0.HhF2OB4pBzCCvC6hxIsvK_VX8ch42dvR9i2sY3f2UcI';
 
 // ---- Supabase REST helper ----
 async function supaFetch(table, method='GET', body=null, query='') {
   const url = `${SUPA_URL}/rest/v1/${table}${query}`;
-  const res = await fetch(url, {
-    method,
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': method === 'POST' ? 'return=representation' : method === 'PATCH' ? 'return=representation' : '',
-    },
-    body: body ? JSON.stringify(body) : null,
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(()=>({message: res.statusText}));
-    throw new Error(`Supabase ${method} ${table}: ${err.message||res.status}`);
+  const headers = {
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + SUPA_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': method === 'POST' ? 'return=representation' : method === 'PATCH' ? 'return=representation' : '',
+  };
+  try {
+    const res = await fetch(url, {
+      method,
+      headers,
+      mode: 'cors',
+      body: body ? JSON.stringify(body) : null,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({message: res.statusText}));
+      throw new Error(`Supabase ${method} ${table}: ${err.message||res.status}`);
+    }
+    if (method === 'DELETE') return true;
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  } catch(e) {
+    if (e.name === 'TypeError' && e.message.includes('fetch')) {
+      throw new Error('Network blocked — check Supabase CORS settings or GitHub Pages CSP');
+    }
+    throw e;
   }
-  if (method === 'DELETE') return true;
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
 }
 
 // ---- Table names ----
@@ -4964,6 +5052,35 @@ function updateCloudBadge() {
   }
 }
 
+async function testSupabaseConnection() {
+  const url = (document.getElementById('test-supa-url')?.value || '').trim();
+  const key = (document.getElementById('test-supa-key')?.value || '').trim();
+  const res = document.getElementById('test-supa-result');
+  if (!res) return;
+
+  if (!url || !key) { res.textContent = '⚠ Enter both URL and key first.'; res.style.color='var(--warn)'; return; }
+  if (!key.startsWith('eyJ')) { res.innerHTML = '❌ Wrong key format — the anon key must start with <strong>eyJ...</strong> not "sb_publishable_". Go to Supabase → Settings → API → copy the <strong>anon</strong> JWT key.'; res.style.color='var(--rose)'; return; }
+
+  res.textContent = '⟳ Testing connection…'; res.style.color='var(--accent2)';
+  try {
+    const testRes = await fetch(`${url}/rest/v1/iad_appstate?limit=1`, {
+      headers: { 'apikey': key, 'Authorization': 'Bearer '+key },
+      mode: 'cors'
+    });
+    if (testRes.status === 200 || testRes.status === 404 || testRes.status === 406) {
+      res.innerHTML = '✅ Connection works! Now paste these credentials into index.html (Step 4).'; res.style.color='var(--teal)';
+    } else if (testRes.status === 401 || testRes.status === 403) {
+      res.innerHTML = '❌ Invalid key — make sure you copied the <strong>anon</strong> key correctly.'; res.style.color='var(--rose)';
+    } else if (testRes.status === 404 && (await testRes.text()).includes('relation')) {
+      res.innerHTML = '✅ Connected! Table not created yet — run the SQL in Step 2 first.'; res.style.color='var(--warn)';
+    } else {
+      res.textContent = `⚠ Got status ${testRes.status} — check URL and key.`; res.style.color='var(--warn)';
+    }
+  } catch(e) {
+    res.innerHTML = '❌ Connection failed: '+e.message+'. Make sure the URL is correct and CORS is enabled in Supabase.'; res.style.color='var(--rose)';
+  }
+}
+
 function openSetupGuide() {
   const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
   const statusEl = document.getElementById('cloud-connect-status');
@@ -6205,6 +6322,336 @@ function getUserRight(mod) {
   const key = role + '::' + mod;
   return rights[key] !== undefined ? rights[key] : getDefaultRight(role, mod);
 }
+
+// ================================================================
+// EXPORT DATA MODULE
+// ================================================================
+const EXPORT_MODULES = [
+  { id:'tasks',       label:'Team Tasks',          icon:'📋', color:'var(--gold)',   getCount:()=>tasks.filter(t=>!t.inactive).length,             getData:()=>tasks.filter(t=>!t.inactive),            dateField:'start' },
+  { id:'fieldwork',   label:'Fieldwork Log',        icon:'⬙',  color:'var(--sky)',    getCount:()=>fieldworks.filter(f=>!f.inactive).length,        getData:()=>fieldworks.filter(f=>!f.inactive),       dateField:'dateFrom' },
+  { id:'reports',     label:'Audit Reports',        icon:'☰',  color:'var(--teal)',   getCount:()=>reports.filter(r=>!r.inactive).length,           getData:()=>reports.filter(r=>!r.inactive).map(r=>({...r,file:r.file?{name:r.file.name,size:r.file.size}:null})), dateField:'date' },
+  { id:'branches',    label:'Branches',             icon:'◈',  color:'var(--violet)', getCount:()=>branches.filter(b=>!b.inactive).length,          getData:()=>branches.filter(b=>!b.inactive),         dateField:'lastAudit' },
+  { id:'auditors',    label:'Auditor Profiles',     icon:'◑',  color:'var(--rose)',   getCount:()=>auditorProfiles.length,                          getData:()=>auditorProfiles.map(p=>({...p,skillLevels:undefined})), dateField:'hired' },
+  { id:'compliance',  label:'Compliance Assessments',icon:'🏆', color:'#b43ee8',      getCount:()=>complianceRecords.filter(r=>!r.inactive).length, getData:()=>complianceRecords.filter(r=>!r.inactive),dateField:'date' },
+  { id:'performance', label:'Performance Evaluations',icon:'⭐',color:'var(--warn)',  getCount:()=>performanceEvals.length,                         getData:()=>performanceEvals,                        dateField:'date' },
+  { id:'schedules',   label:'Audit Schedules',      icon:'▦',  color:'var(--sky)',    getCount:()=>schedules.length,                                getData:()=>schedules,                               dateField:'start' },
+  { id:'audittrail',  label:'Audit Trail',          icon:'📋', color:'var(--muted)',  getCount:()=>auditTrail.length,                               getData:()=>auditTrail,                              dateField:'timestamp' },
+];
+
+let _expFormat = 'csv';
+let _expSelected = new Set(EXPORT_MODULES.map(m => m.id));
+
+function openExportModal() {
+  _expFormat = 'csv';
+  _expSelected = new Set(EXPORT_MODULES.map(m => m.id));
+  renderExportModules();
+  updateExportPreview();
+  // Reset format buttons
+  document.getElementById('exp-fmt-csv').style.border = '2px solid var(--gold)';
+  document.getElementById('exp-fmt-csv').style.background = 'var(--gold-glow)';
+  document.getElementById('exp-fmt-csv').style.color = 'var(--gold)';
+  ['json','xlsx'].forEach(f => {
+    const b = document.getElementById('exp-fmt-'+f);
+    if(b){ b.style.border='2px solid var(--border2)'; b.style.background='transparent'; b.style.color='var(--text2)'; }
+  });
+  document.getElementById('exp-date-from').value = '';
+  document.getElementById('exp-date-to').value = '';
+  openModal('export');
+}
+
+function setExportFormat(fmt, btn) {
+  _expFormat = fmt;
+  ['csv','json','xlsx'].forEach(f => {
+    const b = document.getElementById('exp-fmt-'+f);
+    if(!b) return;
+    if(f === fmt) {
+      b.style.border = '2px solid var(--gold)';
+      b.style.background = 'var(--gold-glow)';
+      b.style.color = 'var(--gold)';
+    } else {
+      b.style.border = '2px solid var(--border2)';
+      b.style.background = 'transparent';
+      b.style.color = 'var(--text2)';
+    }
+  });
+  updateExportPreview();
+}
+
+function setExportDatePreset(preset) {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const fromEl = document.getElementById('exp-date-from');
+  const toEl   = document.getElementById('exp-date-to');
+  if (preset === 'clear') { fromEl.value=''; toEl.value=''; }
+  else if (preset === 'today') { fromEl.value=fmt(now); toEl.value=fmt(now); }
+  else if (preset === 'week') {
+    const start = new Date(now); start.setDate(now.getDate()-now.getDay());
+    fromEl.value=fmt(start); toEl.value=fmt(now);
+  }
+  else if (preset === 'month') {
+    fromEl.value=`${now.getFullYear()}-${pad(now.getMonth()+1)}-01`; toEl.value=fmt(now);
+  }
+  else if (preset === 'year') {
+    fromEl.value=`${now.getFullYear()}-01-01`; toEl.value=fmt(now);
+  }
+  updateExportPreview();
+}
+
+function renderExportModules() {
+  const grid = document.getElementById('exp-modules-grid');
+  if (!grid) return;
+  grid.innerHTML = EXPORT_MODULES.map(m => {
+    const checked = _expSelected.has(m.id);
+    const count = m.getCount();
+    return `
+    <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border:2px solid ${checked?m.color:'var(--border)'};border-radius:10px;cursor:pointer;transition:all 0.15s;user-select:none" id="exp-lbl-${m.id}" onclick="toggleExportModule('${m.id}')">
+      <div style="width:20px;height:20px;border-radius:5px;background:${checked?m.color:'var(--surface3)'};border:2px solid ${checked?m.color:'var(--border2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;font-size:12px">
+        ${checked?'<span style="color:#000;font-weight:900;font-size:11px">✓</span>':''}
+      </div>
+      <span style="font-size:13px;flex-shrink:0">${m.icon}</span>
+      <div style="flex:1">
+        <div style="font-family:var(--font-head);font-size:12px;font-weight:600;color:${checked?'var(--text)':'var(--text2)'}">${m.label}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${count} record${count!==1?'s':''}</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function toggleExportModule(id) {
+  if (_expSelected.has(id)) _expSelected.delete(id);
+  else _expSelected.add(id);
+  renderExportModules();
+  updateExportPreview();
+}
+
+function toggleAllExport(state) {
+  if (state) _expSelected = new Set(EXPORT_MODULES.map(m => m.id));
+  else _expSelected.clear();
+  renderExportModules();
+  updateExportPreview();
+}
+
+function getFilteredData(module) {
+  const from = document.getElementById('exp-date-from')?.value || '';
+  const to   = document.getElementById('exp-date-to')?.value   || '';
+  let data = module.getData();
+  if (from || to) {
+    data = data.filter(row => {
+      const val = row[module.dateField] || '';
+      const d = (val+'').slice(0,10);
+      if (from && d && d < from) return false;
+      if (to   && d && d > to)   return false;
+      return true;
+    });
+  }
+  return data;
+}
+
+function updateExportPreview() {
+  const preview = document.getElementById('exp-preview');
+  if (!preview) return;
+  if (_expSelected.size === 0) {
+    preview.innerHTML = '<span style="color:var(--rose)">⚠ No modules selected — please select at least one.</span>';
+    return;
+  }
+  const selected = EXPORT_MODULES.filter(m => _expSelected.has(m.id));
+  const lines = selected.map(m => {
+    const data = getFilteredData(m);
+    const color = m.color;
+    return `<span style="display:inline-flex;align-items:center;gap:4px;background:${color}18;border:1px solid ${color}33;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;color:${color};margin:2px">${m.icon} ${m.label}: <strong>${data.length}</strong></span>`;
+  }).join(' ');
+  const total = selected.reduce((s,m) => s + getFilteredData(m).length, 0);
+  const fmtLabel = { csv:'CSV', json:'JSON', xlsx:'Excel (XLSX)' }[_expFormat];
+  preview.innerHTML = `
+    <div style="margin-bottom:8px;font-weight:600;color:var(--text)">Export preview — <span style="color:var(--gold)">${total} total records</span> as <span style="color:var(--teal)">${fmtLabel}</span></div>
+    <div>${lines}</div>`;
+}
+
+// ---- CSV helpers ----
+function toCSVRow(row) {
+  return Object.values(row).map(v => {
+    if (v === null || v === undefined) return '';
+    const s = String(typeof v === 'object' ? JSON.stringify(v) : v);
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? '"'+s.replace(/"/g,'""')+'"' : s;
+  }).join(',');
+}
+function toCSV(data) {
+  if (!data.length) return '';
+  const headers = Object.keys(data[0]).join(',');
+  return headers + '\n' + data.map(toCSVRow).join('\n');
+}
+
+// ---- XLSX helper (pure JS, no library needed) ----
+function toXLSX(sheets) {
+  // Build a simple multi-sheet Excel XML (SpreadsheetML)
+  const xmlEscape = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  let sheetsXml = '';
+  let sharedStrings = [];
+  let ssIdx = 0;
+  const getSSIdx = str => { const i = sharedStrings.indexOf(str); if(i>=0)return i; sharedStrings.push(str); return ssIdx++; };
+
+  sheets.forEach(({name, data}) => {
+    if (!data.length) return;
+    const cols = Object.keys(data[0]);
+    let rows = `<row r="1">${cols.map((c,i)=>`<c r="${colName(i)}1" t="s"><v>${getSSIdx(c)}</v></c>`).join('')}</row>`;
+    data.forEach((row, ri) => {
+      rows += `<row r="${ri+2}">${cols.map((c,ci)=>{
+        const v = row[c]; if(v===null||v===undefined) return '';
+        const str = typeof v==='object'?JSON.stringify(v):String(v);
+        const num = !isNaN(str)&&str!=='';
+        if(num) return `<c r="${colName(ci)}${ri+2}"><v>${str}</v></c>`;
+        return `<c r="${colName(ci)}${ri+2}" t="s"><v>${getSSIdx(str)}</v></c>`;
+      }).join('')}</row>`;
+    });
+    sheetsXml += `<sheet name="${xmlEscape(name.slice(0,31))}" sheetId="${sheets.indexOf(sheets.find(s=>s.name===name))+1}" r:id="rId${sheets.indexOf(sheets.find(s=>s.name===name))+1}"/>`;
+    sheets.find(s=>s.name===name)._xml = `<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${rows}</sheetData></worksheet>`;
+  });
+
+  const ssXml = `<?xml version="1.0" encoding="UTF-8"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${sharedStrings.length}" uniqueCount="${sharedStrings.length}">${sharedStrings.map(s=>`<si><t>${xmlEscape(s)}</t></si>`).join('')}</sst>`;
+  const wbXml = `<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheetsXml}</sheets></workbook>`;
+  const relsXml = `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.filter(s=>s._xml).map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rId${sheets.filter(s=>s._xml).length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>`;
+  const ctXml = `<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${sheets.filter(s=>s._xml).map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/></Types>`;
+
+  // Build ZIP manually using a minimal ZIP writer
+  const files = {
+    '[Content_Types].xml': ctXml,
+    '_rels/.rels': `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`,
+    'xl/workbook.xml': wbXml,
+    'xl/_rels/workbook.xml.rels': relsXml,
+    'xl/sharedStrings.xml': ssXml,
+  };
+  sheets.filter(s=>s._xml).forEach((s,i) => { files[`xl/worksheets/sheet${i+1}.xml`] = s._xml; });
+  return buildZip(files);
+}
+
+function colName(idx) {
+  let name=''; let n=idx;
+  do { name=String.fromCharCode(65+(n%26))+name; n=Math.floor(n/26)-1; } while(n>=0);
+  return name;
+}
+
+function buildZip(files) {
+  // Minimal ZIP builder (stored, no compression)
+  const enc = new TextEncoder();
+  const parts = [];
+  const centralDir = [];
+  let offset = 0;
+
+  for (const [name, content] of Object.entries(files)) {
+    const nameBytes = enc.encode(name);
+    const dataBytes = enc.encode(content);
+    const crc = crc32(dataBytes);
+    const local = new Uint8Array(30 + nameBytes.length + dataBytes.length);
+    const dv = new DataView(local.buffer);
+    dv.setUint32(0, 0x04034b50, true); // signature
+    dv.setUint16(4, 20, true);         // version
+    dv.setUint16(6, 0, true);          // flags
+    dv.setUint16(8, 0, true);          // compression (stored)
+    dv.setUint16(10, 0, true);         // mod time
+    dv.setUint16(12, 0, true);         // mod date
+    dv.setUint32(14, crc, true);
+    dv.setUint32(18, dataBytes.length, true);
+    dv.setUint32(22, dataBytes.length, true);
+    dv.setUint16(26, nameBytes.length, true);
+    dv.setUint16(28, 0, true);
+    local.set(nameBytes, 30);
+    local.set(dataBytes, 30 + nameBytes.length);
+
+    const cd = new Uint8Array(46 + nameBytes.length);
+    const cdv = new DataView(cd.buffer);
+    cdv.setUint32(0, 0x02014b50, true);
+    cdv.setUint16(4, 20, true); cdv.setUint16(6, 20, true);
+    cdv.setUint16(8, 0, true); cdv.setUint16(10, 0, true);
+    cdv.setUint16(12, 0, true); cdv.setUint16(14, 0, true);
+    cdv.setUint32(16, crc, true);
+    cdv.setUint32(20, dataBytes.length, true);
+    cdv.setUint32(24, dataBytes.length, true);
+    cdv.setUint16(28, nameBytes.length, true);
+    cdv.setUint16(30, 0, true); cdv.setUint16(32, 0, true);
+    cdv.setUint16(34, 0, true); cdv.setUint16(36, 0, true);
+    cdv.setUint32(38, 0, true); cdv.setUint32(42, offset, true);
+    cd.set(nameBytes, 46);
+
+    parts.push(local);
+    centralDir.push(cd);
+    offset += local.length;
+  }
+
+  const cdSize = centralDir.reduce((s,c)=>s+c.length, 0);
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true); ev.setUint16(6, 0, true);
+  ev.setUint16(8, centralDir.length, true);
+  ev.setUint16(10, centralDir.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, offset, true);
+  ev.setUint16(20, 0, true);
+
+  const all = [...parts, ...centralDir, eocd];
+  const total = all.reduce((s,a)=>s+a.length, 0);
+  const out = new Uint8Array(total);
+  let pos = 0;
+  all.forEach(a => { out.set(a, pos); pos += a.length; });
+  return out;
+}
+
+function crc32(data) {
+  let crc = 0xFFFFFFFF;
+  for (let i=0; i<data.length; i++) {
+    crc ^= data[i];
+    for (let j=0; j<8; j++) crc = (crc>>>1) ^ (crc&1 ? 0xEDB88320 : 0);
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+function downloadBlob(data, filename, mime) {
+  const blob = new Blob([data], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function runExport() {
+  if (_expSelected.size === 0) { alert('Please select at least one module to export.'); return; }
+  const selected = EXPORT_MODULES.filter(m => _expSelected.has(m.id));
+  const today = new Date().toISOString().slice(0,10);
+  const fname = `mc_audit_export_${today}`;
+
+  if (_expFormat === 'json') {
+    const out = {};
+    selected.forEach(m => { out[m.id] = getFilteredData(m); });
+    downloadBlob(JSON.stringify(out, null, 2), fname+'.json', 'application/json');
+
+  } else if (_expFormat === 'csv') {
+    if (selected.length === 1) {
+      const m = selected[0];
+      downloadBlob(toCSV(getFilteredData(m)), `${fname}_${m.id}.csv`, 'text/csv');
+    } else {
+      // Multi-module: zip of CSVs
+      const files = {};
+      selected.forEach(m => {
+        const data = getFilteredData(m);
+        if (data.length) files[`${m.id}.csv`] = toCSV(data);
+      });
+      const zip = buildZip(Object.fromEntries(Object.entries(files).map(([k,v]) => [k, v])));
+      downloadBlob(zip, fname+'_csv.zip', 'application/zip');
+    }
+
+  } else if (_expFormat === 'xlsx') {
+    const sheets = selected.map(m => ({ name: m.label.slice(0,31), data: getFilteredData(m) }));
+    const xlsx = toXLSX(sheets);
+    downloadBlob(xlsx, fname+'.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  }
+
+  showSaveIndicator('✓ Export downloaded');
+  closeModal('export');
+}
+
+// Keep old exportTrail for the Audit Trail page button
+function exportTrail() { _expSelected = new Set(['audittrail']); _expFormat='csv'; openExportModal(); }
 
 // Close modal + confirm on overlay click
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); }));
