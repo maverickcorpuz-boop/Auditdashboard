@@ -71,6 +71,10 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius:10px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+  .sidebar::-webkit-scrollbar { width:3px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius:10px; }
+  .sidebar::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
   /* ─────────────────────────────────────────
      SIDEBAR
@@ -84,6 +88,8 @@
     z-index: 100;
     padding: 0 0 24px;
     box-shadow: 4px 0 32px rgba(0,0,0,0.4);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .sidebar-logo {
@@ -258,6 +264,7 @@
     overflow: hidden;
     transition: box-shadow 0.2s;
   }
+  .card.overflow-visible { overflow: visible; }
   .card-head {
     display: flex; align-items: center; justify-content: space-between;
     padding: 16px 20px;
@@ -810,48 +817,46 @@
       <div class="sub">Secure access · FY <span id="login-year"></span></div>
     </div>
     <div class="login-card">
-
-      <!-- STEP 1: Choose user -->
       <div class="login-step active" id="lstep-1">
-        <div class="login-step-title">Who are you?</div>
-        <div class="login-step-sub">Select your auditor profile to continue.</div>
-        <div class="user-grid" id="login-user-grid">
-          <!-- populated by JS -->
-        </div>
-        <div id="login-error-1" class="login-error">Please select a user first.</div>
-      </div>
+        <div class="login-step-title">Sign In</div>
+        <div class="login-step-sub">Enter your username and password to continue.</div>
 
-      <!-- STEP 2: Enter PIN -->
-      <div class="login-step" id="lstep-2">
-        <div class="login-step-title">Enter your PIN</div>
-        <div class="login-step-sub" id="pin-step-sub">Signing in as <strong id="pin-user-name"></strong></div>
-        <div class="pin-input-wrap" id="pin-display">
-          <div class="pin-dot" id="pd0"></div>
-          <div class="pin-dot" id="pd1"></div>
-          <div class="pin-dot" id="pd2"></div>
-          <div class="pin-dot" id="pd3"></div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Username</label>
+          <input type="text" id="login-username" placeholder="e.g. admin or juan.dela.cruz"
+            autocomplete="username"
+            style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:13px;padding:11px 14px;outline:none;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'"
+            onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
         </div>
-        <div class="numpad">
-          <button class="numpad-btn" onclick="pinPress('1')">1</button>
-          <button class="numpad-btn" onclick="pinPress('2')">2</button>
-          <button class="numpad-btn" onclick="pinPress('3')">3</button>
-          <button class="numpad-btn" onclick="pinPress('4')">4</button>
-          <button class="numpad-btn" onclick="pinPress('5')">5</button>
-          <button class="numpad-btn" onclick="pinPress('6')">6</button>
-          <button class="numpad-btn" onclick="pinPress('7')">7</button>
-          <button class="numpad-btn" onclick="pinPress('8')">8</button>
-          <button class="numpad-btn" onclick="pinPress('9')">9</button>
-          <button class="numpad-btn del" onclick="pinClear()" style="font-size:12px;color:var(--muted)">CLR</button>
-          <button class="numpad-btn" onclick="pinPress('0')">0</button>
-          <button class="numpad-btn del" onclick="pinBackspace()">⌫</button>
+        <div class="form-group" style="margin-bottom:6px;position:relative">
+          <label>Password / PIN</label>
+          <input type="password" id="login-password" placeholder="Enter your password"
+            autocomplete="current-password"
+            style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:13px;padding:11px 40px 11px 14px;outline:none;transition:border-color 0.15s"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'"
+            onkeydown="if(event.key==='Enter')doCredentialLogin()">
+          <button onclick="toggleLoginPwdVisibility()" style="position:absolute;right:12px;bottom:11px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px" id="login-eye-btn">👁</button>
         </div>
-        <div id="login-error-2" class="login-error">Incorrect PIN. Please try again.</div>
-        <button class="login-back" onclick="loginGoBack()">← Back</button>
-      </div>
 
+        <div id="login-error-1" class="login-error" style="margin-bottom:12px">Invalid username or password.</div>
+
+        <button onclick="doCredentialLogin()"
+          style="width:100%;background:linear-gradient(135deg,var(--gold),#a8832a);color:#070b14;border:none;border-radius:var(--radius-sm);padding:12px;font-family:var(--font-head);font-size:13px;font-weight:700;cursor:pointer;margin-top:6px;transition:all 0.18s;letter-spacing:0.03em"
+          onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+          Sign In →
+        </button>
+
+        <!-- Quick user selector -->
+        <div style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px">
+          <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px">Quick Select</div>
+          <div class="user-grid" id="login-user-grid" style="grid-template-columns:repeat(2,1fr)"></div>
+        </div>
+      </div>
     </div>
     <div style="text-align:center;margin-top:18px;font-size:10px;color:var(--muted)">
-      Default PIN for all users: <strong style="color:var(--text)">1234</strong> &nbsp;·&nbsp; Admin PIN: <strong style="color:var(--accent)">0000</strong>
+      Admin: <strong style="color:var(--text)">admin</strong> / <strong style="color:var(--accent)">0000</strong>
+      &nbsp;·&nbsp; Others: <strong style="color:var(--text)">[username]</strong> / <strong style="color:var(--text)">1234</strong>
     </div>
   </div>
 </div>
@@ -881,6 +886,7 @@
   <div class="nav-item" onclick="showPage('audittrail',this)"><span class="icon">📋</span> Audit Trail</div>
   <div class="nav-item" onclick="showPage('compliance',this)"><span class="icon">🏆</span> Compliance</div>
   <div class="nav-item" onclick="showPage('performance',this)"><span class="icon">⭐</span> Performance</div>
+  <div class="nav-item" id="nav-userrights" onclick="showPage('userrights',this)"><span class="icon">🔐</span> User Rights</div>
 </nav>
 
 <!-- TOPBAR -->
@@ -888,7 +894,7 @@
   <div class="topbar-title">M.C. Precision — Internal Audit</div>
   <div class="topbar-right">
     <span id="save-indicator" class="save-indicator" style="color:var(--ok)">✓ Saved</span>
-    <span class="badge-live">● LIVE</span>
+    <span class="badge-live" id="cloud-status-badge" onclick="openSetupGuide()" style="cursor:pointer" title="Cloud sync status — click for setup guide">💾 Local</span>
     <div class="notif" style="cursor:pointer;" onclick="showPage('audittrail',null);document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.textContent.includes('Audit Trail')))">🔔<span class="notif-dot" id="trail-notif-dot"></span></div>
     <!-- SESSION USER -->
     <div class="session-user" onclick="toggleSessionDropdown()">
@@ -899,7 +905,7 @@
       <div class="avatar" id="session-avatar-display" style="background:linear-gradient(135deg,var(--accent),var(--accent2))">?</div>
       <div class="session-dropdown" id="session-dropdown">
         <div class="sdrop-item" onclick="openMyProfile()">👤 My Profile</div>
-        <div class="sdrop-item" onclick="openChangePin()">🔑 Change PIN</div>
+        <div class="sdrop-item" onclick="openChangePin()">🔑 Change Password</div>
         <div class="sdrop-divider"></div>
         <div class="sdrop-item danger" onclick="doLogout()">🚪 Sign Out</div>
       </div>
@@ -1570,6 +1576,10 @@
         <input type="date" id="perf-date">
       </div>
     </div>
+    <!-- Auto-fill banner -->
+    <div id="perf-autofill-banner" style="display:none;background:rgba(45,212,191,0.07);border:1px solid rgba(45,212,191,0.25);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--teal)">
+      <span style="font-weight:700">⚡ Live Data Loaded</span> — counts below are auto-filled from system records. You may still override any value.
+    </div>
 
     <!-- Live score bar -->
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:20px">
@@ -1646,6 +1656,50 @@
     <div style="display:flex;justify-content:flex-end;gap:10px">
       <button class="btn btn-ghost" onclick="closeModal('performance')">Cancel</button>
       <button class="btn btn-primary" onclick="savePerformance()">💾 Save Evaluation</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: USER RIGHTS -->
+<div class="page" id="page-userrights">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-family:var(--font-display);font-size:24px">User Rights Management</div>
+      <div style="color:var(--muted);font-size:11px;margin-top:3px">Assign module access and permissions per user role. Admin only.</div>
+    </div>
+    <button class="btn btn-primary" onclick="saveAllRights()" id="save-rights-btn">💾 Save All Changes</button>
+  </div>
+
+  <!-- Role permissions matrix -->
+  <div class="card" style="margin-bottom:20px;overflow:visible">
+    <div class="card-head">
+      <span class="card-head-title">Role-Based Access Control</span>
+      <span style="font-size:11px;color:var(--muted)">✅ Full Access &nbsp; 👁 View Only &nbsp; ❌ No Access</span>
+    </div>
+    <div style="overflow-x:auto;overflow-y:visible;width:100%;-webkit-overflow-scrolling:touch;border-radius:0 0 var(--radius-lg) var(--radius-lg)">
+      <table class="team-table" id="rights-matrix-table" style="width:max-content;min-width:100%;border-collapse:collapse">
+        <thead><tr id="rights-header-row">
+          <th style="min-width:160px;position:sticky;left:0;background:var(--surface2);z-index:2;border-right:1px solid var(--border2)">Module</th>
+          <!-- role columns injected by JS -->
+        </tr></thead>
+        <tbody id="rights-matrix-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Per-user credential overview -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-head-title">User Accounts & Credentials</span>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('auditors',document.querySelector('#nav-userrights'))">+ Add Auditor →</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="team-table" style="min-width:700px">
+        <thead><tr>
+          <th>Name</th><th>Role</th><th>Username</th><th>Password</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="user-accounts-tbody"></tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -1732,11 +1786,11 @@
   </div>
 </div>
 
-<!-- MODAL: Add Auditor -->
+<!-- MODAL: Add / Edit Auditor -->
 <div class="modal-overlay" id="modal-addauditor">
   <div class="modal modal-wide">
     <div class="modal-head">
-      <div class="modal-title">Add New Auditor</div>
+      <div class="modal-title" id="addauditor-title">Add New Auditor</div>
       <button class="modal-close" onclick="closeModal('addauditor')">✕</button>
     </div>
     <div class="modal-row">
@@ -1773,9 +1827,19 @@
       </div>
       <div class="form-group"><label>Date Hired</label><input type="date" id="na-hired"></div>
     </div>
+    <!-- Login Credentials Section -->
+    <div id="na-credentials-section" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-family:var(--font-head);font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">🔐 Login Credentials</div>
+      <div class="modal-row" style="margin-bottom:0">
+        <div class="form-group"><label>Username</label><input type="text" id="na-username" placeholder="Auto-generated from name" readonly style="background:var(--bg);color:var(--sky);font-family:var(--font-mono)"></div>
+        <div class="form-group"><label>Default Password</label><input type="text" id="na-pin-display" value="1234" readonly style="background:var(--bg);color:var(--gold);font-family:var(--font-mono);font-size:16px;text-align:center;letter-spacing:0.2em"></div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px">Username is auto-generated from the name · Default password is <strong style="color:var(--gold)">1234</strong> · User can change it after login via the top-right menu</div>
+    </div>
+    <input type="hidden" id="na-edit-idx" value="-1">
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
       <button class="btn btn-ghost" onclick="closeModal('addauditor')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveNewAuditor()">Add Auditor</button>
+      <button class="btn btn-primary" id="na-save-btn" onclick="saveNewAuditor()">Add Auditor</button>
     </div>
   </div>
 </div>
@@ -2067,20 +2131,148 @@
     </div>
   </div>
 </div>
-<!-- MODAL: Change PIN -->
+<!-- MODAL: Change PIN / Password -->
 <div class="modal-overlay" id="modal-changepin">
   <div class="modal" style="width:360px">
     <div class="modal-head">
-      <div class="modal-title">Change PIN</div>
+      <div class="modal-title">Change Password</div>
       <button class="modal-close" onclick="closeModal('changepin')">✕</button>
     </div>
-    <div class="form-group" style="margin-bottom:14px"><label>Current PIN</label><input type="password" id="cp-old" maxlength="4" placeholder="••••" style="letter-spacing:0.3em;text-align:center;font-size:18px"></div>
-    <div class="form-group" style="margin-bottom:14px"><label>New PIN (4 digits)</label><input type="password" id="cp-new" maxlength="4" placeholder="••••" style="letter-spacing:0.3em;text-align:center;font-size:18px"></div>
-    <div class="form-group" style="margin-bottom:18px"><label>Confirm New PIN</label><input type="password" id="cp-confirm" maxlength="4" placeholder="••••" style="letter-spacing:0.3em;text-align:center;font-size:18px"></div>
+    <div class="form-group" style="margin-bottom:14px"><label>Current Password</label><input type="password" id="cp-old" maxlength="20" placeholder="Current password" style="letter-spacing:0.1em;text-align:left;font-size:13px"></div>
+    <div class="form-group" style="margin-bottom:14px"><label>New Password (min 4 chars)</label><input type="password" id="cp-new" maxlength="20" placeholder="New password" style="font-size:13px"></div>
+    <div class="form-group" style="margin-bottom:18px"><label>Confirm New Password</label><input type="password" id="cp-confirm" maxlength="20" placeholder="Confirm password" style="font-size:13px"></div>
     <div id="cp-error" style="color:var(--danger);font-size:11px;margin-bottom:14px;display:none"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button class="btn btn-ghost" onclick="closeModal('changepin')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveChangePin()">Update PIN</button>
+      <button class="btn btn-primary" onclick="saveChangePin()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Cloud Setup Guide -->
+<div class="modal-overlay" id="modal-setupguide">
+  <div class="modal" style="width:740px;max-width:97vw;max-height:92vh;overflow-y:auto;padding:28px">
+    <div class="modal-head" style="position:sticky;top:0;background:var(--surface);z-index:5;padding-bottom:14px;margin-bottom:0">
+      <div>
+        <div class="modal-title">☁ Enable Shared Cloud Data</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px">Follow all 5 steps so every user sees the same data</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('setupguide')">✕</button>
+    </div>
+
+    <div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--rose)">
+      ⚠ <strong>Right now data is saved only on YOUR browser.</strong> Your colleagues see empty screens because each browser has its own private localStorage. Complete the steps below — it takes about 5 minutes and is completely free.
+    </div>
+
+    <!-- Step 1 -->
+    <div style="display:flex;gap:14px;margin-bottom:20px;padding:16px;background:var(--bg2);border-radius:12px;border:1px solid var(--border)">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--gold);color:#000;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px">Create a free Supabase account</div>
+        <div style="font-size:12px;color:var(--text2);line-height:2">
+          → Open <a href="https://supabase.com" target="_blank" style="color:var(--sky);font-weight:700">https://supabase.com</a> in a new tab<br>
+          → Click <strong style="color:var(--text)">Start your project</strong> → Sign up with GitHub or email<br>
+          → Click <strong style="color:var(--text)">New Project</strong> → Name it (e.g. <em>mc-audit</em>) → Set any DB password → <strong>Create project</strong><br>
+          → Wait about 2 minutes for it to be ready ✅
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div style="display:flex;gap:14px;margin-bottom:20px;padding:16px;background:var(--bg2);border-radius:12px;border:1px solid var(--border)">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--gold);color:#000;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px">Create the database table</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.8">
+          → In your Supabase project, click <strong style="color:var(--text)">SQL Editor</strong> in the left sidebar<br>
+          → Click <strong style="color:var(--text)">New query</strong><br>
+          → Paste the SQL below and click <strong style="color:var(--teal)">▶ Run</strong>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:14px;font-family:var(--font-mono);font-size:11px;color:var(--teal);line-height:2;overflow-x:auto;white-space:pre" id="setup-sql-block">create table if not exists iad_appstate (
+  id text primary key,
+  value text not null,
+  updated_at timestamptz default now()
+);
+alter table iad_appstate enable row level security;
+create policy "allow all" on iad_appstate
+  for all using (true) with check (true);</div>
+        <button onclick="copySetupSQL()" class="btn btn-ghost btn-sm" style="margin-top:8px">⎘ Copy SQL</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div style="display:flex;gap:14px;margin-bottom:20px;padding:16px;background:var(--bg2);border-radius:12px;border:1px solid var(--border2);box-shadow:0 0 0 2px rgba(201,168,76,0.2)">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--gold);color:#000;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px;color:var(--gold);margin-bottom:8px">📋 Copy your API credentials — HERE IS HOW:</div>
+        <div style="font-size:12px;color:var(--text2);line-height:2.2;margin-bottom:12px">
+          → In Supabase, look at the <strong style="color:var(--text)">left sidebar</strong><br>
+          → Click the ⚙ <strong style="color:var(--text)">gear icon</strong> at the very bottom left → click <strong style="color:var(--text)">Settings</strong><br>
+          → In the Settings menu, click <strong style="color:var(--text)">API</strong> (under "Configuration")<br>
+          → You will see two things to copy:
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.25);border-radius:8px;padding:12px">
+            <div style="font-size:10px;font-weight:700;color:var(--sky);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">① Project URL</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Under "Project URL" heading</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--sky);background:var(--bg);padding:6px 8px;border-radius:4px">https://abcdefgh.supabase.co</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:6px">Click the copy icon next to it</div>
+          </div>
+          <div style="background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.25);border-radius:8px;padding:12px">
+            <div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">② Anon Public Key</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Under "Project API keys" → <strong>anon</strong> row</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--teal);background:var(--bg);padding:6px 8px;border-radius:4px;word-break:break-all">eyJhbGciOiJIUzI1NiIs...</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:6px">Click the copy icon on that row</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--warn);background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:6px;padding:8px 10px">
+          ⚠ Copy the <strong>anon</strong> key only — NOT the <strong>service_role</strong> key
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div style="display:flex;gap:14px;margin-bottom:20px;padding:16px;background:var(--bg2);border-radius:12px;border:1px solid var(--border)">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--gold);color:#000;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px">Paste credentials into index.html</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.8">
+          → Open <strong>index.html</strong> in Notepad, VS Code, or any text editor<br>
+          → Press <strong>Ctrl+F</strong> (Find) and search for: <code style="color:var(--sky);background:var(--bg);padding:1px 6px;border-radius:3px">YOUR_PROJECT_ID</code><br>
+          → Replace <strong>both lines</strong> below with your copied values:
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:14px;font-family:var(--font-mono);font-size:11px;line-height:2">
+          <div>const SUPA_URL = <span style="color:var(--rose)">'https://YOUR_PROJECT_ID.supabase.co'</span>; <span style="color:var(--muted)">← replace with ① Project URL</span></div>
+          <div>const SUPA_KEY = <span style="color:var(--rose)">'YOUR_ANON_PUBLIC_KEY'</span>; <span style="color:var(--muted)">← replace with ② Anon key</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:10px;line-height:1.8">
+          → Save the file → Go to GitHub → upload/replace index.html → wait for GitHub Pages to update (~1 min)
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div style="display:flex;gap:14px;margin-bottom:20px;padding:16px;background:var(--bg2);border-radius:12px;border:1px solid var(--border)">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--gold);color:#000;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">5</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px">Push your existing data to the cloud</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.8">
+          → Open the app on GitHub Pages → Log in as Admin<br>
+          → Click the badge in the top bar → Click the button below<br>
+          → This uploads all your existing records so colleagues see them
+        </div>
+        <button onclick="forcePushToCloud()" class="btn btn-primary" style="margin-bottom:8px">⬆ Push My Local Data to Cloud Now</button>
+        <div id="push-status" style="font-size:11px;color:var(--muted);margin-top:6px"></div>
+      </div>
+    </div>
+
+    <div style="background:rgba(45,212,191,0.06);border:1px solid rgba(45,212,191,0.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--teal)">
+      ✅ After setup: Everyone opens the same GitHub Pages URL → logs in → sees the same shared data. Any change one user makes is instantly visible to all others.
+    </div>
+
+    <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div id="cloud-connect-status" style="font-size:12px;font-weight:600"></div>
+      <button class="btn btn-ghost" onclick="closeModal('setupguide')">Close</button>
     </div>
   </div>
 </div>
@@ -2093,17 +2285,32 @@
 const auditorColors = ['#e8a83e','#3e8ee8','#3ee8a8','#e84b3e','#b43ee8'];
 const auditorBg = ['rgba(232,168,62,0.2)','rgba(62,142,232,0.2)','rgba(62,232,168,0.2)','rgba(232,75,62,0.2)','rgba(180,62,232,0.2)'];
 
-const DEFAULT_AUDITOR_PROFILES = [];
+const DEFAULT_AUDITOR_PROFILES = [
+  {
+    name: 'Sample Auditor', initials: 'SA',
+    cls: 'a2', color: '#3e8ee8', bg: 'rgba(62,142,232,0.2)',
+    role: 'Audit Associate', dept: 'Internal Audit Division',
+    email: 'sample@company.com', phone: '—',
+    hired: '2025-01-01', exp: 1, status: 'Active',
+    specialization: 'Financial Audit',
+    certs: [], skills: [], skillLevels: {},
+    engagements: 0, tasksCompleted: 0, findings: 0, reports: 0,
+    bio: 'Placeholder account. Delete and replace with real auditors.'
+  }
+];
 // loaded after DB_KEYS is defined — see persistence block below
 
 // ================================================================
 // SUPABASE CONFIGURATION
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// STEP 1: Replace the two values below with your Supabase credentials
-//         Found at: https://supabase.com → your project → Settings → API
+// To share data across all users:
+// 1. Go to https://supabase.com → create free account → New Project
+// 2. Go to Settings → API → copy "Project URL" and "anon public" key
+// 3. Replace the two values below, then re-upload to GitHub
+// 4. In Supabase → SQL Editor → run the SQL in the setup guide (see app)
 // ================================================================
-const SUPA_URL  = 'https://YOUR_PROJECT_ID.supabase.co';   // ← change this
-const SUPA_KEY  = 'YOUR_ANON_PUBLIC_KEY';                  // ← change this
+const SUPA_URL  = 'https://ieeffiwzbajftevutpnu.supabase.co';
+const SUPA_KEY  = 'sb_publishable_MEj9HAFrra9TvkAm65nBFg_obQskrzd';
 
 // ---- Supabase REST helper ----
 async function supaFetch(table, method='GET', body=null, query='') {
@@ -2127,7 +2334,7 @@ async function supaFetch(table, method='GET', body=null, query='') {
   return text ? JSON.parse(text) : null;
 }
 
-// ---- Table names (must match what you create in Supabase) ----
+// ---- Table names ----
 const TABLES = {
   tasks:         'iad_tasks',
   fieldworks:    'iad_fieldworks',
@@ -2137,14 +2344,16 @@ const TABLES = {
   branches:      'iad_branches',
   auditors:      'iad_auditors',
   auditTrail:    'iad_audit_trail',
-  settings:      'iad_settings',    // stores JSON blobs for small config
+  compliance:    'iad_compliance',
+  performance:   'iad_performance',
+  appstate:      'iad_appstate',   // single-row JSON blob for small config
 };
 
 // ---- Connection state ----
 let SUPA_CONNECTED = false;
 let SUPA_REALTIME  = null;
 
-// ---- Fallback: localStorage (used when Supabase not yet configured) ----
+// ---- Fallback: localStorage ----
 const DB_KEYS = {
   tasks:'iad_tasks', fieldworks:'iad_fieldworks', reports:'iad_reports',
   timelineEvents:'iad_timeline', schedules:'iad_schedules', branches:'iad_branches',
@@ -2160,17 +2369,11 @@ function dbSave(key, value) {
 function dbClear(key) { try { localStorage.removeItem(key); } catch(e){} }
 
 // ================================================================
-// NUCLEAR CLEAR — runs BEFORE any dbLoad call.
-// Wipes every iad_* key from localStorage so old cached sample
-// data can never appear. Uses a version stamp so it only fires once.
-// To force a re-wipe: change the version string below.
+// VERSION STAMP — bump to force-clear old cached data
 // ================================================================
-const DATA_VERSION = 'v3-empty-2025';
+const DATA_VERSION = 'v5-shared-2025';
 if (localStorage.getItem('iad_data_version') !== DATA_VERSION) {
-  // Remove every key that belongs to this app
-  Object.keys(localStorage)
-    .filter(k => k.startsWith('iad_'))
-    .forEach(k => localStorage.removeItem(k));
+  Object.keys(localStorage).filter(k => k.startsWith('iad_')).forEach(k => localStorage.removeItem(k));
   localStorage.setItem('iad_data_version', DATA_VERSION);
 }
 
@@ -2189,11 +2392,9 @@ let reports        = dbLoad(DB_KEYS.reports,         DEFAULT_REPORTS);
 let timelineEvents = dbLoad(DB_KEYS.timelineEvents,  DEFAULT_TIMELINE);
 let auditorProfiles = dbLoad(DB_KEYS.auditProfiles,  DEFAULT_AUDITOR_PROFILES);
 
-// ---- PERSIST HELPER ----
-// When Supabase is connected → writes to DB and localStorage cache
-// When offline/not connected → localStorage only
+// ---- PERSIST HELPER — saves locally AND to Supabase if connected ----
 async function persist() {
-  // Always update localStorage cache first (instant)
+  // Always save to localStorage first (instant, works offline)
   dbSave(DB_KEYS.tasks,          tasks);
   dbSave(DB_KEYS.fieldworks,     fieldworks);
   dbSave(DB_KEYS.reports,        reports);
@@ -2203,65 +2404,85 @@ async function persist() {
   dbSave(DB_KEYS.auditProfiles,  auditorProfiles);
   dbSave(DB_KEYS.auditTrail,     auditTrail);
 
-  // If Supabase connected, sync all tables
   if (SUPA_CONNECTED) {
     try {
-      await syncTableToSupabase(TABLES.tasks,      tasks);
-      await syncTableToSupabase(TABLES.fieldworks,  fieldworks);
-      await syncTableToSupabase(TABLES.timeline,    timelineEvents);
-      await syncTableToSupabase(TABLES.schedules,   schedules);
-      await syncTableToSupabase(TABLES.branches,    branches);
-      await syncTableToSupabase(TABLES.auditTrail,  auditTrail);
-      // Reports skip file blobs in DB sync (too large); stored in localStorage only
-      showSaveIndicator('✓ Synced to cloud');
+      // Sync all shared tables to Supabase
+      await Promise.all([
+        syncBlobToSupabase('tasks',          tasks),
+        syncBlobToSupabase('fieldworks',     fieldworks),
+        syncBlobToSupabase('timeline',       timelineEvents),
+        syncBlobToSupabase('schedules',      schedules),
+        syncBlobToSupabase('branches',       branches),
+        syncBlobToSupabase('auditTrail',     auditTrail),
+        syncBlobToSupabase('auditors',       auditorProfiles),
+        syncBlobToSupabase('compliance',     complianceRecords),
+        syncBlobToSupabase('performance',    performanceEvals),
+      ]);
+      showSaveIndicator('☁ Synced to cloud');
     } catch(e) {
       console.warn('Supabase sync error:', e);
-      showSaveIndicator('⚠ Local only', 'var(--warn)');
+      showSaveIndicator('⚠ Saved locally only', 'var(--warn)');
     }
   } else {
-    showSaveIndicator('✓ Saved locally');
+    showSaveIndicator('💾 Saved locally');
   }
 }
 
-// Upsert entire table (delete-all then insert) – simple approach for small datasets
-async function syncTableToSupabase(table, data) {
-  if (!data || !data.length) return;
-  // Strip file blobs before sending (reports with dataUrl are too large)
-  const clean = data.map(r => {
-    if (r.file) return { ...r, file: r.file ? { name: r.file.name, size: r.file.size, type: r.file.type } : null };
-    return r;
-  });
-  await supaFetch(table, 'DELETE', null, '?id=gte.0');
-  await supaFetch(table, 'POST', clean);
+// Store entire array as a single JSON blob per "table" using iad_appstate
+async function syncBlobToSupabase(key, data) {
+  const payload = JSON.stringify(data || []);
+  // Upsert into iad_appstate: id=key, value=JSON string
+  await supaFetch(TABLES.appstate, 'DELETE', null, `?id=eq.${key}`);
+  await supaFetch(TABLES.appstate, 'POST', [{ id: key, value: payload, updated_at: new Date().toISOString() }]);
+}
+
+async function loadBlobFromSupabase(key) {
+  try {
+    const rows = await supaFetch(TABLES.appstate, 'GET', null, `?id=eq.${key}`);
+    if (rows && rows.length && rows[0].value) return JSON.parse(rows[0].value);
+  } catch(e) {}
+  return null;
 }
 
 // Load all data from Supabase and refresh UI
 async function loadFromSupabase() {
-  showSaveIndicator('⟳ Loading from cloud…', 'var(--accent2)');
+  showSaveIndicator('⟳ Loading shared data…', 'var(--accent2)');
   try {
-    const [t, fw, rpts, tl, sc, br, at] = await Promise.all([
-      supaFetch(TABLES.tasks,      'GET', null, '?order=id'),
-      supaFetch(TABLES.fieldworks, 'GET', null, '?order=ref'),
-      supaFetch(TABLES.timeline,   'GET', null, '?order=id'),
-      supaFetch(TABLES.schedules,  'GET', null, '?order=id'),
-      supaFetch(TABLES.branches,   'GET', null, '?order=id'),
-      supaFetch(TABLES.auditTrail, 'GET', null, '?order=id.desc'),
+    const [t, fw, tl, sc, br, at, aud, cmp, perf] = await Promise.all([
+      loadBlobFromSupabase('tasks'),
+      loadBlobFromSupabase('fieldworks'),
+      loadBlobFromSupabase('timeline'),
+      loadBlobFromSupabase('schedules'),
+      loadBlobFromSupabase('branches'),
+      loadBlobFromSupabase('auditTrail'),
+      loadBlobFromSupabase('auditors'),
+      loadBlobFromSupabase('compliance'),
+      loadBlobFromSupabase('performance'),
     ]);
-    if (t  && t.length)  tasks          = t;
-    if (fw && fw.length) fieldworks     = fw;
-    if (rpts&& rpts.length) timelineEvents = rpts;
-    if (tl && tl.length) schedules      = tl;
-    if (sc && sc.length) branches       = sc;
-    if (br && br.length) auditTrail     = br;
+    if (t)    tasks             = t;
+    if (fw)   fieldworks        = fw;
+    if (tl)   timelineEvents    = tl;
+    if (sc)   schedules         = sc;
+    if (br)   branches          = br;
+    if (at)   auditTrail        = at;
+    if (aud)  auditorProfiles   = aud;
+    if (cmp)  complianceRecords = cmp;
+    if (perf) performanceEvals  = perf;
+    // Sync local cache
+    dbSave(DB_KEYS.tasks,         tasks);
+    dbSave(DB_KEYS.fieldworks,    fieldworks);
+    dbSave(DB_KEYS.timelineEvents,timelineEvents);
+    dbSave(DB_KEYS.schedules,     schedules);
+    dbSave(DB_KEYS.branches,      branches);
+    dbSave(DB_KEYS.auditTrail,    auditTrail);
+    dbSave(DB_KEYS.auditProfiles, auditorProfiles);
     SUPA_CONNECTED = true;
-    showSaveIndicator('✓ Connected to Supabase', 'var(--ok)');
-    renderDashboard();
-    updateAuditorDropdowns();
-    updateBranchDropdowns();
+    showSaveIndicator('☁ Connected — shared data loaded', 'var(--ok)');
+    renderLoginGrid();
   } catch(e) {
     console.warn('Supabase load failed, using local data:', e);
     SUPA_CONNECTED = false;
-    showSaveIndicator('⚡ Offline mode (local data)', 'var(--warn)');
+    showSaveIndicator('⚡ Offline mode (local data only)', 'var(--warn)');
   }
 }
 
@@ -2840,7 +3061,11 @@ function renderProfiles() {
         </div>
         <div class="profile-footer">
           <div style="font-size:10px;color:var(--muted)">${activeTasks} active task${activeTasks!==1?'s':''} · ${p.exp} yrs exp</div>
-          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProfileModal(${i})">View Profile →</button>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" style="color:var(--rose);border-color:rgba(248,113,113,0.3)" onclick="event.stopPropagation();deleteAuditor(${i})">🗑</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--sky);border-color:rgba(96,165,250,0.3)" onclick="event.stopPropagation();openEditAuditor(${i})">✎</button>
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProfileModal(${i})">View →</button>
+          </div>
         </div>
       </div>
     </div>`;
@@ -2949,6 +3174,7 @@ function openProfileModal(idx) {
 
     <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px">
       <button class="btn btn-ghost" onclick="closeModal('profile')">Close</button>
+      <button class="btn btn-ghost" style="color:var(--sky);border-color:rgba(96,165,250,0.35)" onclick="closeModal('profile');openEditAuditor(${idx})">✎ Edit Profile</button>
       <button class="btn btn-primary" onclick="closeModal('profile');openModal('task')">Assign Task</button>
     </div>
   `;
@@ -2958,18 +3184,26 @@ function openProfileModal(idx) {
 function saveNewAuditor() {
   const name = document.getElementById('na-name').value.trim();
   if (!name) { alert('Please enter auditor name.'); return; }
+  const editIdx = parseInt(document.getElementById('na-edit-idx').value);
+  const isEdit = editIdx >= 0;
+
   const words = name.split(' ');
   const initials = words.length >= 2 ? words[0][0]+words[words.length-1][0] : name.slice(0,2);
-  const idx = auditorProfiles.length;
+  const idx = isEdit ? editIdx : auditorProfiles.length;
   const clsArr = ['a1','a2','a3','a4','a5'];
   const certsRaw = document.getElementById('na-certs').value;
   const certsParsed = certsRaw ? certsRaw.split(',').map(c=>({ name:c.trim(), abbr:c.trim(), issued:'2025', expiry:'2028', icon:'🎓' })) : [];
   const skillsRaw = document.getElementById('na-skills').value;
   const skillsParsed = skillsRaw ? skillsRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
   const skillLevels = {};
-  skillsParsed.forEach(s=>{ skillLevels[s] = Math.floor(Math.random()*30)+65; });
+  if (isEdit && auditorProfiles[editIdx]?.skillLevels) {
+    Object.assign(skillLevels, auditorProfiles[editIdx].skillLevels);
+  }
+  skillsParsed.forEach(s=>{ if(!skillLevels[s]) skillLevels[s] = Math.floor(Math.random()*30)+65; });
 
+  const base = isEdit ? auditorProfiles[editIdx] : {};
   const newP = {
+    ...base,
     name, initials: initials.toUpperCase(),
     cls: clsArr[idx % 5], color: auditorColors[idx % 5], bg: auditorBg[idx % 5],
     role: document.getElementById('na-role').value || 'Audit Associate',
@@ -2983,16 +3217,87 @@ function saveNewAuditor() {
     certs: certsParsed,
     skills: skillsParsed,
     skillLevels,
-    engagements:0, tasksCompleted:0, findings:0, reports:0,
+    engagements: base.engagements||0,
+    tasksCompleted: base.tasksCompleted||0,
+    findings: base.findings||0,
+    reports: base.reports||0,
     bio:`${name} is a ${document.getElementById('na-role').value||'audit associate'} specializing in ${document.getElementById('na-spec').value}.`
   };
-  auditorProfiles.push(newP);
-  persist();
-  closeModal('addauditor');
-  renderProfiles();
-  // Update dropdowns
-  updateAuditorDropdowns();
-  alert(`${name} added to the audit team!`);
+
+  if (isEdit) {
+    auditorProfiles[editIdx] = newP;
+    logTrail('EDIT','Auditor',name,'Profile updated');
+    persist();
+    closeModal('addauditor');
+    renderProfiles();
+    updateAuditorDropdowns();
+    renderLoginGrid();
+  } else {
+    // Generate username
+    const username = name.toLowerCase().replace(/\s+/g,'.');
+    auditorProfiles.push(newP);
+    logTrail('ADD','Auditor',name,'New auditor added · '+newP.role+' · Username: '+username+' · Default PIN: 1234');
+    persist();
+    closeModal('addauditor');
+    renderProfiles();
+    updateAuditorDropdowns();
+    renderLoginGrid();
+    // Show credentials popup
+    showConfirm(
+      '✅ Auditor Added',
+      `<div style="text-align:left;line-height:1.8">
+        <div style="margin-bottom:10px;color:var(--text2)">Login credentials for <strong style="color:var(--text)">${name}</strong>:</div>
+        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;font-family:var(--font-mono);font-size:13px">
+          <div>👤 <strong>Username:</strong> <span style="color:var(--gold)">${username}</span></div>
+          <div>🔑 <strong>PIN:</strong> <span style="color:var(--sky)">1234</span> (default)</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">The user can change their PIN after logging in.</div>
+      </div>`,
+      'var(--ok)',
+      () => {}
+    );
+  }
+}
+
+function openEditAuditor(idx) {
+  const p = auditorProfiles[idx];
+  if (!p) return;
+  document.getElementById('addauditor-title').textContent = 'Edit Auditor Profile';
+  document.getElementById('na-edit-idx').value = idx;
+  document.getElementById('na-save-btn').textContent = '💾 Save Changes';
+  document.getElementById('na-credentials-section').style.display = 'none';
+  document.getElementById('na-name').value     = p.name  || '';
+  document.getElementById('na-role').value     = p.role  || '';
+  document.getElementById('na-dept').value     = p.dept  || '';
+  document.getElementById('na-email').value    = p.email !== '—' ? p.email : '';
+  document.getElementById('na-phone').value    = p.phone !== '—' ? p.phone : '';
+  document.getElementById('na-exp').value      = p.exp   || '';
+  document.getElementById('na-hired').value    = p.hired || '';
+  document.getElementById('na-certs').value    = p.certs ? p.certs.map(c=>c.abbr).join(', ') : '';
+  document.getElementById('na-skills').value   = p.skills ? p.skills.join(', ') : '';
+  document.getElementById('na-spec').value     = p.specialization || 'Financial Audit';
+  document.getElementById('na-empstatus').value = p.status || 'Active';
+  document.getElementById('modal-addauditor').classList.add('open');
+}
+
+function deleteAuditor(idx) {
+  const p = auditorProfiles[idx];
+  if (!p) return;
+  showConfirm(
+    'Delete Auditor?',
+    `"${p.name}" will be permanently removed from the system. This cannot be undone.`,
+    'var(--danger)',
+    () => {
+      logTrail('DELETE','Auditor', p.name, 'Auditor profile permanently deleted');
+      auditorProfiles.splice(idx, 1);
+      // Remove their PIN
+      const pins = loadPins(); delete pins[p.name]; savePins(pins);
+      persist();
+      renderProfiles();
+      updateAuditorDropdowns();
+      renderLoginGrid();
+    }
+  );
 }
 
 function updateAuditorDropdowns() {
@@ -3022,6 +3327,10 @@ function showPage(id, el) {
   if (id==='audittrail')  renderTrail();
   if (id==='compliance')  renderCompliance();
   if (id==='performance') renderPerformance();
+  if (id==='userrights')  renderUserRights();
+  // Show/hide User Rights nav based on role
+  const urNav = document.getElementById('nav-userrights');
+  if (urNav) urNav.style.display = (currentUser && currentUser.name === 'Admin') ? '' : 'none';
 }
 
 function filterTasks(filter, el) {
@@ -3297,11 +3606,34 @@ function openModal(type) {
     clearUpload();
   }
   if (type === 'addbranch' || type === 'branch') {
-    document.getElementById('addbranch-title').textContent = 'Add New Branch';
-    ['br-name','br-code','br-city','br-address','br-manager','br-phone','br-email','br-notes']
-      .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-    const la=document.getElementById('br-lastaudit'); if(la) la.value='';
-    const bs=document.getElementById('br-status'); if(bs) bs.value='Active';
+    if (_branchEditIdx === null) {
+      document.getElementById('addbranch-title').textContent = 'Add New Branch';
+      ['br-name','br-code','br-city','br-address','br-manager','br-phone','br-email','br-notes']
+        .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+      const la=document.getElementById('br-lastaudit'); if(la) la.value='';
+      const bs=document.getElementById('br-status'); if(bs) bs.value='Active';
+    }
+  }
+  if (type === 'addauditor') {
+    document.getElementById('addauditor-title').textContent = 'Add New Auditor';
+    document.getElementById('na-edit-idx').value = '-1';
+    document.getElementById('na-save-btn').textContent = 'Add Auditor';
+    document.getElementById('na-credentials-section').style.display = '';
+    ['na-name','na-role','na-dept','na-email','na-phone','na-certs','na-skills'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    const naExp=document.getElementById('na-exp'); if(naExp) naExp.value='';
+    const naHired=document.getElementById('na-hired'); if(naHired) naHired.value='';
+    const naSpec=document.getElementById('na-spec'); if(naSpec) naSpec.selectedIndex=0;
+    const naEmp=document.getElementById('na-empstatus'); if(naEmp) naEmp.selectedIndex=0;
+    const naUsr=document.getElementById('na-username'); if(naUsr) naUsr.value='';
+    const naPin=document.getElementById('na-pin-display'); if(naPin) naPin.value='1234';
+    // Live username preview
+    const naName=document.getElementById('na-name');
+    if(naName) {
+      naName.oninput = function() {
+        const usr = document.getElementById('na-username');
+        if(usr) usr.value = this.value.toLowerCase().replace(/\s+/g,'.')||'';
+      };
+    }
   }
 }
 
@@ -4105,34 +4437,43 @@ function saveBranch() {
   if (_branchEditIdx !== null) {
     branches[_branchEditIdx] = obj;
     logTrail('EDIT','Branch',obj.name+' ('+obj.code+')','Branch updated · Region: '+obj.region+' · Manager: '+obj.manager+' · Status: '+obj.status);
+    _branchEditIdx = null;
+    persist();
+    updateBranchDropdowns();
+    closeModal('addbranch');
+    renderBranches();
   } else {
     branches.push(obj);
     logTrail('ADD','Branch',obj.name+' ('+obj.code+')','New branch added · '+obj.type+' · Region: '+obj.region+' · Manager: '+obj.manager);
+    _branchEditIdx = null;
+    persist();
+    updateBranchDropdowns();
+    closeModal('addbranch');
+    renderBranches();
   }
-  _branchEditIdx = null;
-  persist();
-  updateBranchDropdowns();
-  closeModal('addbranch');
-  renderBranches();
 }
 
 function editBranch(idx) {
   const b = branches[idx];
+  if (!b) return;
   _branchEditIdx = idx;
   logTrail('EDIT','Branch',b.name+' ('+b.code+')','Branch opened for editing by Admin');
-  document.getElementById('br-name').value      = b.name;
-  document.getElementById('br-code').value      = b.code;
-  document.getElementById('br-region').value    = b.region;
-  document.getElementById('br-city').value      = b.city;
-  document.getElementById('br-address').value   = b.address;
-  document.getElementById('br-manager').value   = b.manager;
-  document.getElementById('br-phone').value     = b.phone;
-  document.getElementById('br-email').value     = b.email;
-  document.getElementById('br-type').value      = b.type;
-  document.getElementById('br-status').value    = b.status;
-  document.getElementById('br-lastaudit').value = b.lastAudit||'';
-  document.getElementById('br-notes').value     = b.notes||'';
-  openModal('addbranch');
+  // Open modal first (openModal resets fields, so we set _branchEditIdx before to skip reset)
+  document.getElementById('addbranch-title').textContent = 'Edit Branch';
+  document.getElementById('modal-addbranch').classList.add('open');
+  // Now populate — done AFTER modal opens to avoid the reset in openModal()
+  document.getElementById('br-name').value      = b.name      || '';
+  document.getElementById('br-code').value      = b.code      || '';
+  document.getElementById('br-region').value    = b.region    || 'NCR';
+  document.getElementById('br-city').value      = b.city      !== '—' ? b.city    : '';
+  document.getElementById('br-address').value   = b.address   !== '—' ? b.address : '';
+  document.getElementById('br-manager').value   = b.manager   !== '—' ? b.manager : '';
+  document.getElementById('br-phone').value     = b.phone     !== '—' ? b.phone   : '';
+  document.getElementById('br-email').value     = b.email     !== '—' ? b.email   : '';
+  document.getElementById('br-type').value      = b.type      || 'Main Branch';
+  document.getElementById('br-status').value    = b.status    || 'Active';
+  document.getElementById('br-lastaudit').value = b.lastAudit || '';
+  document.getElementById('br-notes').value     = b.notes     || '';
 }
 
 function prefillBranchToTask(branchName) {
@@ -4277,12 +4618,18 @@ function resetAllData() {
 function showConfirm(title, msg, color, cb) {
   _confirmCallback = cb;
   document.getElementById('confirm-title').textContent = title;
-  document.getElementById('confirm-msg').textContent = msg;
+  // Support HTML in confirm message
+  const msgEl = document.getElementById('confirm-msg');
+  if (msg && (msg.includes('<') && msg.includes('>'))) {
+    msgEl.innerHTML = msg;
+  } else {
+    msgEl.textContent = msg;
+  }
   const btn = document.getElementById('confirm-ok-btn');
   btn.style.background = color||'var(--danger)';
   btn.style.color = '#fff';
   btn.style.border = 'none';
-  btn.textContent = 'Confirm';
+  btn.textContent = 'OK';
   document.getElementById('confirm-overlay').classList.add('open');
 }
 function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('open'); _confirmCallback=null; }
@@ -4464,86 +4811,113 @@ let _pinEntry = '';
 
 function renderLoginGrid() {
   const users = getAllLoginUsers();
-  document.getElementById('login-user-grid').innerHTML = users.map(u => `
-    <button class="user-btn" id="ubtn-${u.name.replace(/\s/g,'_')}" onclick="loginSelectUser('${u.name}')">
+  const grid = document.getElementById('login-user-grid');
+  if (!grid) return;
+  grid.innerHTML = users.map(u => {
+    const uname = u.name === 'Admin' ? 'admin' : u.name.toLowerCase().replace(/\s+/g,'.');
+    return `
+    <button class="user-btn" onclick="quickSelectUser('${uname}','${u.name}')">
       <div class="ubava" style="background:${u.bg};color:${u.color}">${u.initials}</div>
       <div>
         <div class="ubname">${u.name}</div>
-        <div class="ubrole">${u.role}</div>
+        <div class="ubrole" style="color:var(--muted);font-size:9px">${uname}</div>
       </div>
-    </button>
-  `).join('');
+    </button>`;
+  }).join('');
+  // clear fields
+  const fu = document.getElementById('login-username');
+  const fp = document.getElementById('login-password');
+  if (fu) fu.value = '';
+  if (fp) fp.value = '';
+  const err = document.getElementById('login-error-1');
+  if (err) err.style.display = 'none';
 }
 
-function loginSelectUser(name) {
-  _loginSelectedUser = getAllLoginUsers().find(u => u.name === name);
+function quickSelectUser(username, displayName) {
+  const fu = document.getElementById('login-username');
+  const fp = document.getElementById('login-password');
+  if (fu) { fu.value = username; }
+  if (fp) { fp.value = ''; fp.focus(); }
   document.querySelectorAll('.user-btn').forEach(b => b.classList.remove('selected'));
-  const btn = document.getElementById('ubtn-'+name.replace(/\s/g,'_'));
-  if (btn) btn.classList.add('selected');
-  document.getElementById('login-error-1').style.display = 'none';
-  setTimeout(() => {
-    document.getElementById('pin-user-name').textContent = name;
-    _pinEntry = '';
-    updatePinDisplay();
-    document.getElementById('lstep-1').classList.remove('active');
-    document.getElementById('lstep-2').classList.add('active');
-    document.getElementById('login-error-2').style.display = 'none';
-  }, 180);
+  event.currentTarget.classList.add('selected');
 }
 
-function loginGoBack() {
-  _pinEntry = ''; _loginSelectedUser = null;
-  document.getElementById('lstep-2').classList.remove('active');
-  document.getElementById('lstep-1').classList.add('active');
-  document.getElementById('login-error-1').style.display = 'none';
-  document.querySelectorAll('.user-btn').forEach(b => b.classList.remove('selected'));
+function toggleLoginPwdVisibility() {
+  const inp = document.getElementById('login-password');
+  const btn = document.getElementById('login-eye-btn');
+  if (!inp) return;
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
 }
 
-function pinPress(digit) {
-  if (_pinEntry.length >= 4) return;
-  _pinEntry += digit;
-  updatePinDisplay();
-  if (_pinEntry.length === 4) setTimeout(verifyPin, 120);
+function getUserByUsername(username) {
+  const u = username.trim().toLowerCase();
+  if (u === 'admin') return ADMIN_USER;
+  return auditorProfiles.find(p => {
+    const gen = p.name.toLowerCase().replace(/\s+/g,'.');
+    return gen === u || p.name.toLowerCase() === u;
+  });
 }
-function pinBackspace() { _pinEntry = _pinEntry.slice(0,-1); updatePinDisplay(); }
-function pinClear()     { _pinEntry = ''; updatePinDisplay(); }
 
-function updatePinDisplay() {
-  for (let i = 0; i < 4; i++) {
-    const dot = document.getElementById('pd'+i);
-    if (!dot) continue;
-    dot.classList.toggle('filled', i < _pinEntry.length);
-    dot.classList.remove('error');
-    dot.textContent = i < _pinEntry.length ? '●' : '';
+function doCredentialLogin() {
+  const username = (document.getElementById('login-username').value || '').trim();
+  const password = (document.getElementById('login-password').value || '').trim();
+  const errEl = document.getElementById('login-error-1');
+  errEl.style.display = 'none';
+
+  if (!username || !password) {
+    errEl.textContent = 'Please enter your username and password.';
+    errEl.style.display = 'block';
+    return;
   }
-}
 
-async function verifyPin() {
-  const correct = getPinFor(_loginSelectedUser.name);
-  if (_pinEntry === correct) {
-    currentUser = _loginSelectedUser;
-    saveSession(currentUser);
+  const userObj = getUserByUsername(username);
+  if (!userObj) {
+    errEl.textContent = 'Username not found.';
+    errEl.style.display = 'block';
+    return;
+  }
 
-    // If Supabase credentials set, try to load live data
-    const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
-    if (isConfigured) {
-      await loadFromSupabase();
-      subscribeRealtime();
-    }
+  const correctPin = getPinFor(userObj.name);
+  if (password !== correctPin) {
+    errEl.textContent = 'Incorrect password. Please try again.';
+    errEl.style.display = 'block';
+    // Shake password field
+    const fp = document.getElementById('login-password');
+    fp.style.borderColor = 'var(--rose)';
+    fp.style.animation = 'shake 0.4s';
+    setTimeout(() => { fp.style.animation = ''; fp.style.borderColor = 'var(--border2)'; fp.value = ''; }, 800);
+    return;
+  }
 
-    bootApp();
+  // Login success
+  const loginUser = {
+    name: userObj.name,
+    role: userObj.role,
+    initials: userObj.initials,
+    color: userObj.color,
+    bg: userObj.bg,
+    cls: userObj.cls
+  };
+  currentUser = loginUser;
+  saveSession(currentUser);
+  const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
+  if (isConfigured) {
+    loadFromSupabase().then(() => { subscribeRealtime(); bootApp(); });
   } else {
-    for (let i = 0; i < 4; i++) {
-      const dot = document.getElementById('pd'+i);
-      if (dot) { dot.classList.add('error'); void dot.offsetWidth; }
-    }
-    document.getElementById('login-error-2').style.display = 'block';
-    setTimeout(() => {
-      _pinEntry = ''; updatePinDisplay();
-      for (let i = 0; i < 4; i++) { const d = document.getElementById('pd'+i); if(d) d.classList.remove('error'); }
-    }, 900);
+    bootApp();
   }
 }
+
+// Keep old PIN functions for Change PIN modal compatibility
+function loginSelectUser(name) {
+  quickSelectUser(name === 'Admin' ? 'admin' : name.toLowerCase().replace(/\s+/g,'.'), name);
+}
+function loginGoBack() {}
+function pinPress(d) {}
+function pinBackspace() {}
+function pinClear() {}
+function updatePinDisplay() {}
 
 function bootApp() {
   document.getElementById('login-screen').classList.add('hidden');
@@ -4562,18 +4936,99 @@ function updateSessionTopbar() {
   document.getElementById('session-role-display').textContent = currentUser.role;
   const ava = document.getElementById('session-avatar-display');
   if (ava) { ava.textContent = currentUser.initials; ava.style.background = `linear-gradient(135deg,${currentUser.color},${currentUser.bg})`; }
+  updateCloudBadge();
+}
 
-  // Show Supabase status badge
+function updateCloudBadge() {
+  const badge = document.getElementById('cloud-status-badge');
+  if (!badge) return;
   const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
-  showSaveIndicator(isConfigured ? (SUPA_CONNECTED ? '☁ Supabase connected' : '⚠ Supabase not reachable') : '💾 Local mode', isConfigured && SUPA_CONNECTED ? 'var(--ok)' : 'var(--warn)');
+  if (!isConfigured) {
+    badge.textContent = '💾 Local Only';
+    badge.style.background = 'rgba(251,191,36,0.1)';
+    badge.style.color = 'var(--warn)';
+    badge.style.border = '1px solid rgba(251,191,36,0.3)';
+    badge.title = 'Data not shared — click to set up cloud sync';
+  } else if (SUPA_CONNECTED) {
+    badge.textContent = '☁ Cloud Synced';
+    badge.style.background = 'rgba(45,212,191,0.1)';
+    badge.style.color = 'var(--teal)';
+    badge.style.border = '1px solid rgba(45,212,191,0.25)';
+    badge.title = 'Connected to Supabase — data shared across all users';
+  } else {
+    badge.textContent = '⚠ Cloud Error';
+    badge.style.background = 'rgba(248,113,113,0.1)';
+    badge.style.color = 'var(--rose)';
+    badge.style.border = '1px solid rgba(248,113,113,0.25)';
+    badge.title = 'Supabase credentials set but connection failed';
+  }
+}
+
+function openSetupGuide() {
+  const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
+  const statusEl = document.getElementById('cloud-connect-status');
+  if (statusEl) {
+    if (!isConfigured) statusEl.innerHTML = '<span style="color:var(--warn)">⚠ Not configured — follow the steps above</span>';
+    else if (SUPA_CONNECTED) statusEl.innerHTML = '<span style="color:var(--teal)">✅ Connected to Supabase — data is shared</span>';
+    else statusEl.innerHTML = '<span style="color:var(--rose)">❌ Credentials set but connection failed — check URL and key</span>';
+  }
+  document.getElementById('push-status').textContent = '';
+  openModal('setupguide');
+}
+
+function copySetupSQL() {
+  const sql = document.getElementById('setup-sql-block').textContent;
+  navigator.clipboard.writeText(sql).then(() => showSaveIndicator('⎘ SQL copied!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = sql; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showSaveIndicator('⎘ SQL copied!');
+  });
+}
+
+async function forcePushToCloud() {
+  const statusEl = document.getElementById('push-status');
+  const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
+  if (!isConfigured) {
+    statusEl.textContent = '❌ Not configured yet — complete steps 1–4 first';
+    statusEl.style.color = 'var(--rose)';
+    return;
+  }
+  statusEl.textContent = '⟳ Pushing to cloud…';
+  statusEl.style.color = 'var(--accent2)';
+  try {
+    await Promise.all([
+      syncBlobToSupabase('tasks',       tasks),
+      syncBlobToSupabase('fieldworks',  fieldworks),
+      syncBlobToSupabase('timeline',    timelineEvents),
+      syncBlobToSupabase('schedules',   schedules),
+      syncBlobToSupabase('branches',    branches),
+      syncBlobToSupabase('auditTrail',  auditTrail),
+      syncBlobToSupabase('auditors',    auditorProfiles),
+      syncBlobToSupabase('compliance',  complianceRecords),
+      syncBlobToSupabase('performance', performanceEvals),
+    ]);
+    SUPA_CONNECTED = true;
+    statusEl.textContent = '✅ All data pushed to cloud! Your colleagues can now see it.';
+    statusEl.style.color = 'var(--teal)';
+    updateCloudBadge();
+    const statusEl2 = document.getElementById('cloud-connect-status');
+    if (statusEl2) statusEl2.innerHTML = '<span style="color:var(--teal)">✅ Connected — data is now shared</span>';
+  } catch(e) {
+    statusEl.textContent = '❌ Push failed: ' + e.message;
+    statusEl.style.color = 'var(--rose)';
+  }
 }
 
 function applyRolePermissions() {
-  const isAdmin = currentUser.name === 'Admin';
+  const isAdmin = currentUser && currentUser.name === 'Admin';
   const resetBtn = document.querySelector('[onclick="resetAllData()"]');
   if (resetBtn) resetBtn.style.display = isAdmin ? '' : 'none';
   const clearBtn = document.querySelector('[onclick="clearTrail()"]');
   if (clearBtn) clearBtn.style.display = isAdmin ? '' : 'none';
+  // User Rights nav: admin only
+  const urNav = document.getElementById('nav-userrights');
+  if (urNav) urNav.style.display = isAdmin ? '' : 'none';
 }
 
 function toggleSessionDropdown() { document.getElementById('session-dropdown').classList.toggle('open'); }
@@ -4585,7 +5040,12 @@ document.addEventListener('click', function(e) {
 
 function openMyProfile() {
   document.getElementById('session-dropdown').classList.remove('open');
-  if (currentUser.name === 'Admin') { alert('Admin · Audit Manager\nPIN: 0000 (default)\nChange PIN from the dropdown menu.'); return; }
+  if (currentUser.name === 'Admin') {
+    const uname = 'admin';
+    const pin = getPinFor('Admin');
+    showConfirm('Admin Account', `<div style="text-align:left;line-height:1.9"><div style="margin-bottom:8px;color:var(--text2)">Your login credentials:</div><div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;font-family:var(--font-mono);font-size:13px"><div>👤 <strong>Username:</strong> <span style="color:var(--sky)">${uname}</span></div><div>🔑 <strong>Password:</strong> <span style="color:var(--gold)">${pin}</span></div></div><div style="font-size:10px;color:var(--muted);margin-top:8px">Change password from the dropdown menu.</div></div>`, 'var(--accent2)', ()=>{});
+    return;
+  }
   const idx = auditorProfiles.findIndex(p => p.name === currentUser.name);
   if (idx >= 0) {
     showPage('auditors', null);
@@ -4604,29 +5064,26 @@ function openChangePin() {
 function saveChangePin() {
   const oldP=document.getElementById('cp-old').value, newP=document.getElementById('cp-new').value, conf=document.getElementById('cp-confirm').value;
   const errEl=document.getElementById('cp-error');
-  if (oldP !== getPinFor(currentUser.name)) { errEl.textContent='Current PIN is incorrect.'; errEl.style.display='block'; return; }
-  if (!/^\d{4}$/.test(newP)) { errEl.textContent='New PIN must be 4 digits.'; errEl.style.display='block'; return; }
-  if (newP !== conf) { errEl.textContent='PINs do not match.'; errEl.style.display='block'; return; }
+  if (oldP !== getPinFor(currentUser.name)) { errEl.textContent='Current password is incorrect.'; errEl.style.display='block'; return; }
+  if (!newP || newP.length < 4) { errEl.textContent='New password must be at least 4 characters.'; errEl.style.display='block'; return; }
+  if (newP !== conf) { errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
   const pins = loadPins(); pins[currentUser.name] = newP; savePins(pins);
-  logTrail('EDIT','System','PIN Changed', currentUser.name+' changed their PIN');
-  closeModal('changepin'); alert('PIN updated successfully!');
+  logTrail('EDIT','System','Password Changed', currentUser.name+' changed their password');
+  closeModal('changepin'); alert('Password updated successfully!');
 }
 
 async function doLogout() {
   document.getElementById('session-dropdown').classList.remove('open');
-  showConfirm('Sign Out?','You will be returned to the login screen.','var(--accent2)', async () => {
-    logTrail('ADD','System','User Logout', currentUser.name+' signed out');
-    if (SUPA_REALTIME) { SUPA_REALTIME.close(); SUPA_REALTIME = null; }
-    clearSession(); currentUser = null; SUPA_CONNECTED = false;
-    _loginSelectedUser = null; _pinEntry = '';
-    document.getElementById('lstep-2').classList.remove('active');
-    document.getElementById('lstep-1').classList.add('active');
-    document.querySelectorAll('.user-btn').forEach(b => b.classList.remove('selected'));
-    updatePinDisplay();
-    document.getElementById('app-shell').classList.remove('visible');
-    document.getElementById('login-screen').classList.remove('hidden');
-    renderLoginGrid();
-  });
+  if (currentUser) logTrail('ADD','System','User Logout', currentUser.name+' signed out');
+  if (SUPA_REALTIME) { try { SUPA_REALTIME.close(); } catch(e){} SUPA_REALTIME = null; }
+  clearSession();
+  currentUser = null;
+  SUPA_CONNECTED = false;
+  _loginSelectedUser = null;
+  _pinEntry = '';
+  document.getElementById('app-shell').classList.remove('visible');
+  document.getElementById('login-screen').classList.remove('hidden');
+  renderLoginGrid();
 }
 
 
@@ -4712,7 +5169,11 @@ let complianceRecords = (function() {
 })();
 function cmpPersist() {
   try { localStorage.setItem(DB_KEYS_CMP, JSON.stringify(complianceRecords)); } catch(e) {}
-  showSaveIndicator('✓ Saved');
+  // Also sync to Supabase if connected
+  if (SUPA_CONNECTED) {
+    syncBlobToSupabase('compliance', complianceRecords).catch(e => console.warn('Compliance sync error:', e));
+  }
+  showSaveIndicator(SUPA_CONNECTED ? '☁ Synced to cloud' : '💾 Saved locally');
 }
 
 let _cmpEditIdx = -1; // -1 = new
@@ -5238,7 +5699,10 @@ let performanceEvals = (function() {
 })();
 function perfPersist() {
   try { localStorage.setItem(DB_KEYS_PERF, JSON.stringify(performanceEvals)); } catch(e) {}
-  showSaveIndicator('✓ Saved');
+  if (SUPA_CONNECTED) {
+    syncBlobToSupabase('performance', performanceEvals).catch(e => console.warn('Performance sync error:', e));
+  }
+  showSaveIndicator(SUPA_CONNECTED ? '☁ Synced to cloud' : '💾 Saved locally');
 }
 
 let _perfEditIdx = -1;
@@ -5419,11 +5883,12 @@ function openPerfEvalModal() {
   ['pf-tasks-assigned','pf-tasks-completed','pf-tasks-override','pf-ontime','pf-overdue','pf-time-override',
    'pf-reports','pf-fieldwork','pf-quality-override','pf-findings-total','pf-findings-high','pf-findings-override',
    'pf-prof','pf-attendance'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-
+  // Hide banner until auditor selected
+  const banner = document.getElementById('perf-autofill-banner');
+  if (banner) banner.style.display = 'none';
   // Populate auditor dropdown
   const sel = document.getElementById('perf-auditor');
   sel.innerHTML = '<option value="">— Select Auditor —</option>' + auditorProfiles.map(p=>`<option value="${p.name}">${p.name} · ${p.role}</option>`).join('');
-
   updatePerfLive();
   openModal('performance');
 }
@@ -5431,7 +5896,8 @@ function openPerfEvalModal() {
 // ---- AUTO-FILL from live data ----
 function autofillPerfData() {
   const name = document.getElementById('perf-auditor').value;
-  if (!name) return;
+  const banner = document.getElementById('perf-autofill-banner');
+  if (!name) { if(banner) banner.style.display='none'; return; }
   const m = computeAuditorMetrics(name);
   const setVal = (id, v) => { const el=document.getElementById(id); if(el) el.value = v; };
   setVal('pf-tasks-assigned',  m.assigned);
@@ -5442,6 +5908,7 @@ function autofillPerfData() {
   setVal('pf-fieldwork',       m.fwCount);
   setVal('pf-findings-total',  m.allFindings);
   setVal('pf-findings-high',   m.highFindings);
+  if(banner) banner.style.display = (m.assigned > 0 || m.rptCount > 0 || m.fwCount > 0) ? '' : 'none';
   updatePerfLive();
 }
 
@@ -5588,6 +6055,157 @@ function deletePerf(idx) {
 
 // ---- CALENDAR INIT (called from showPage) ----
 
+// ================================================================
+// USER RIGHTS MODULE
+// ================================================================
+const RIGHTS_MODULES = [
+  'Dashboard','Team Tasks','Auditor Profiles','Branches','Fieldwork','Reports',
+  'Timeline','Calendar','Audit Trail','Compliance','Performance','User Rights'
+];
+const RIGHTS_LEVELS = ['Full','View','None'];
+const RIGHTS_KEY = 'iad_userrights';
+
+function loadRights() {
+  try { return JSON.parse(localStorage.getItem(RIGHTS_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveRights(r) { localStorage.setItem(RIGHTS_KEY, JSON.stringify(r)); }
+
+function getRoleFor(name) {
+  if (name === 'Admin') return 'Admin';
+  const p = auditorProfiles.find(x => x.name === name);
+  return p ? (p.role || 'Auditor') : 'Auditor';
+}
+
+function getUniqueRoles() {
+  const roles = new Set(['Admin']);
+  auditorProfiles.forEach(p => roles.add(p.role || 'Auditor'));
+  return [...roles];
+}
+
+function getDefaultRight(role, mod) {
+  if (role === 'Admin') return 'Full';
+  const viewOnly = ['Audit Trail','User Rights','Compliance'];
+  const noAccess = ['User Rights'];
+  if (noAccess.includes(mod) && role !== 'Admin') return 'None';
+  if (viewOnly.includes(mod)) return 'View';
+  return 'Full';
+}
+
+function renderUserRights() {
+  const rights = loadRights();
+  const roles = getUniqueRoles();
+
+  // Build header — sticky first column
+  const headerRow = document.getElementById('rights-header-row');
+  if (headerRow) {
+    headerRow.innerHTML =
+      `<th style="min-width:160px;position:sticky;left:0;background:var(--surface2);z-index:3;border-right:1px solid var(--border2)">Module</th>` +
+      roles.map(r => `<th style="text-align:center;min-width:140px;white-space:nowrap">${r}</th>`).join('');
+  }
+
+  // Build matrix
+  const tbody = document.getElementById('rights-matrix-tbody');
+  if (tbody) {
+    tbody.innerHTML = RIGHTS_MODULES.map(mod => {
+      const cells = roles.map(role => {
+        const key = role + '::' + mod;
+        const current = rights[key] !== undefined ? rights[key] : getDefaultRight(role, mod);
+        const isAdmin = role === 'Admin';
+        const bgColor = current==='Full' ? 'rgba(45,212,191,0.07)' : current==='View' ? 'rgba(96,165,250,0.07)' : 'rgba(248,113,113,0.05)';
+        const opts = RIGHTS_LEVELS.map(lvl => {
+          const color = lvl==='Full'?'var(--teal)':lvl==='View'?'var(--sky)':'var(--rose)';
+          return `<option value="${lvl}" ${current===lvl?'selected':''} style="color:${color}">${lvl==='Full'?'✅ Full':lvl==='View'?'👁 View':'❌ None'}</option>`;
+        }).join('');
+        return `<td style="text-align:center;background:${isAdmin?'rgba(201,168,76,0.04)':bgColor}">
+          <select ${isAdmin?'disabled':''} data-role="${role}" data-mod="${mod}" onchange="updateRight(this)"
+            style="background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--font-head);font-size:11px;font-weight:600;padding:5px 6px;outline:none;cursor:${isAdmin?'not-allowed':'pointer'};width:110px;opacity:${isAdmin?'0.55':'1'}">
+            ${opts}
+          </select>
+        </td>`;
+      }).join('');
+      return `<tr>
+        <td style="font-weight:600;font-size:12px;position:sticky;left:0;background:var(--surface);z-index:1;border-right:1px solid var(--border2);white-space:nowrap;padding-right:18px">${mod}</td>
+        ${cells}
+      </tr>`;
+    }).join('');
+  }
+
+  // Build user accounts table
+  const uaTbody = document.getElementById('user-accounts-tbody');
+  if (uaTbody) {
+    const allUsers = [
+      { name:'Admin', role:'Admin', status:'Active' },
+      ...auditorProfiles.map(p => ({ name:p.name, role:p.role, status:p.status }))
+    ];
+    const pins = loadPins();
+    uaTbody.innerHTML = allUsers.map((u, i) => {
+      const username = u.name === 'Admin' ? 'admin' : u.name.toLowerCase().replace(/\s+/g,'.');
+      const pin = pins[u.name] || (u.name==='Admin'?'0000':'1234');
+      const isAdmin = u.name === 'Admin';
+      const auditorIdx = i - 1; // offset because Admin is index 0
+      return `<tr>
+        <td style="font-weight:600">${u.name}</td>
+        <td><span class="pill ${isAdmin?'pill-warn':'pill-info'}">${u.role}</span></td>
+        <td style="font-family:var(--font-mono);font-size:11px;color:var(--sky)">${username}</td>
+        <td>
+          <span id="pin-cell-${i}" style="font-family:var(--font-mono);font-size:13px;letter-spacing:0.2em">••••</span>
+          <button onclick="togglePinVisibility(${i},'${pin}')" style="background:none;border:none;color:var(--muted);cursor:pointer;margin-left:6px;font-size:12px" title="Show/Hide Password">👁</button>
+        </td>
+        <td>${statusPill(u.status||'Active')}</td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            ${!isAdmin ? `<button class="btn btn-ghost btn-sm" style="color:var(--sky);border-color:rgba(96,165,250,0.3)" onclick="openEditAuditor(${auditorIdx})">✎ Edit</button>` : ''}
+            <button class="btn btn-ghost btn-sm" style="color:var(--warn);border-color:rgba(251,191,36,0.3)" onclick="adminResetPin('${u.name}')">🔑 Reset</button>
+            ${!isAdmin ? `<button class="btn btn-ghost btn-sm" style="color:var(--rose);border-color:rgba(248,113,113,0.3)" onclick="deleteAuditor(${auditorIdx})">🗑 Delete</button>` : ''}
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+let _pinVisible = {};
+function togglePinVisibility(idx, pin) {
+  const cell = document.getElementById('pin-cell-'+idx);
+  if (!cell) return;
+  _pinVisible[idx] = !_pinVisible[idx];
+  cell.textContent = _pinVisible[idx] ? pin : '••••';
+}
+
+function adminResetPin(name) {
+  const def = name === 'Admin' ? '0000' : '1234';
+  showConfirm('Reset Password?', `Reset password for <strong>${name}</strong> to default (${def})?`, 'var(--warn)', () => {
+    const pins = loadPins(); pins[name] = def; savePins(pins);
+    logTrail('EDIT','System','Password Reset','Admin reset password for '+name+' to default');
+    showSaveIndicator('✓ Password reset to '+def);
+    renderUserRights();
+  });
+}
+
+function updateRight(sel) {
+  const rights = loadRights();
+  const key = sel.dataset.role + '::' + sel.dataset.mod;
+  rights[key] = sel.value;
+  saveRights(rights);
+}
+
+function saveAllRights() {
+  // Rights are saved per-change; this just confirms
+  logTrail('EDIT','System','User Rights','Admin saved role permissions matrix');
+  showSaveIndicator('✓ Permissions saved');
+  const btn = document.getElementById('save-rights-btn');
+  if(btn){ btn.textContent='✓ Saved!'; setTimeout(()=>{ btn.textContent='💾 Save All Changes'; },2000); }
+}
+
+function getUserRight(mod) {
+  if (!currentUser) return 'None';
+  if (currentUser.name === 'Admin') return 'Full';
+  const role = getRoleFor(currentUser.name);
+  const rights = loadRights();
+  const key = role + '::' + mod;
+  return rights[key] !== undefined ? rights[key] : getDefaultRight(role, mod);
+}
+
 // Close modal + confirm on overlay click
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); }));
 document.getElementById('confirm-overlay').addEventListener('click', function(e){ if(e.target===this) closeConfirm(); });
@@ -5596,7 +6214,6 @@ document.getElementById('confirm-overlay').addEventListener('click', function(e)
 // INIT — Check session, show login or boot dashboard
 // ================================================================
 (function() {
-  // Set current year everywhere
   const yr = new Date().getFullYear();
   document.querySelectorAll('#login-year, #kpi-fy-year').forEach(el => { if(el) el.textContent = yr; });
 
