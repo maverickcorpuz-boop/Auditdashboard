@@ -803,6 +803,36 @@
   .gantt-month { font-size:10px; color:var(--muted); text-align:center; font-family:var(--font-mono); }
   .save-indicator { font-size:10px; opacity:0; transition:opacity 0.4s; display:flex; align-items:center; gap:4px; font-family:var(--font-mono); }
   @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  /* ─────────────────────────────────────────
+     PAGE DATE FILTER BAR
+  ───────────────────────────────────────── */
+  .page-date-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 10px 16px;
+    margin-bottom: 18px; flex-wrap: wrap;
+  }
+  .page-date-bar-label {
+    font-family: var(--font-head); font-size: 11px; font-weight: 700;
+    color: var(--text2); letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .page-date-bar input[type="date"] {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: var(--font-body); font-size: 12px; padding: 6px 10px;
+    outline: none; transition: border-color 0.15s; width: 148px;
+  }
+  .page-date-bar input[type="date"]:focus { border-color: var(--gold); }
+  .date-presets { display: flex; gap: 4px; flex-wrap: wrap; }
+  .date-presets button {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; color: var(--text2); cursor: pointer;
+    font-family: var(--font-head); font-size: 10px; font-weight: 600;
+    padding: 4px 10px; transition: all 0.15s; white-space: nowrap;
+  }
+  .date-presets button:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+  .date-presets button.active { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
 </style>
 </head>
 <body>
@@ -917,6 +947,22 @@
 
 <!-- PAGE: DASHBOARD -->
 <div class="page active" id="page-dashboard">
+  <!-- Date Filter Bar -->
+  <div id="dash-date-bar" class="page-date-bar">
+    <span class="page-date-bar-label">📅 Period</span>
+    <input type="date" id="dash-from" oninput="renderDashboard()" placeholder="From">
+    <span style="color:var(--muted);font-size:11px">to</span>
+    <input type="date" id="dash-to" oninput="renderDashboard()" placeholder="To">
+    <div class="date-presets">
+      <button onclick="setPageDate('dash','today')">Today</button>
+      <button onclick="setPageDate('dash','week')">Week</button>
+      <button onclick="setPageDate('dash','month')">Month</button>
+      <button onclick="setPageDate('dash','quarter')">Quarter</button>
+      <button onclick="setPageDate('dash','year')">Year</button>
+      <button onclick="setPageDate('dash','clear')" style="color:var(--muted)">All</button>
+    </div>
+    <span id="dash-date-label" style="font-size:10px;color:var(--muted);margin-left:4px"></span>
+  </div>
   <div class="kpi-row">
     <div class="kpi-card c1">
       <div class="kpi-label">Total Tasks</div>
@@ -1034,6 +1080,21 @@
 
 <!-- PAGE: TEAM -->
 <div class="page" id="page-team">
+  <div id="team-date-bar" class="page-date-bar">
+    <span class="page-date-bar-label">📅 Period</span>
+    <input type="date" id="team-from" oninput="renderAllTasks()" placeholder="From">
+    <span style="color:var(--muted);font-size:11px">to</span>
+    <input type="date" id="team-to" oninput="renderAllTasks()" placeholder="To">
+    <div class="date-presets">
+      <button onclick="setPageDate('team','today')">Today</button>
+      <button onclick="setPageDate('team','week')">Week</button>
+      <button onclick="setPageDate('team','month')">Month</button>
+      <button onclick="setPageDate('team','quarter')">Quarter</button>
+      <button onclick="setPageDate('team','year')">Year</button>
+      <button onclick="setPageDate('team','clear')" style="color:var(--muted)">All</button>
+    </div>
+    <span id="team-date-label" style="font-size:10px;color:var(--muted);margin-left:4px"></span>
+  </div>
   <div class="card">
     <div class="card-head">
       <span class="card-head-title">All Team Tasks</span>
@@ -1060,6 +1121,21 @@
 
 <!-- PAGE: FIELDWORK -->
 <div class="page" id="page-fieldwork">
+  <div id="fieldwork-date-bar" class="page-date-bar">
+    <span class="page-date-bar-label">📅 Period</span>
+    <input type="date" id="fieldwork-from" oninput="renderFieldwork()" placeholder="From">
+    <span style="color:var(--muted);font-size:11px">to</span>
+    <input type="date" id="fieldwork-to" oninput="renderFieldwork()" placeholder="To">
+    <div class="date-presets">
+      <button onclick="setPageDate('fieldwork','today')">Today</button>
+      <button onclick="setPageDate('fieldwork','week')">Week</button>
+      <button onclick="setPageDate('fieldwork','month')">Month</button>
+      <button onclick="setPageDate('fieldwork','quarter')">Quarter</button>
+      <button onclick="setPageDate('fieldwork','year')">Year</button>
+      <button onclick="setPageDate('fieldwork','clear')" style="color:var(--muted)">All</button>
+    </div>
+    <span id="fieldwork-date-label" style="font-size:10px;color:var(--muted);margin-left:4px"></span>
+  </div>
   <div class="card">
     <div class="card-head">
       <span class="card-head-title">Audit Fieldwork Log</span>
@@ -1081,6 +1157,21 @@
 
 <!-- PAGE: REPORTS -->
 <div class="page" id="page-reports">
+  <div id="reports-date-bar" class="page-date-bar">
+    <span class="page-date-bar-label">📅 Period</span>
+    <input type="date" id="reports-from" oninput="renderReports()" placeholder="From">
+    <span style="color:var(--muted);font-size:11px">to</span>
+    <input type="date" id="reports-to" oninput="renderReports()" placeholder="To">
+    <div class="date-presets">
+      <button onclick="setPageDate('reports','today')">Today</button>
+      <button onclick="setPageDate('reports','week')">Week</button>
+      <button onclick="setPageDate('reports','month')">Month</button>
+      <button onclick="setPageDate('reports','quarter')">Quarter</button>
+      <button onclick="setPageDate('reports','year')">Year</button>
+      <button onclick="setPageDate('reports','clear')" style="color:var(--muted)">All</button>
+    </div>
+    <span id="reports-date-label" style="font-size:10px;color:var(--muted);margin-left:4px"></span>
+  </div>
   <div class="grid2">
     <div class="card">
       <div class="card-head">
@@ -1100,6 +1191,21 @@
 
 <!-- PAGE: TIMELINE -->
 <div class="page" id="page-timeline">
+  <div id="timeline-date-bar" class="page-date-bar">
+    <span class="page-date-bar-label">📅 Period</span>
+    <input type="date" id="timeline-from" oninput="renderTimeline()" placeholder="From">
+    <span style="color:var(--muted);font-size:11px">to</span>
+    <input type="date" id="timeline-to" oninput="renderTimeline()" placeholder="To">
+    <div class="date-presets">
+      <button onclick="setPageDate('timeline','today')">Today</button>
+      <button onclick="setPageDate('timeline','week')">Week</button>
+      <button onclick="setPageDate('timeline','month')">Month</button>
+      <button onclick="setPageDate('timeline','quarter')">Quarter</button>
+      <button onclick="setPageDate('timeline','year')">Year</button>
+      <button onclick="setPageDate('timeline','clear')" style="color:var(--muted)">All</button>
+    </div>
+    <span id="timeline-date-label" style="font-size:10px;color:var(--muted);margin-left:4px"></span>
+  </div>
   <div class="grid2">
     <div class="card">
       <div class="card-head"><span class="card-head-title">Activity Timeline</span></div>
@@ -1249,6 +1355,21 @@
 
 <!-- PAGE: COMPLIANCE PERFORMANCE -->
 <div class="page" id="page-compliance">
+  <div id="compliance-date-bar" class="page-date-bar">
+    <span class="page-date-bar-label">📅 Period</span>
+    <input type="date" id="compliance-from" oninput="renderCompliance()" placeholder="From">
+    <span style="color:var(--muted);font-size:11px">to</span>
+    <input type="date" id="compliance-to" oninput="renderCompliance()" placeholder="To">
+    <div class="date-presets">
+      <button onclick="setPageDate('compliance','today')">Today</button>
+      <button onclick="setPageDate('compliance','week')">Week</button>
+      <button onclick="setPageDate('compliance','month')">Month</button>
+      <button onclick="setPageDate('compliance','quarter')">Quarter</button>
+      <button onclick="setPageDate('compliance','year')">Year</button>
+      <button onclick="setPageDate('compliance','clear')" style="color:var(--muted)">All</button>
+    </div>
+    <span id="compliance-date-label" style="font-size:10px;color:var(--muted);margin-left:4px"></span>
+  </div>
 
   <!-- Header -->
   <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px">
@@ -1451,19 +1572,27 @@
 
 <!-- PAGE: AUDITOR PERFORMANCE -->
 <div class="page" id="page-performance">
+  <div id="performance-date-bar" class="page-date-bar">
+    <span class="page-date-bar-label">📅 Period</span>
+    <input type="date" id="performance-from" oninput="renderPerformance()" placeholder="From">
+    <span style="color:var(--muted);font-size:11px">to</span>
+    <input type="date" id="performance-to" oninput="renderPerformance()" placeholder="To">
+    <div class="date-presets">
+      <button onclick="setPageDate('performance','today')">Today</button>
+      <button onclick="setPageDate('performance','week')">Week</button>
+      <button onclick="setPageDate('performance','month')">Month</button>
+      <button onclick="setPageDate('performance','quarter')">Quarter</button>
+      <button onclick="setPageDate('performance','year')">Year</button>
+      <button onclick="setPageDate('performance','clear')" style="color:var(--muted)">All</button>
+    </div>
+    <span id="performance-date-label" style="font-size:10px;color:var(--muted);margin-left:4px"></span>
+  </div>
   <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px">
     <div>
       <div style="font-family:var(--font-display);font-size:26px;font-weight:700">Auditor Performance Evaluation</div>
       <div style="color:var(--text2);font-size:12px;margin-top:4px">Quantitative scoring across 5 KPIs · Live data + manual ratings</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <select id="perf-period" onchange="renderPerformance()" style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:12px;padding:6px 12px;outline:none">
-        <option value="all">All Time</option>
-        <option value="thisyear">This Year</option>
-        <option value="thisquarter">This Quarter</option>
-      </select>
-      <button class="btn btn-primary" onclick="openPerfEvalModal()">+ New Evaluation</button>
-    </div>
+    <button class="btn btn-primary" onclick="openPerfEvalModal()">+ New Evaluation</button>
   </div>
 
   <!-- KPI summary row -->
@@ -2459,9 +2588,11 @@ function dbClear(key) { try { localStorage.removeItem(key); } catch(e){} }
 // ================================================================
 // VERSION STAMP — bump to force-clear old cached data
 // ================================================================
-const DATA_VERSION = 'v5-shared-2025';
+const DATA_VERSION = 'v6-datebar-2025';
 if (localStorage.getItem('iad_data_version') !== DATA_VERSION) {
-  Object.keys(localStorage).filter(k => k.startsWith('iad_')).forEach(k => localStorage.removeItem(k));
+  // Only clear core keys, NOT compliance/performance (they have separate keys)
+  ['iad_tasks','iad_fieldworks','iad_reports','iad_timeline',
+   'iad_schedules','iad_branches','iad_auditorProfiles','iad_auditTrail'].forEach(k => localStorage.removeItem(k));
   localStorage.setItem('iad_data_version', DATA_VERSION);
 }
 
@@ -2553,10 +2684,10 @@ async function loadFromSupabase() {
     if (sc)   schedules         = sc;
     if (br)   branches          = br;
     if (at)   auditTrail        = at;
-    if (aud)  auditorProfiles   = aud;
+    if (aud && aud.length)  auditorProfiles   = aud;
     if (cmp)  complianceRecords = cmp;
     if (perf) performanceEvals  = perf;
-    // Sync local cache
+    // Sync all to localStorage cache
     dbSave(DB_KEYS.tasks,         tasks);
     dbSave(DB_KEYS.fieldworks,    fieldworks);
     dbSave(DB_KEYS.timelineEvents,timelineEvents);
@@ -2564,6 +2695,8 @@ async function loadFromSupabase() {
     dbSave(DB_KEYS.branches,      branches);
     dbSave(DB_KEYS.auditTrail,    auditTrail);
     dbSave(DB_KEYS.auditProfiles, auditorProfiles);
+    try { localStorage.setItem(DB_KEYS_CMP,  JSON.stringify(complianceRecords)); } catch(e){}
+    try { localStorage.setItem(DB_KEYS_PERF, JSON.stringify(performanceEvals));  } catch(e){}
     SUPA_CONNECTED = true;
     showSaveIndicator('☁ Connected — shared data loaded', 'var(--ok)');
     renderLoginGrid();
@@ -2634,9 +2767,89 @@ function progressBar(p, color='#3e8ee8') {
 }
 
 // ---- RENDER ----
+// ================================================================
+// PAGE DATE FILTER HELPERS
+// ================================================================
+function getPageDates(page) {
+  const from = document.getElementById(page+'-from')?.value || '';
+  const to   = document.getElementById(page+'-to')?.value   || '';
+  return { from, to };
+}
+
+function setPageDate(page, preset) {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const fromEl = document.getElementById(page+'-from');
+  const toEl   = document.getElementById(page+'-to');
+  if (!fromEl || !toEl) return;
+
+  // Clear active state on all preset buttons for this page
+  const bar = document.getElementById(page+'-date-bar');
+  if (bar) bar.querySelectorAll('.date-presets button').forEach(b => b.classList.remove('active'));
+
+  if (preset === 'clear') {
+    fromEl.value = ''; toEl.value = '';
+  } else if (preset === 'today') {
+    fromEl.value = fmt(now); toEl.value = fmt(now);
+  } else if (preset === 'week') {
+    const start = new Date(now); start.setDate(now.getDate() - now.getDay());
+    fromEl.value = fmt(start); toEl.value = fmt(now);
+  } else if (preset === 'month') {
+    fromEl.value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-01`; toEl.value = fmt(now);
+  } else if (preset === 'quarter') {
+    const qStart = new Date(now.getFullYear(), Math.floor(now.getMonth()/3)*3, 1);
+    fromEl.value = fmt(qStart); toEl.value = fmt(now);
+  } else if (preset === 'year') {
+    fromEl.value = `${now.getFullYear()}-01-01`; toEl.value = fmt(now);
+  }
+
+  // Highlight active preset button
+  if (bar && preset !== 'clear') {
+    const btns = bar.querySelectorAll('.date-presets button');
+    const labels = ['today','week','month','quarter','year','clear'];
+    const idx = labels.indexOf(preset);
+    if (btns[idx]) btns[idx].classList.add('active');
+  }
+
+  // Update label
+  updateDateLabel(page);
+
+  // Re-render the corresponding page
+  const renderMap = {
+    dash: renderDashboard,
+    team: renderAllTasks,
+    fieldwork: renderFieldwork,
+    reports: renderReports,
+    timeline: renderTimeline,
+    compliance: renderCompliance,
+    performance: renderPerformance,
+  };
+  if (renderMap[page]) renderMap[page]();
+}
+
+function updateDateLabel(page) {
+  const labelEl = document.getElementById(page+'-date-label');
+  if (!labelEl) return;
+  const { from, to } = getPageDates(page);
+  if (!from && !to) { labelEl.textContent = 'Showing all records'; return; }
+  if (from && to && from === to) { labelEl.textContent = `📌 ${from}`; return; }
+  labelEl.textContent = `${from || '…'} → ${to || '…'}`;
+}
+
+function inDateRange(dateStr, from, to) {
+  if (!dateStr) return true;
+  const d = (dateStr+'').slice(0,10);
+  if (from && d < from) return false;
+  if (to   && d > to)   return false;
+  return true;
+}
+
 function renderDashboard() {
-  const activeTasks = tasks.filter(t => !t.inactive);
-  const activeFW    = fieldworks.filter(f => !f.inactive);
+  updateDateLabel('dash');
+  const { from, to } = getPageDates('dash');
+  const activeTasks = tasks.filter(t => !t.inactive && inDateRange(t.start, from, to));
+  const activeFW    = fieldworks.filter(f => !f.inactive && inDateRange(f.dateFrom, from, to));
   const today       = new Date().toISOString().slice(0, 10);
 
   // ---- KPI cards ----
@@ -2891,11 +3104,14 @@ function renderDashboard() {
 }
 
 function renderAllTasks(filter='all') {
+  updateDateLabel('team');
+  const { from, to } = getPageDates('team');
   const tbody = document.getElementById('all-tasks-tbody');
-  const activeFilter = filter;
-  const filtered = filter==='all' ? tasks : filter==='Inactive' ? tasks.filter(t=>t.inactive) : tasks.filter(t=>t.status===filter&&!t.inactive);
-  const base = filter==='all' ? tasks.filter(t=>!t.inactive) : filtered;
-  tbody.innerHTML = (filter==='all'?tasks:filtered).map(t=>`
+  const dateFiltered = tasks.filter(t => inDateRange(t.start, from, to) || inDateRange(t.due, from, to));
+  const filtered = filter==='all' ? dateFiltered.filter(t=>!t.inactive)
+    : filter==='Inactive' ? dateFiltered.filter(t=>t.inactive)
+    : dateFiltered.filter(t=>t.status===filter&&!t.inactive);
+  tbody.innerHTML = (filter==='Inactive' ? dateFiltered.filter(t=>t.inactive) : filtered).map(t=>`
     <tr class="${t.inactive?'row-inactive':''}">
       <td style="font-weight:600;font-size:12px">${t.name}${t.inactive?'<span style="font-size:9px;color:var(--muted);margin-left:6px">[INACTIVE]</span>':''}</td>
       <td>${auditorAvatar(t.auditor)}</td>
@@ -2920,8 +3136,11 @@ function renderAllTasks(filter='all') {
 }
 
 function renderFieldwork() {
+  updateDateLabel('fieldwork');
+  const { from, to } = getPageDates('fieldwork');
   const tbody = document.getElementById('fieldwork-tbody');
-  tbody.innerHTML = fieldworks.map((f,i)=>{
+  const list = fieldworks.filter(f => inDateRange(f.dateFrom, from, to) || inDateRange(f.dateTo, from, to));
+  tbody.innerHTML = list.map((f,i)=>{
     const sameDay = f.dateFrom === f.dateTo;
     const dateDisplay = sameDay ? f.dateFrom : `${f.dateFrom} → ${f.dateTo}`;
     const days = sameDay ? 1 : Math.round((new Date(f.dateTo)-new Date(f.dateFrom))/(1000*60*60*24))+1;
@@ -2952,14 +3171,18 @@ function renderFieldwork() {
         </div>
       </td>
     </tr>`;
-  }).join('') || `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px">No fieldwork entries yet.</td></tr>`;
+  }).join('') || `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px">No fieldwork entries found${(from||to)?' for the selected period':' yet'}.</td></tr>`;
 }
 
 function renderReports() {
+  updateDateLabel('reports');
+  const { from, to } = getPageDates('reports');
   const icons = { 'Draft':'📄','Under Review':'🔍','Final – Issued':'✅','Findings Raised':'⚠️' };
   const colors = { 'Draft':'var(--muted)','Under Review':'var(--accent2)','Final – Issued':'var(--ok)','Findings Raised':'var(--danger)' };
   const extColors = { pdf:'#e84b3e', doc:'#3e8ee8', docx:'#3e8ee8', xls:'#3ee8a8', xlsx:'#3ee8a8', ppt:'#e8a83e', pptx:'#e8a83e', txt:'#6b7a99', csv:'#b43ee8' };
-  document.getElementById('reports-list').innerHTML = reports.map((r,i)=>{
+  const filteredReports = reports.filter(r => inDateRange(r.date, from, to));
+  document.getElementById('reports-list').innerHTML = filteredReports.map((r,i)=>{
+    const globalIdx = reports.indexOf(r);
     const hasFile = r.file && r.file.dataUrl;
     const ext = hasFile ? r.file.name.split('.').pop().toLowerCase() : '';
     const fileColor = extColors[ext] || 'var(--muted)';
@@ -2971,7 +3194,7 @@ function renderReports() {
          </div>`
       : `<div style="display:flex;align-items:center;gap:5px;margin-top:5px">
            <span style="font-size:10px;color:var(--muted);font-style:italic">No file attached</span>
-           ${!r.inactive?`<button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:9px" onclick="openReportUpload(${i})">+ Attach</button>`:''}
+           ${!r.inactive?`<button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:9px" onclick="openReportUpload(${globalIdx})">+ Attach</button>`:''}
          </div>`;
     return `
     <div class="rpt-item${r.inactive?' item-inactive':''}" style="flex-wrap:wrap;align-items:flex-start;gap:10px;padding:14px 0">
@@ -3000,17 +3223,17 @@ function renderReports() {
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
         ${statusPill(r.status)}
         <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
-          ${hasFile&&!r.inactive?`<button class="btn btn-primary btn-sm" onclick="downloadReport(${i})">⬇ Download</button>`:''}
+          ${hasFile&&!r.inactive?`<button class="btn btn-primary btn-sm" onclick="downloadReport(${globalIdx})">⬇ Download</button>`:''}
           ${!r.inactive
-            ?`<button class="btn btn-ghost btn-sm" onclick="openReportEdit(${i})">✎</button>
-              <button class="btn btn-ghost btn-sm" style="color:var(--muted)" onclick="setReportInactive(${i})">⏸</button>
-              <button class="btn btn-ghost btn-sm" style="color:var(--danger);border-color:rgba(232,75,62,0.3)" onclick="confirmDeleteReport(${i})">🗑</button>`
-            :`<button class="btn btn-ghost btn-sm" style="color:var(--ok)" onclick="restoreReport(${i})">↩ Restore</button>
-              <button class="btn btn-ghost btn-sm" style="color:var(--danger);border-color:rgba(232,75,62,0.3)" onclick="confirmDeleteReport(${i})">🗑</button>`}
+            ?`<button class="btn btn-ghost btn-sm" onclick="openReportEdit(${globalIdx})">✎</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--muted)" onclick="setReportInactive(${globalIdx})">⏸</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);border-color:rgba(232,75,62,0.3)" onclick="confirmDeleteReport(${globalIdx})">🗑</button>`
+            :`<button class="btn btn-ghost btn-sm" style="color:var(--ok)" onclick="restoreReport(${globalIdx})">↩ Restore</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);border-color:rgba(232,75,62,0.3)" onclick="confirmDeleteReport(${globalIdx})">🗑</button>`}
         </div>
       </div>
     </div>`;
-  }).join('') || `<div style="color:var(--muted);font-size:12px;padding:16px 0;text-align:center">No reports yet. Click "+ New Report" to add one.</div>`;
+  }).join('') || `<div style="color:var(--muted);font-size:12px;padding:16px 0;text-align:center">No reports found${(from||to)?' for the selected period':' yet'}.</div>`;
 
   // ---- Report Summary panel ----
   const summaryEl = document.getElementById('report-summary-body');
@@ -3038,14 +3261,17 @@ function renderReports() {
 }
 
 function renderTimeline() {
-  document.getElementById('timeline-list').innerHTML = timelineEvents.map(e=>`
+  updateDateLabel('timeline');
+  const { from, to } = getPageDates('timeline');
+  const filteredEvents = timelineEvents.filter(e => inDateRange(e.date, from, to));
+  document.getElementById('timeline-list').innerHTML = filteredEvents.map(e=>`
     <div class="tl-item">
       <div class="tl-dot ${e.type}"></div>
       <div class="tl-date">${e.date}</div>
       <div class="tl-title">${e.title}</div>
       <div class="tl-sub">${e.sub}</div>
     </div>
-  `).join('') || `<div style="color:var(--text2);font-size:12px;padding:12px 0">No activity yet.</div>`;
+  `).join('') || `<div style="color:var(--text2);font-size:12px;padding:12px 0">No activity found${(from||to)?' for the selected period':' yet'}.</div>`;
 
   // Deadlines — combine tasks (by due date) + fieldworks (by dateTo), exclude completed/closed/inactive
   const taskDeadlines = tasks
@@ -4989,12 +5215,7 @@ function doCredentialLogin() {
   };
   currentUser = loginUser;
   saveSession(currentUser);
-  const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
-  if (isConfigured) {
-    loadFromSupabase().then(() => { subscribeRealtime(); bootApp(); });
-  } else {
-    bootApp();
-  }
+  bootApp();
 }
 
 // Keep old PIN functions for Change PIN modal compatibility
@@ -5007,15 +5228,27 @@ function pinBackspace() {}
 function pinClear() {}
 function updatePinDisplay() {}
 
-function bootApp() {
+async function bootApp() {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app-shell').classList.add('visible');
   updateSessionTopbar();
   applyRolePermissions();
   logTrail('ADD','System','User Login', currentUser.name+' logged in · Role: '+currentUser.role);
+
+  // Load from Supabase if configured, then render everything
+  const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
+  if (isConfigured) {
+    await loadFromSupabase();
+    subscribeRealtime();
+  }
+
+  // Render all pages so data is ready when navigating
   renderDashboard();
+  renderProfiles();
+  renderBranches();
   updateAuditorDropdowns();
   updateBranchDropdowns();
+  updateCloudBadge();
 }
 
 function updateSessionTopbar() {
@@ -5297,26 +5530,29 @@ let _cmpEditIdx = -1; // -1 = new
 
 // ---- RENDER COMPLIANCE PAGE ----
 function renderCompliance() {
+  updateDateLabel('compliance');
+  const { from, to } = getPageDates('compliance');
   const search = (document.getElementById('cmp-search')?.value || '').toLowerCase();
-  const recs = complianceRecords.filter(r => !r.inactive && r.branch.toLowerCase().includes(search));
+  const recs = complianceRecords.filter(r => !r.inactive && r.branch.toLowerCase().includes(search) && inDateRange(r.date, from, to));
+  const baseRecs = complianceRecords.filter(r => !r.inactive && inDateRange(r.date, from, to));
 
   // KPIs
   const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setEl('cmp-kpi-total', complianceRecords.filter(r=>!r.inactive).length);
-  const uniqueBranches = new Set(complianceRecords.filter(r=>!r.inactive).map(r=>r.branch)).size;
+  setEl('cmp-kpi-total', baseRecs.length);
+  const uniqueBranches = new Set(baseRecs.map(r=>r.branch)).size;
   setEl('cmp-kpi-branches', uniqueBranches + ' branch' + (uniqueBranches!==1?'es':'') + ' assessed');
 
-  const allScores = complianceRecords.filter(r=>!r.inactive && r.auditScore !== null).map(r=>r.auditScore);
+  const allScores = baseRecs.filter(r=>r.auditScore !== null).map(r=>r.auditScore);
   if (allScores.length) {
     setEl('cmp-kpi-avg', (allScores.reduce((a,b)=>a+b,0)/allScores.length).toFixed(1)+'%');
     const maxScore = Math.max(...allScores);
-    const maxRec   = complianceRecords.filter(r=>!r.inactive).find(r=>r.auditScore===maxScore);
+    const maxRec   = baseRecs.find(r=>r.auditScore===maxScore);
     setEl('cmp-kpi-high', maxScore.toFixed(1)+'%');
     setEl('cmp-kpi-high-branch', maxRec?.branch || '—');
   } else {
     setEl('cmp-kpi-avg','—'); setEl('cmp-kpi-high','—'); setEl('cmp-kpi-high-branch','—');
   }
-  setEl('cmp-kpi-low', complianceRecords.filter(r=>!r.inactive && r.auditScore !== null && r.auditScore < 70).length);
+  setEl('cmp-kpi-low', baseRecs.filter(r=>r.auditScore !== null && r.auditScore < 70).length);
 
   // Category averages sidebar
   const catBar = document.getElementById('cmp-category-bars');
@@ -5879,32 +6115,22 @@ function computeFinalScore(kpis) {
 
 // ---- RENDER PERFORMANCE PAGE ----
 function renderPerformance() {
-  const period  = document.getElementById('perf-period')?.value || 'all';
+  updateDateLabel('performance');
+  const { from, to } = getPageDates('performance');
   const search  = (document.getElementById('perf-search')?.value || '').toLowerCase();
   const setEl   = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
 
-  // Filter evals by period
-  const now = new Date();
-  const filterByPeriod = e => {
-    if (period === 'all') return true;
-    const d = new Date(e.date);
-    if (period === 'thisyear')    return d.getFullYear() === now.getFullYear();
-    if (period === 'thisquarter') {
-      const q = Math.floor(now.getMonth() / 3);
-      return d.getFullYear() === now.getFullYear() && Math.floor(d.getMonth() / 3) === q;
-    }
-    return true;
-  };
-  const filtered = performanceEvals.filter(e => !e.inactive && filterByPeriod(e));
+  const filtered = performanceEvals.filter(e => !e.inactive && inDateRange(e.date, from, to));
 
   // KPIs
+  const periodLabel = (from || to) ? `${from||'…'} → ${to||'…'}` : 'all time';
   setEl('perf-kpi-total', filtered.length);
-  setEl('perf-kpi-sub', period === 'all' ? 'all time' : period === 'thisyear' ? 'this year' : 'this quarter');
+  setEl('perf-kpi-sub', periodLabel);
   if (filtered.length) {
     const allScores = filtered.map(e => e.finalScore).filter(s => s !== null);
     const avg = allScores.length ? (allScores.reduce((a,b)=>a+b,0)/allScores.length).toFixed(1) : '—';
     setEl('perf-kpi-avg', avg !== '—' ? avg + '%' : '—');
-    const top = filtered.sort((a,b)=>(b.finalScore||0)-(a.finalScore||0))[0];
+    const top = [...filtered].sort((a,b)=>(b.finalScore||0)-(a.finalScore||0))[0];
     setEl('perf-kpi-top', top?.auditor?.split(' ')[0] || '—');
     setEl('perf-kpi-top-score', top?.finalScore ? top.finalScore + '% · ' + perfGrade(top.finalScore).label : '—');
     setEl('perf-kpi-dev', filtered.filter(e => e.finalScore !== null && e.finalScore < 60).length);
@@ -5961,7 +6187,7 @@ function renderPerformance() {
   const histTbody = document.getElementById('perf-history-tbody');
   if (histTbody) {
     if (!historyFiltered.length) {
-      histTbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:20px;font-size:12px">${search ? 'No results for "'+search+'".' : 'No evaluations yet.'}</td></tr>`;
+      histTbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:20px;font-size:12px">${search ? 'No results for "'+search+'".' : (from||to) ? 'No evaluations found for the selected period.' : 'No evaluations yet.'}</td></tr>`;
     } else {
       histTbody.innerHTML = historyFiltered.sort((a,b)=>b.date>a.date?1:-1).map(e => {
         const g   = perfGrade(e.finalScore);
@@ -6668,12 +6894,7 @@ document.getElementById('confirm-overlay').addEventListener('click', function(e)
   const saved = loadSession();
   if (saved) {
     currentUser = saved;
-    const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
-    if (isConfigured) {
-      loadFromSupabase().then(() => { subscribeRealtime(); bootApp(); });
-    } else {
-      bootApp();
-    }
+    bootApp();
   } else {
     document.getElementById('login-screen').classList.remove('hidden');
   }
