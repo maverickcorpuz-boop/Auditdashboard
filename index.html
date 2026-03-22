@@ -923,6 +923,7 @@
     <span id="save-indicator" class="save-indicator" style="color:var(--ok)">✓ Saved</span>
     <span class="badge-live" id="cloud-status-badge" onclick="openSetupGuide()" style="cursor:pointer" title="Cloud sync status — click for setup guide">💾 Local</span>
     <button class="btn btn-ghost btn-sm" onclick="openExportModal()" style="font-size:11px;padding:5px 12px" title="Export Data">⬇ Export</button>
+    <button class="btn btn-ghost btn-sm" onclick="openImportModal()" style="font-size:11px;padding:5px 12px" title="Import / Restore Backup">⬆ Import</button>
     <div class="notif" style="cursor:pointer;" onclick="showPage('audittrail',null);document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.textContent.includes('Audit Trail')))">🔔<span class="notif-dot" id="trail-notif-dot"></span></div>
     <!-- SESSION USER -->
     <div class="session-user" onclick="toggleSessionDropdown()">
@@ -934,6 +935,8 @@
       <div class="session-dropdown" id="session-dropdown">
         <div class="sdrop-item" onclick="openMyProfile()">👤 My Profile</div>
         <div class="sdrop-item" onclick="openChangePin()">🔑 Change Password</div>
+        <div class="sdrop-divider"></div>
+        <div class="sdrop-item" style="font-size:10px;color:var(--muted);cursor:default;padding:6px 16px" id="session-info-line">🕐 Session active</div>
         <div class="sdrop-divider"></div>
         <div class="sdrop-item danger" onclick="doLogout()">🚪 Sign Out</div>
       </div>
@@ -1856,7 +1859,7 @@
   </div>
 
   <!-- Per-user credential overview -->
-  <div class="card">
+  <div class="card" style="margin-bottom:20px">
     <div class="card-head">
       <span class="card-head-title">User Accounts & Credentials</span>
       <button class="btn btn-ghost btn-sm" onclick="showPage('auditors',document.querySelector('#nav-userrights'))">+ Add Auditor →</button>
@@ -1868,6 +1871,41 @@
         </tr></thead>
         <tbody id="user-accounts-tbody"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Security Standards Panel -->
+  <div class="card">
+    <div class="card-head"><span class="card-head-title">🔒 Security Standards</span></div>
+    <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--bg2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--teal)">
+          <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">✅ SHA-256 Password Hashing</div>
+          <div style="font-size:11px;color:var(--text2)">All passwords are hashed with SHA-256 + salt before storage. Plain text passwords are never saved.</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--teal)">
+          <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">✅ Brute Force Protection</div>
+          <div style="font-size:11px;color:var(--text2)">Accounts are locked for <strong>15 minutes</strong> after <strong>5 failed login attempts</strong>. All lockouts are logged.</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--teal)">
+          <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">✅ Session Timeout</div>
+          <div style="font-size:11px;color:var(--text2)">Sessions auto-expire after <strong>30 minutes of inactivity</strong>. Users are logged out and must re-authenticate.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--bg2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--teal)">
+          <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">✅ Role-Based Access Control</div>
+          <div style="font-size:11px;color:var(--text2)">Every module access is checked per user role. Unauthorized navigation is blocked and logged.</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--teal)">
+          <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px">✅ Full Audit Trail</div>
+          <div style="font-size:11px;color:var(--text2)">Every login, logout, lockout, password change, data add/edit/delete is permanently logged with timestamp and actor.</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:8px;padding:12px 14px;border-left:3px solid var(--sky)">
+          <div style="font-size:11px;font-weight:700;color:var(--sky);margin-bottom:4px">ℹ Password Requirements</div>
+          <div style="font-size:11px;color:var(--text2)">Minimum <strong>6 characters</strong>. Users can change their own password from the top-right menu. Admin can reset any password.</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2559,6 +2597,85 @@ create policy "allow all" on iad_appstate
   </div>
 </div>
 
+<!-- MODAL: Import / Restore Backup -->
+<div class="modal-overlay" id="modal-import">
+  <div class="modal" style="width:640px;max-width:97vw;max-height:92vh;overflow-y:auto">
+    <div class="modal-head" style="position:sticky;top:0;background:var(--surface);z-index:5;padding-bottom:12px">
+      <div>
+        <div class="modal-title">⬆ Import / Restore Backup</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px">Restore from a JSON backup file exported from this app</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('import')">✕</button>
+    </div>
+
+    <!-- Warning -->
+    <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--warn)">
+      ⚠ <strong>Important:</strong> Importing will <strong>merge</strong> data — existing records are kept and new ones from the backup are added. Use <strong>Replace Mode</strong> below to overwrite specific modules entirely.
+    </div>
+
+    <!-- Drop zone -->
+    <div id="import-dropzone"
+      onclick="document.getElementById('import-file-input').click()"
+      ondragover="event.preventDefault();this.style.borderColor='var(--gold)';this.style.background='rgba(201,168,76,0.04)'"
+      ondragleave="this.style.borderColor='var(--border2)';this.style.background='var(--bg2)'"
+      ondrop="handleImportDrop(event)"
+      style="border:2px dashed var(--border2);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all 0.18s;background:var(--bg2);margin-bottom:20px">
+      <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(this)">
+      <div id="import-dropzone-content">
+        <div style="font-size:36px;margin-bottom:10px">📂</div>
+        <div style="font-family:var(--font-head);font-size:13px;font-weight:700;color:var(--text)">Click to select or drag & drop a JSON backup file</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">Only .json files exported from this app are supported</div>
+      </div>
+    </div>
+
+    <!-- File preview + module selection (shown after file loaded) -->
+    <div id="import-preview" style="display:none">
+      <!-- File info -->
+      <div id="import-file-info" style="background:rgba(45,212,191,0.06);border:1px solid rgba(45,212,191,0.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:24px">📋</span>
+        <div style="flex:1">
+          <div id="import-filename" style="font-weight:700;font-size:13px;color:var(--text)"></div>
+          <div id="import-summary" style="font-size:11px;color:var(--text2);margin-top:3px"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="color:var(--muted)" onclick="resetImport()">✕ Clear</button>
+      </div>
+
+      <!-- Replace mode toggle -->
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;cursor:pointer" onclick="toggleReplaceMode()">
+        <div id="import-replace-toggle" style="width:36px;height:20px;border-radius:20px;background:var(--muted);position:relative;transition:background 0.2s;flex-shrink:0">
+          <div id="import-replace-knob" style="position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.2s"></div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-head);font-size:12px;font-weight:700">Replace Mode</div>
+          <div style="font-size:10px;color:var(--muted)">ON = overwrite selected modules completely · OFF = merge (add missing records)</div>
+        </div>
+      </div>
+
+      <!-- Module checkboxes -->
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;display:flex;justify-content:space-between">
+        <span>Select Modules to Import</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="toggleAllImport(true)">Select All</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleAllImport(false)">Deselect All</button>
+        </div>
+      </div>
+      <div id="import-modules-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px"></div>
+
+      <!-- Progress -->
+      <div id="import-progress" style="display:none;margin-bottom:16px">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px" id="import-progress-text">Importing…</div>
+        <div class="pbar-wrap"><div id="import-pbar" class="pbar" style="width:0%;background:var(--teal);transition:width 0.3s"></div></div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button class="btn btn-ghost" onclick="closeModal('import')">Cancel</button>
+        <button class="btn btn-primary" onclick="runImport()" id="import-run-btn">⬆ Restore Selected Modules</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /app-shell -->
 
 <input type="file" id="attach-file-hidden" style="display:none" accept=".pdf,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.txt,.csv" onchange="handleAttachFile(this)">
@@ -2597,27 +2714,44 @@ const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 // ---- Supabase REST helper ----
 async function supaFetch(table, method='GET', body=null, query='') {
   const url = `${SUPA_URL}/rest/v1/${table}${query}`;
-  const prefer = method === 'POST' ? 'return=minimal,resolution=merge-duplicates' : '';
   const headers = {
     'apikey': SUPA_KEY,
     'Authorization': 'Bearer ' + SUPA_KEY,
     'Content-Type': 'application/json',
   };
-  if (prefer) headers['Prefer'] = prefer;
+  if (method === 'POST') headers['Prefer'] = 'return=minimal,resolution=merge-duplicates';
 
-  const res = await fetch(url, {
-    method,
-    headers,
-    mode: 'cors',
-    body: body ? JSON.stringify(body) : null,
-  });
+  let res;
+  try {
+    res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : null });
+  } catch(e) {
+    // Network error — not a Supabase error
+    throw new Error('Failed to fetch');
+  }
   if (!res.ok) {
-    const err = await res.json().catch(()=>({message: res.statusText}));
-    throw new Error(`Supabase ${method} ${table}: ${err.message||res.status}`);
+    const errText = await res.text().catch(()=>'');
+    let msg = res.statusText;
+    try { msg = JSON.parse(errText)?.message || msg; } catch(e){}
+    throw new Error(`${res.status}: ${msg}`);
   }
   if (method === 'DELETE' || method === 'PATCH') return true;
   const text = await res.text();
   return text ? JSON.parse(text) : null;
+}
+
+// Quick connectivity test — checks if Supabase is reachable at all
+async function testSupabaseReachable() {
+  try {
+    const url = `${SUPA_URL}/rest/v1/iad_appstate?limit=1&select=id`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY },
+    });
+    // 200, 404, 406 all mean Supabase is reachable — 406 = table doesn't exist yet
+    return res.status === 200 || res.status === 404 || res.status === 406 || res.ok;
+  } catch(e) {
+    return false;
+  }
 }
 
 // ---- Table names ----
@@ -2694,8 +2828,8 @@ async function persist() {
 
   if (SUPA_CONNECTED) {
     try {
-      // Sync all shared tables to Supabase
-      await Promise.all([
+      // Sync all shared tables to Supabase — use allSettled so one failure doesn't break others
+      const results = await Promise.allSettled([
         syncBlobToSupabase('tasks',          tasks),
         syncBlobToSupabase('fieldworks',     fieldworks),
         syncBlobToSupabase('timeline',       timelineEvents),
@@ -2706,10 +2840,19 @@ async function persist() {
         syncBlobToSupabase('compliance',     complianceRecords),
         syncBlobToSupabase('performance',    performanceEvals),
       ]);
-      showSaveIndicator('☁ Synced to cloud');
+      const failed = results.filter(r => r.status === 'rejected');
+      if (failed.length === 0) {
+        showSaveIndicator('☁ Synced to cloud');
+      } else if (failed.length === results.length) {
+        // All failed — likely offline, mark disconnected
+        SUPA_CONNECTED = false;
+        showSaveIndicator('💾 Saved locally (cloud unreachable)', 'var(--warn)');
+      } else {
+        showSaveIndicator('⚠ Partially synced', 'var(--warn)');
+      }
     } catch(e) {
-      console.warn('Supabase sync error:', e);
-      showSaveIndicator('⚠ Saved locally only', 'var(--warn)');
+      SUPA_CONNECTED = false;
+      showSaveIndicator('💾 Saved locally', 'var(--warn)');
     }
   } else {
     showSaveIndicator('💾 Saved locally');
@@ -2719,33 +2862,33 @@ async function persist() {
 // Store entire array as a single JSON blob per "table" using iad_appstate
 async function syncBlobToSupabase(key, data) {
   const payload = JSON.stringify(data || []);
-  // Single upsert — ON CONFLICT (id) DO UPDATE — no DELETE needed
   await supaFetch(TABLES.appstate, 'POST', [{ id: key, value: payload, updated_at: new Date().toISOString() }]);
 }
 
 async function loadBlobFromSupabase(key) {
-  try {
-    const rows = await supaFetch(TABLES.appstate, 'GET', null, `?id=eq.${encodeURIComponent(key)}&select=id,value`);
-    if (rows && rows.length && rows[0].value) return JSON.parse(rows[0].value);
-  } catch(e) { console.warn('loadBlob', key, e.message); }
+  const rows = await supaFetch(TABLES.appstate, 'GET', null, `?id=eq.${encodeURIComponent(key)}&select=id,value`);
+  if (rows && rows.length && rows[0].value) return JSON.parse(rows[0].value);
   return null;
 }
 
 // Load all data from Supabase and refresh UI
 async function loadFromSupabase() {
-  showSaveIndicator('⟳ Loading shared data…', 'var(--accent2)');
+  showSaveIndicator('⟳ Connecting to cloud…', 'var(--accent2)');
+
+  // Test reachability first — prevents 9 failed fetch errors
+  const reachable = await testSupabaseReachable();
+  if (!reachable) {
+    SUPA_CONNECTED = false;
+    showSaveIndicator('⚡ Offline — using local data', 'var(--warn)');
+    return;
+  }
+
   try {
-    const [t, fw, tl, sc, br, at, aud, cmp, perf] = await Promise.all([
-      loadBlobFromSupabase('tasks'),
-      loadBlobFromSupabase('fieldworks'),
-      loadBlobFromSupabase('timeline'),
-      loadBlobFromSupabase('schedules'),
-      loadBlobFromSupabase('branches'),
-      loadBlobFromSupabase('auditTrail'),
-      loadBlobFromSupabase('auditors'),
-      loadBlobFromSupabase('compliance'),
-      loadBlobFromSupabase('performance'),
-    ]);
+    // Load all blobs in parallel
+    const keys = ['tasks','fieldworks','timeline','schedules','branches','auditTrail','auditors','compliance','performance'];
+    const results = await Promise.allSettled(keys.map(k => loadBlobFromSupabase(k)));
+
+    const [t, fw, tl, sc, br, at, aud, cmp, perf] = results.map(r => r.status === 'fulfilled' ? r.value : null);
     if (t)    tasks             = t;
     if (fw)   fieldworks        = fw;
     if (tl)   timelineEvents    = tl;
@@ -3292,6 +3435,9 @@ function renderReports() {
         ${statusPill(r.status)}
         <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
           ${hasFile&&!r.inactive?`<button class="btn btn-primary btn-sm" onclick="downloadReport(${globalIdx})">⬇ Download</button>`:''}
+          ${!r.inactive && r.branch
+            ?`<button class="btn btn-ghost btn-sm" style="color:var(--sky);border-color:rgba(96,165,250,0.3)" onclick="shareAuditeeLink('${(r.branch||'').replace(/'/g,"\\'")}',${globalIdx})" title="Share auditee response link">🔗 Share</button>`
+            :''}
           ${!r.inactive
             ?`<button class="btn btn-ghost btn-sm" onclick="openReportEdit(${globalIdx})">✎</button>
               <button class="btn btn-ghost btn-sm" style="color:var(--muted)" onclick="setReportInactive(${globalIdx})">⏸</button>
@@ -4287,6 +4433,32 @@ function clearUpload() {
   document.getElementById('upload-zone').style.background = 'var(--bg)';
   document.getElementById('upload-pbar').style.width = '0%';
 }
+function shareAuditeeLink(branchName, reportIdx) {
+  // Find branch code
+  const branch = branches.find(b => b.name === branchName);
+  const code   = branch?.code || '';
+  const baseUrl = window.location.href.replace('index.html','').replace(/\/$/, '');
+  const link = `${baseUrl}/auditee-response.html${code ? '?branch='+encodeURIComponent(code) : ''}`;
+
+  showConfirm(
+    '🔗 Auditee Response Link',
+    `<div style="line-height:1.8;font-size:12px">
+      <div style="margin-bottom:10px;color:var(--text2)">Share this link with <strong style="color:var(--text)">${branchName}</strong> branch manager to collect their management responses:</div>
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--sky);word-break:break-all;margin-bottom:10px">${link}</div>
+      ${code ? `<div style="font-size:11px;color:var(--muted)">Branch code <strong style="color:var(--gold)">${code}</strong> is pre-filled in the link. The manager still needs to enter their name.</div>` : '<div style="font-size:11px;color:var(--warn)">⚠ No branch code found — branch manager will need to enter their code manually.</div>'}
+    </div>`,
+    'var(--sky)',
+    () => {
+      navigator.clipboard.writeText(link).then(() => showSaveIndicator('🔗 Link copied to clipboard!'));
+    }
+  );
+  // Change OK button text
+  setTimeout(() => {
+    const btn = document.getElementById('confirm-ok-btn');
+    if (btn) btn.textContent = '⎘ Copy Link';
+  }, 10);
+}
+
 function downloadReport(idx) {
   const r = reports[idx];
   if (!r.file || !r.file.dataUrl) {
@@ -5189,18 +5361,125 @@ function restoreBranch(idx) {
 // ================================================================
 // LOGIN / SESSION SYSTEM — Supabase Auth
 // ================================================================
-const SESSION_KEY = 'iad_session';
-const PINS_KEY    = 'iad_pins';
+const SESSION_KEY  = 'iad_session';
+const PINS_KEY     = 'iad_pins';
+const SEC_KEY      = 'iad_security';
 
-// ---- PIN helpers (stored locally per device for speed) ----
+// ================================================================
+// SECURITY STANDARDS
+// ================================================================
+// Password hashing (SHA-256 via Web Crypto API)
+async function hashPassword(password) {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest('SHA-256', enc.encode('mc_precision_salt_2025:' + password));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Brute force protection
+const _loginAttempts = {};
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS   = 15 * 60 * 1000; // 15 minutes
+
+function isLockedOut(username) {
+  const rec = _loginAttempts[username];
+  if (!rec) return false;
+  if (rec.count >= MAX_ATTEMPTS) {
+    if (Date.now() - rec.lastAttempt < LOCKOUT_MS) return true;
+    // Lockout expired — reset
+    delete _loginAttempts[username];
+  }
+  return false;
+}
+
+function recordFailedAttempt(username) {
+  if (!_loginAttempts[username]) _loginAttempts[username] = { count: 0, lastAttempt: 0 };
+  _loginAttempts[username].count++;
+  _loginAttempts[username].lastAttempt = Date.now();
+}
+
+function clearAttempts(username) {
+  delete _loginAttempts[username];
+}
+
+function getLockoutRemaining(username) {
+  const rec = _loginAttempts[username];
+  if (!rec) return 0;
+  const remaining = LOCKOUT_MS - (Date.now() - rec.lastAttempt);
+  return Math.max(0, Math.ceil(remaining / 60000)); // minutes
+}
+
+// Session timeout (30 minutes of inactivity)
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+let _sessionTimer = null;
+let _lastActivity  = Date.now();
+
+function resetSessionTimer() {
+  _lastActivity = Date.now();
+  clearTimeout(_sessionTimer);
+  _sessionTimer = setTimeout(() => {
+    if (currentUser) {
+      logTrail('ADD','System','Auto Logout', (currentUser?.name||'?')+' — session timed out after 30min inactivity');
+      showSaveIndicator('⏱ Session expired — please log in again', 'var(--warn)');
+      doLogout();
+    }
+  }, SESSION_TIMEOUT_MS);
+}
+
+// Reset timer on any user interaction
+['click','keydown','mousemove','touchstart'].forEach(evt => {
+  document.addEventListener(evt, () => { if (currentUser) resetSessionTimer(); }, { passive: true });
+});
+
+// Password strength validator
+function validatePasswordStrength(pwd) {
+  if (pwd.length < 6) return { ok: false, msg: 'Password must be at least 6 characters.' };
+  return { ok: true, msg: '' };
+}
+
+// ---- PIN/Password helpers (hashed) ----
 function loadPins() {
   try { return JSON.parse(localStorage.getItem(PINS_KEY)) || {}; } catch(e) { return {}; }
 }
 function savePins(pins) { localStorage.setItem(PINS_KEY, JSON.stringify(pins)); }
+
+// Get stored hash for user — falls back to default if not set
 function getPinFor(name) {
   const pins = loadPins();
-  if (name === 'Admin') return pins['Admin'] || '0000';
-  return pins[name] || '1234';
+  return pins[name] || null; // null = not yet hashed (legacy)
+}
+
+// Verify password — handles both plain (legacy) and hashed
+async function verifyPassword(name, inputPassword) {
+  const stored = getPinFor(name);
+  // Not yet stored — check against defaults and migrate
+  if (!stored) {
+    const defaultPwd = name === 'Admin' ? '0000' : '1234';
+    if (inputPassword === defaultPwd) {
+      // Migrate to hash
+      const hashed = await hashPassword(inputPassword);
+      const pins = loadPins(); pins[name] = hashed; savePins(pins);
+      return true;
+    }
+    return false;
+  }
+  // Stored value — check if it's a hash (64 hex chars) or legacy plain text
+  if (stored.length === 64 && /^[0-9a-f]+$/.test(stored)) {
+    const inputHash = await hashPassword(inputPassword);
+    return inputHash === stored;
+  }
+  // Legacy plain text — compare and migrate to hash
+  if (inputPassword === stored) {
+    const hashed = await hashPassword(inputPassword);
+    const pins = loadPins(); pins[name] = hashed; savePins(pins);
+    return true;
+  }
+  return false;
+}
+
+// Save hashed password
+async function saveHashedPassword(name, newPassword) {
+  const hashed = await hashPassword(newPassword);
+  const pins = loadPins(); pins[name] = hashed; savePins(pins);
 }
 
 let currentUser = null;
@@ -5302,8 +5581,8 @@ function getUserByUsername(username) {
   });
 }
 
-function doCredentialLogin() {
-  const username = (document.getElementById('login-username').value || '').trim();
+async function doCredentialLogin() {
+  const username = (document.getElementById('login-username').value || '').trim().toLowerCase();
   const password = (document.getElementById('login-password').value || '').trim();
   const errEl = document.getElementById('login-error-1');
   errEl.style.display = 'none';
@@ -5314,36 +5593,53 @@ function doCredentialLogin() {
     return;
   }
 
+  // Brute force check
+  if (isLockedOut(username)) {
+    const mins = getLockoutRemaining(username);
+    errEl.textContent = `⛔ Account locked after too many failed attempts. Try again in ${mins} minute${mins!==1?'s':''}.`;
+    errEl.style.display = 'block';
+    return;
+  }
+
   const userObj = getUserByUsername(username);
   if (!userObj) {
+    recordFailedAttempt(username);
     errEl.textContent = 'Username not found.';
     errEl.style.display = 'block';
     return;
   }
 
-  const correctPin = getPinFor(userObj.name);
-  if (password !== correctPin) {
-    errEl.textContent = 'Incorrect password. Please try again.';
-    errEl.style.display = 'block';
-    // Shake password field
+  // Verify hashed password
+  const valid = await verifyPassword(userObj.name, password);
+  if (!valid) {
+    recordFailedAttempt(username);
+    const rec = _loginAttempts[username];
+    const remaining = rec ? Math.max(0, MAX_ATTEMPTS - rec.count) : MAX_ATTEMPTS;
     const fp = document.getElementById('login-password');
     fp.style.borderColor = 'var(--rose)';
     fp.style.animation = 'shake 0.4s';
     setTimeout(() => { fp.style.animation = ''; fp.style.borderColor = 'var(--border2)'; fp.value = ''; }, 800);
+    if (remaining <= 0) {
+      errEl.textContent = `⛔ Account locked for 15 minutes after too many failed attempts.`;
+      logTrail('ADD','System','Account Locked', username+' locked out after '+MAX_ATTEMPTS+' failed attempts');
+    } else {
+      errEl.textContent = `Incorrect password. ${remaining} attempt${remaining!==1?'s':''} remaining before lockout.`;
+    }
+    errEl.style.display = 'block';
     return;
   }
 
-  // Login success
+  // Success — clear attempts, start session timer
+  clearAttempts(username);
   const loginUser = {
-    name: userObj.name,
-    role: userObj.role,
-    initials: userObj.initials,
-    color: userObj.color,
-    bg: userObj.bg,
-    cls: userObj.cls
+    name: userObj.name, role: userObj.role,
+    initials: userObj.initials, color: userObj.color,
+    bg: userObj.bg, cls: userObj.cls,
+    loginTime: Date.now()
   };
   currentUser = loginUser;
   saveSession(currentUser);
+  resetSessionTimer();
   bootApp();
 }
 
@@ -5363,6 +5659,7 @@ async function bootApp() {
   updateSessionTopbar();
   applyRolePermissions();
   logTrail('ADD','System','User Login', currentUser.name+' logged in · Role: '+currentUser.role);
+  resetSessionTimer(); // start inactivity timer
 
   // Load from Supabase if configured, then render everything
   const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
@@ -5389,6 +5686,17 @@ function updateSessionTopbar() {
   const ava = document.getElementById('session-avatar-display');
   if (ava) { ava.textContent = currentUser.initials; ava.style.background = `linear-gradient(135deg,${currentUser.color},${currentUser.bg})`; }
   updateCloudBadge();
+  // Start session clock
+  updateSessionClock();
+  setInterval(updateSessionClock, 60000);
+}
+
+function updateSessionClock() {
+  const el = document.getElementById('session-info-line');
+  if (!el || !currentUser?.loginTime) return;
+  const mins = Math.floor((Date.now() - currentUser.loginTime) / 60000);
+  const remaining = Math.max(0, 30 - Math.floor((Date.now() - _lastActivity) / 60000));
+  el.textContent = `🕐 Logged in ${mins}min · ${remaining}min until timeout`;
 }
 
 function updateCloudBadge() {
@@ -5471,14 +5779,21 @@ async function forcePushToCloud() {
   const statusEl = document.getElementById('push-status');
   const isConfigured = SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co';
   if (!isConfigured) {
-    statusEl.textContent = '❌ Not configured yet — complete steps 1–4 first';
-    statusEl.style.color = 'var(--rose)';
+    if (statusEl) { statusEl.textContent = '❌ Not configured — complete steps 1–4 first'; statusEl.style.color='var(--rose)'; }
     return;
   }
-  statusEl.textContent = '⟳ Pushing to cloud…';
-  statusEl.style.color = 'var(--accent2)';
+  if (statusEl) { statusEl.textContent = '⟳ Testing connection…'; statusEl.style.color='var(--accent2)'; }
+
+  // Test reachability first
+  const reachable = await testSupabaseReachable();
+  if (!reachable) {
+    if (statusEl) { statusEl.textContent = '❌ Cannot reach Supabase — check your internet connection and that the table exists (Step 2).'; statusEl.style.color='var(--rose)'; }
+    return;
+  }
+
+  if (statusEl) { statusEl.textContent = '⟳ Pushing data to cloud…'; statusEl.style.color='var(--accent2)'; }
   try {
-    await Promise.all([
+    const results = await Promise.allSettled([
       syncBlobToSupabase('tasks',       tasks),
       syncBlobToSupabase('fieldworks',  fieldworks),
       syncBlobToSupabase('timeline',    timelineEvents),
@@ -5489,15 +5804,18 @@ async function forcePushToCloud() {
       syncBlobToSupabase('compliance',  complianceRecords),
       syncBlobToSupabase('performance', performanceEvals),
     ]);
-    SUPA_CONNECTED = true;
-    statusEl.textContent = '✅ All data pushed to cloud! Your colleagues can now see it.';
-    statusEl.style.color = 'var(--teal)';
-    updateCloudBadge();
-    const statusEl2 = document.getElementById('cloud-connect-status');
-    if (statusEl2) statusEl2.innerHTML = '<span style="color:var(--teal)">✅ Connected — data is now shared</span>';
+    const failed = results.filter(r => r.status === 'rejected');
+    SUPA_CONNECTED = failed.length < results.length;
+    if (failed.length === 0) {
+      if (statusEl) { statusEl.textContent = '✅ All data pushed to cloud! Your colleagues can now see it.'; statusEl.style.color='var(--teal)'; }
+      updateCloudBadge();
+      const statusEl2 = document.getElementById('cloud-connect-status');
+      if (statusEl2) statusEl2.innerHTML = '<span style="color:var(--teal)">✅ Connected — data is now shared</span>';
+    } else {
+      if (statusEl) { statusEl.textContent = `⚠ ${results.length - failed.length}/${results.length} modules pushed. Some failed: ${failed.map(f=>f.reason?.message||'error').join(', ')}`; statusEl.style.color='var(--warn)'; }
+    }
   } catch(e) {
-    statusEl.textContent = '❌ Push failed: ' + e.message;
-    statusEl.style.color = 'var(--rose)';
+    if (statusEl) { statusEl.textContent = '❌ Push failed: ' + e.message; statusEl.style.color='var(--rose)'; }
   }
 }
 
@@ -5576,15 +5894,28 @@ function openChangePin() {
   openModal('changepin');
 }
 
-function saveChangePin() {
-  const oldP=document.getElementById('cp-old').value, newP=document.getElementById('cp-new').value, conf=document.getElementById('cp-confirm').value;
-  const errEl=document.getElementById('cp-error');
-  if (oldP !== getPinFor(currentUser.name)) { errEl.textContent='Current password is incorrect.'; errEl.style.display='block'; return; }
-  if (!newP || newP.length < 4) { errEl.textContent='New password must be at least 4 characters.'; errEl.style.display='block'; return; }
-  if (newP !== conf) { errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
-  const pins = loadPins(); pins[currentUser.name] = newP; savePins(pins);
+async function saveChangePin() {
+  const oldP  = document.getElementById('cp-old').value;
+  const newP  = document.getElementById('cp-new').value;
+  const conf  = document.getElementById('cp-confirm').value;
+  const errEl = document.getElementById('cp-error');
+  errEl.style.display = 'none';
+
+  // Verify current password
+  const valid = await verifyPassword(currentUser.name, oldP);
+  if (!valid) { errEl.textContent = 'Current password is incorrect.'; errEl.style.display = 'block'; return; }
+
+  // Strength check
+  const strength = validatePasswordStrength(newP);
+  if (!strength.ok) { errEl.textContent = strength.msg; errEl.style.display = 'block'; return; }
+
+  if (newP !== conf) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+
+  // Save hashed
+  await saveHashedPassword(currentUser.name, newP);
   logTrail('EDIT','System','Password Changed', currentUser.name+' changed their password');
-  closeModal('changepin'); alert('Password updated successfully!');
+  closeModal('changepin');
+  alert('Password updated successfully!');
 }
 
 async function doLogout() {
@@ -6186,48 +6517,15 @@ Write the full formal memo. Be specific to these findings. End with a table of a
   };
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-allow-browser': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: prompts[type] }]
-      })
-    });
-
+    const text = await aiCall(prompts[type], 1500);
     if (loading) loading.style.display = 'none';
-
-    if (!response.ok) {
-      const err = await response.json().catch(()=>({error:{message:response.statusText}}));
-      const errMsg = err?.error?.message || response.statusText;
-      let hint = '';
-      if (response.status === 401) hint = '<br><span style="color:var(--muted)">Your API key may be incorrect or expired. Check console.anthropic.com</span>';
-      if (response.status === 429) hint = '<br><span style="color:var(--muted)">Rate limit hit — wait a moment and try again.</span>';
-      if (response.status === 403) hint = '<br><span style="color:var(--muted)">API key does not have permission. Make sure it is a valid Claude API key.</span>';
-      panel.innerHTML = `<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:10px;padding:16px;color:var(--rose);font-size:12px">
-        <strong>Error ${response.status}:</strong> ${errMsg}${hint}</div>`;
-      return;
-    }
-
-    const data = await response.json();
-    const text = data.content?.find(b => b.type === 'text')?.text || '';
     _aiResults[type] = text;
-
-    // Render the response nicely
     panel.innerHTML = renderAIText(text, type);
-
   } catch (err) {
     if (loading) loading.style.display = 'none';
-    const isCORS = err.message.includes('fetch') || err.message.includes('Failed');
     panel.innerHTML = `<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:10px;padding:16px;color:var(--rose);font-size:12px">
-      <strong>Connection error:</strong> ${err.message}
-      ${isCORS ? '<br><span style="color:var(--muted)">This may be a CORS issue. The Anthropic API requires the <code>anthropic-dangerous-allow-browser: true</code> header which is already set — if you still see this error, try a different browser or check your API key.</span>' : ''}
+      <strong>AI Error:</strong> ${err.message}
+      <br><span style="color:var(--muted);font-size:11px">Make sure the Cloudflare Worker proxy is deployed and the URL is set in AI_PROXY_URL.</span>
     </div>`;
   }
 }
@@ -6748,10 +7046,10 @@ function togglePinVisibility(idx, pin) {
 
 function adminResetPin(name) {
   const def = name === 'Admin' ? '0000' : '1234';
-  showConfirm('Reset Password?', `Reset password for <strong>${name}</strong> to default (${def})?`, 'var(--warn)', () => {
-    const pins = loadPins(); pins[name] = def; savePins(pins);
+  showConfirm('Reset Password?', `Reset password for <strong>${name}</strong> to default (${def})?`, 'var(--warn)', async () => {
+    await saveHashedPassword(name, def);
     logTrail('EDIT','System','Password Reset','Admin reset password for '+name+' to default');
-    showSaveIndicator('✓ Password reset to '+def);
+    showSaveIndicator('✓ Password reset to default');
     renderUserRights();
   });
 }
@@ -7123,23 +7421,50 @@ function runExport() {
 // ================================================================
 // AI FEATURES — Shared helper
 // ================================================================
+// ================================================================
+// AI PROXY — routes through Cloudflare Worker to avoid CORS block
+// Set your Worker URL here after deploying anthropic-proxy-worker.js
+// ================================================================
+const AI_PROXY_URL = 'https://dry-mode-cd99.mavcorpuz-evrvetoptions.workers.dev';
+
 async function aiCall(prompt, maxTokens=1200) {
   const key = loadAIKey();
   if (!key) throw new Error('No API key configured');
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-allow-browser': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: maxTokens,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
+
+  // Try proxy first (needed for GitHub Pages), fall back to direct if proxy not set
+  const useProxy = AI_PROXY_URL && !AI_PROXY_URL.includes('YOUR_WORKER');
+
+  let res;
+  if (useProxy) {
+    // Route through Cloudflare Worker proxy
+    res = await fetch(AI_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: key,
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+  } else {
+    // Direct call (works in Claude.ai artifacts but blocked on GitHub Pages)
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-allow-browser': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(()=>({}));
     throw new Error(err?.error?.message || 'API error ' + res.status);
@@ -7430,6 +7755,220 @@ Use the auditor's first name. Be warm but professional. Under 180 words.`;
     setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 5000);
   } catch(e) {
     if (statusEl) { statusEl.textContent = '❌ '+e.message; statusEl.style.color='var(--rose)'; }
+  }
+}
+
+// ================================================================
+// IMPORT / RESTORE MODULE
+// ================================================================
+let _importData     = null; // parsed JSON backup
+let _importSelected = new Set();
+let _importReplace  = false;
+
+const IMPORT_MODULE_MAP = {
+  tasks:       { label:'Team Tasks',              icon:'📋', color:'var(--gold)',   apply: d => { if(_importReplace) tasks=d; else { const ids=new Set(tasks.map(t=>t.id)); d.forEach(r=>{ if(!ids.has(r.id)) tasks.push(r); }); } } },
+  fieldwork:   { label:'Fieldwork Log',           icon:'⬙',  color:'var(--sky)',    apply: d => { if(_importReplace) fieldworks=d; else { const refs=new Set(fieldworks.map(f=>f.ref)); d.forEach(r=>{ if(!refs.has(r.ref)) fieldworks.push(r); }); } } },
+  reports:     { label:'Audit Reports',           icon:'☰',  color:'var(--teal)',   apply: d => { if(_importReplace) reports=d; else { const ts=new Set(reports.map(r=>r.title+'|'+r.date)); d.forEach(r=>{ if(!ts.has(r.title+'|'+r.date)) reports.push(r); }); } } },
+  branches:    { label:'Branches',                icon:'◈',  color:'var(--violet)', apply: d => { if(_importReplace) branches=d; else { const ns=new Set(branches.map(b=>b.name)); d.forEach(r=>{ if(!ns.has(r.name)) branches.push(r); }); } } },
+  auditors:    { label:'Auditor Profiles',        icon:'◑',  color:'var(--rose)',   apply: d => { if(_importReplace) auditorProfiles=d; else { const ns=new Set(auditorProfiles.map(p=>p.name)); d.forEach(r=>{ if(!ns.has(r.name)) auditorProfiles.push(r); }); } } },
+  compliance:  { label:'Compliance Assessments',  icon:'🏆', color:'#b43ee8',       apply: d => { if(_importReplace) complianceRecords=d; else { const ks=new Set(complianceRecords.map(r=>r.branch+'|'+r.date)); d.forEach(r=>{ if(!ks.has(r.branch+'|'+r.date)) complianceRecords.push(r); }); } } },
+  performance: { label:'Performance Evaluations', icon:'⭐', color:'var(--warn)',   apply: d => { if(_importReplace) performanceEvals=d; else { const ks=new Set(performanceEvals.map(e=>e.auditor+'|'+e.date)); d.forEach(r=>{ if(!ks.has(r.auditor+'|'+r.date)) performanceEvals.push(r); }); } } },
+  schedules:   { label:'Audit Schedules',         icon:'▦',  color:'var(--sky)',    apply: d => { if(_importReplace) schedules=d; else { const ids=new Set(schedules.map(s=>s.id)); d.forEach(r=>{ if(!ids.has(r.id)) schedules.push(r); }); } } },
+  audittrail:  { label:'Audit Trail',             icon:'📋', color:'var(--muted)',  apply: d => { if(_importReplace) auditTrail=d; else { const ids=new Set(auditTrail.map(e=>e.id)); d.forEach(r=>{ if(!ids.has(r.id)) auditTrail.push(r); }); } } },
+};
+
+function openImportModal() {
+  resetImport();
+  openModal('import');
+}
+
+function resetImport() {
+  _importData = null;
+  _importSelected = new Set();
+  _importReplace = false;
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-dropzone').style.display = '';
+  const dz = document.getElementById('import-dropzone-content');
+  if (dz) dz.innerHTML = `<div style="font-size:36px;margin-bottom:10px">📂</div>
+    <div style="font-family:var(--font-head);font-size:13px;font-weight:700;color:var(--text)">Click to select or drag & drop a JSON backup file</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">Only .json files exported from this app are supported</div>`;
+  document.getElementById('import-file-input').value = '';
+  const tog = document.getElementById('import-replace-toggle');
+  const knob = document.getElementById('import-replace-knob');
+  if (tog) { tog.style.background = 'var(--muted)'; }
+  if (knob) { knob.style.left = '3px'; }
+  const prog = document.getElementById('import-progress');
+  if (prog) prog.style.display = 'none';
+}
+
+function handleImportDrop(e) {
+  e.preventDefault();
+  document.getElementById('import-dropzone').style.borderColor = 'var(--border2)';
+  document.getElementById('import-dropzone').style.background = 'var(--bg2)';
+  const file = e.dataTransfer.files[0];
+  if (file) processImportFile(file);
+}
+
+function handleImportFile(inp) {
+  if (inp.files[0]) processImportFile(inp.files[0]);
+}
+
+function processImportFile(file) {
+  if (!file.name.endsWith('.json')) {
+    alert('Please select a .json backup file exported from this app.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Validate — must be an object with at least one known module key
+      const keys = Object.keys(data).filter(k => IMPORT_MODULE_MAP[k]);
+      if (keys.length === 0) {
+        alert('This file does not appear to be a valid backup from this app.\nExpected keys like: tasks, fieldwork, reports, branches, etc.');
+        return;
+      }
+      _importData = data;
+      _importSelected = new Set(keys); // pre-select all available modules
+      document.getElementById('import-dropzone').style.display = 'none';
+      document.getElementById('import-preview').style.display = '';
+      document.getElementById('import-filename').textContent = file.name;
+
+      // Summary
+      const summary = keys.map(k => {
+        const arr = data[k];
+        const count = Array.isArray(arr) ? arr.length : '?';
+        return `${IMPORT_MODULE_MAP[k].icon} ${IMPORT_MODULE_MAP[k].label}: ${count} records`;
+      }).join(' · ');
+      document.getElementById('import-summary').textContent = summary;
+
+      // Render module checkboxes
+      renderImportModules(keys);
+    } catch(err) {
+      alert('Could not parse the file. Make sure it is a valid JSON backup.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function renderImportModules(availableKeys) {
+  const grid = document.getElementById('import-modules-grid');
+  if (!grid) return;
+  grid.innerHTML = availableKeys.map(k => {
+    const m = IMPORT_MODULE_MAP[k];
+    const count = Array.isArray(_importData[k]) ? _importData[k].length : 0;
+    const checked = _importSelected.has(k);
+    return `<label style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border:2px solid ${checked?m.color:'var(--border)'};border-radius:10px;cursor:pointer;transition:all 0.15s" onclick="toggleImportModule('${k}')">
+      <div style="width:20px;height:20px;border-radius:5px;background:${checked?m.color:'var(--surface3)'};border:2px solid ${checked?m.color:'var(--border2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;font-size:12px">
+        ${checked?'<span style="color:#000;font-weight:900;font-size:11px">✓</span>':''}
+      </div>
+      <span style="font-size:13px;flex-shrink:0">${m.icon}</span>
+      <div style="flex:1">
+        <div style="font-family:var(--font-head);font-size:12px;font-weight:600;color:${checked?'var(--text)':'var(--text2)'}">${m.label}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${count} record${count!==1?'s':''} in backup</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function toggleImportModule(k) {
+  if (_importSelected.has(k)) _importSelected.delete(k);
+  else _importSelected.add(k);
+  renderImportModules(Object.keys(_importData).filter(k => IMPORT_MODULE_MAP[k]));
+}
+
+function toggleAllImport(state) {
+  const keys = Object.keys(_importData || {}).filter(k => IMPORT_MODULE_MAP[k]);
+  _importSelected = state ? new Set(keys) : new Set();
+  renderImportModules(keys);
+}
+
+function toggleReplaceMode() {
+  _importReplace = !_importReplace;
+  const tog = document.getElementById('import-replace-toggle');
+  const knob = document.getElementById('import-replace-knob');
+  if (tog) tog.style.background = _importReplace ? 'var(--danger)' : 'var(--muted)';
+  if (knob) knob.style.left = _importReplace ? '19px' : '3px';
+}
+
+async function runImport() {
+  if (!_importData || _importSelected.size === 0) {
+    alert('Please select at least one module to import.');
+    return;
+  }
+
+  const mode = _importReplace ? 'REPLACE' : 'MERGE';
+  const selected = [..._importSelected];
+
+  // Show progress
+  const prog = document.getElementById('import-progress');
+  const progBar = document.getElementById('import-pbar');
+  const progText = document.getElementById('import-progress-text');
+  if (prog) prog.style.display = '';
+  const btn = document.getElementById('import-run-btn');
+  if (btn) btn.disabled = true;
+
+  try {
+    for (let i = 0; i < selected.length; i++) {
+      const key = selected[i];
+      const mod = IMPORT_MODULE_MAP[key];
+      const data = _importData[key];
+      if (!Array.isArray(data)) continue;
+
+      if (progText) progText.textContent = `Importing ${mod.label}… (${i+1}/${selected.length})`;
+      if (progBar) progBar.style.width = ((i+1)/selected.length*100)+'%';
+
+      // Apply the data
+      mod.apply(data);
+
+      // Small delay for visual feedback
+      await new Promise(r => setTimeout(r, 80));
+    }
+
+    // Persist everything
+    if (progText) progText.textContent = 'Saving to storage…';
+    await persist();
+
+    // Push to Supabase if connected
+    if (SUPA_CONNECTED) {
+      if (progText) progText.textContent = 'Syncing to cloud…';
+      await forcePushToCloud();
+    }
+
+    // Log the import
+    logTrail('ADD', 'System', 'Data Import', `${mode} import · Modules: ${selected.join(', ')} · ${selected.reduce((s,k)=>s+(Array.isArray(_importData[k])?_importData[k].length:0),0)} total records`);
+
+    // Refresh UI
+    updateAuditorDropdowns();
+    updateBranchDropdowns();
+    renderDashboard();
+    renderProfiles();
+    renderBranches();
+    renderLoginGrid();
+
+    if (progBar) progBar.style.width = '100%';
+    if (progText) progText.textContent = '✅ Import complete!';
+    progText.style.color = 'var(--teal)';
+
+    showSaveIndicator(`✓ ${mode} import done — ${selected.length} module${selected.length!==1?'s':''} restored`);
+
+    setTimeout(() => {
+      closeModal('import');
+      showConfirm(
+        '✅ Import Complete',
+        `<div style="line-height:1.8;font-size:12px">
+          <div style="margin-bottom:8px"><strong style="color:var(--text)">${mode}</strong> import finished successfully.</div>
+          <div style="color:var(--muted)">Modules restored: <strong style="color:var(--teal)">${selected.map(k=>IMPORT_MODULE_MAP[k].label).join(', ')}</strong></div>
+          <div style="color:var(--muted);margin-top:4px">Total records: <strong style="color:var(--gold)">${selected.reduce((s,k)=>s+(Array.isArray(_importData[k])?_importData[k].length:0),0)}</strong></div>
+        </div>`,
+        'var(--teal)',
+        () => {}
+      );
+    }, 800);
+
+  } catch(err) {
+    if (progText) { progText.textContent = '❌ Import failed: ' + err.message; progText.style.color = 'var(--rose)'; }
+    if (btn) btn.disabled = false;
   }
 }
 

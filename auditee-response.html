@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.C. Precision — Auditee Response Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --bg:#070b14; --bg2:#0c1120; --surface:#0f1623; --surface2:#141d2e;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+  --gold:#c9a84c; --teal:#2dd4bf; --sky:#60a5fa; --rose:#f87171;
+  --warn:#fbbf24; --violet:#a78bfa; --ok:#4ade80;
+  --text:#e2e8f0; --text2:#94a3b8; --muted:#4a5568;
+  --r:12px; --rsm:8px; --rlg:18px;
+  --font:'Inter',system-ui,sans-serif;
+  --display:'Playfair Display',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;min-height:100vh;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:10px}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#0d1525,#080e1c);border-bottom:1px solid var(--border);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--gold),transparent 60%);opacity:.4}
+.hdr-brand .label{font-size:9px;font-weight:700;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
+.hdr-brand .title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.portal-badge{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.3);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600}
+.hdr-user{font-size:11px;color:var(--text2);display:none;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* SCREENS */
+.screen{display:none;animation:fi .3s ease}
+.screen.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wrap{max-width:880px;margin:0 auto;padding:24px 16px}
+
+/* CARD */
+.card{background:linear-gradient(135deg,rgba(15,22,35,.97),rgba(10,15,25,.99));border:1px solid rgba(201,168,76,.14);border-radius:var(--rlg);padding:28px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.45}
+.card-title{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:4px}
+.card-sub{font-size:12px;color:var(--text2);margin-bottom:22px;line-height:1.65}
+
+/* ACCESS METHOD TABS */
+.method-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.method-tab{padding:10px 6px;border-radius:var(--rsm);border:2px solid var(--border);background:var(--surface2);cursor:pointer;text-align:center;transition:all .15s}
+.method-tab .tab-icon{font-size:20px;margin-bottom:4px}
+.method-tab .tab-label{font-size:11px;font-weight:600;color:var(--text2)}
+.method-tab .tab-hint{font-size:9px;color:var(--muted);margin-top:2px}
+.method-tab.active{border-color:var(--gold);background:rgba(201,168,76,.07)}
+.method-tab.active .tab-label{color:var(--gold)}
+.method-tab:hover:not(.active){border-color:var(--border2)}
+.method-panel{display:none}
+.method-panel.active{display:block;animation:fi .2s ease}
+
+/* FORM */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
+.fg input,.fg select,.fg textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:var(--rsm);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 13px;outline:none;transition:border-color .15s,box-shadow .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+.fg select option{background:#1a2535}
+.fg textarea{resize:vertical;min-height:82px;line-height:1.6}
+.fg-hint{font-size:10px;color:var(--muted);margin-top:5px}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:11px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:var(--rsm);font-family:var(--font);font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .18s;letter-spacing:.03em}
+.btn-primary{background:linear-gradient(135deg,var(--gold),#a8832a);color:#070b14;box-shadow:0 2px 12px rgba(201,168,76,.3);width:100%;padding:12px;font-size:13px}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,.45)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2);padding:6px 14px;font-size:11px}
+.btn-ghost:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.btn-save{background:linear-gradient(135deg,var(--teal),#1a9d8c);color:#070b14;font-weight:700;padding:8px 18px}
+.btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(45,212,191,.3)}
+.btn-violet{background:rgba(167,139,250,.1);color:var(--violet);border:1px solid rgba(167,139,250,.3);padding:6px 14px;font-size:11px}
+.btn-violet:hover{background:rgba(167,139,250,.18)}
+
+/* ALERTS */
+.alert{padding:10px 14px;border-radius:var(--rsm);font-size:12px;margin-bottom:14px;display:none}
+.alert-err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);color:var(--rose)}
+.alert-ok{background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.25);color:var(--teal)}
+.alert-info{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:var(--sky)}
+.alert-warn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);color:var(--warn)}
+
+/* REPORT HEADER */
+.rpt-hdr{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:18px 20px;margin-bottom:14px}
+.rpt-title{font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:5px}
+.rpt-meta{color:var(--text2);font-size:12px;display:flex;flex-wrap:wrap;gap:14px}
+.spill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+
+/* FINDING CARD */
+.fcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;transition:box-shadow .2s}
+.fcard:hover{box-shadow:0 4px 18px rgba(0,0,0,.3)}
+.fhead{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.015);cursor:pointer;user-select:none}
+.fnum{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.fdesc{flex:1;font-size:13px;font-weight:600;line-height:1.4}
+.fbody{padding:15px 16px}
+.slabel{font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.ftext{font-size:12px;color:var(--text2);line-height:1.7;background:var(--bg2);border-radius:6px;padding:9px 12px;border:1px solid var(--border);margin-bottom:12px}
+.resp-box{background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.15);border-radius:var(--rsm);padding:13px}
+.resp-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.resp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:540px){.resp-row{grid-template-columns:1fr}}
+
+/* PROGRESS */
+.pbar-wrap{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden}
+.pbar{height:100%;border-radius:4px;transition:width .4s ease}
+
+/* QR PANEL */
+.qr-panel{background:var(--surface);border:1px solid rgba(167,139,250,.2);border-radius:var(--r);padding:18px;margin-top:16px;text-align:center}
+.qr-panel-title{font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+#qr-canvas-wrap{display:inline-block;background:#fff;padding:12px;border-radius:8px;margin-bottom:10px}
+.qr-url{font-size:10px;color:var(--sky);word-break:break-all;background:var(--bg2);padding:8px 10px;border-radius:6px;border:1px solid var(--border2);font-family:monospace;margin-bottom:10px;text-align:left}
+
+/* LOADING/EMPTY */
+.loading{text-align:center;padding:50px 20px;color:var(--muted)}
+.spin{font-size:28px;animation:sp 1s linear infinite;display:inline-block}
+@keyframes sp{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:40px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg)}
+
+/* STICKY FOOTER */
+.sfooter{position:sticky;bottom:0;background:rgba(7,11,20,.93);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:11px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;z-index:40}
+
+/* SECURITY NOTE */
+.sec-note{font-size:10px;color:var(--muted);text-align:center;margin-top:14px;padding-top:13px;border-top:1px solid var(--border);line-height:1.7}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-brand">
+    <div class="label">M.C. Precision</div>
+    <div class="title">Auditee Response Portal</div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-user" id="hdr-user"></div>
+    <div class="portal-badge">Branch Access</div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 1 · LOGIN                                       -->
+<!-- ====================================================== -->
+<div class="screen active" id="screen-login">
+  <div class="wrap" style="max-width:520px">
+    <div class="card">
+      <div class="card-title">Access Your Findings</div>
+      <div class="card-sub">Choose how to identify your branch, then enter your name to view and respond to audit findings.</div>
+
+      <div id="err-box"  class="alert alert-err"></div>
+      <div id="info-box" class="alert alert-info"></div>
+
+      <!-- 3 ACCESS METHOD TABS -->
+      <div class="method-tabs">
+        <div class="method-tab active" id="tab-dd"   onclick="setMethod('dd',this)">
+          <div class="tab-icon">🏢</div>
+          <div class="tab-label">Select Branch</div>
+          <div class="tab-hint">From dropdown</div>
+        </div>
+        <div class="method-tab" id="tab-code" onclick="setMethod('code',this)">
+          <div class="tab-icon">🔑</div>
+          <div class="tab-label">Access Code</div>
+          <div class="tab-hint">Branch code</div>
+        </div>
+        <div class="method-tab" id="tab-link" onclick="setMethod('link',this)">
+          <div class="tab-icon">🔗</div>
+          <div class="tab-label">Link / QR</div>
+          <div class="tab-hint">From email/QR</div>
+        </div>
+      </div>
+
+      <!-- PANEL: Dropdown -->
+      <div class="method-panel active" id="panel-dd">
+        <div class="fg">
+          <label>Select Your Branch</label>
+          <select id="sel-branch">
+            <option value="">⟳ Loading branches…</option>
+          </select>
+          <div class="fg-hint">Select the branch you are responding on behalf of.</div>
+        </div>
+      </div>
+
+      <!-- PANEL: Access Code -->
+      <div class="method-panel" id="panel-code">
+        <div class="fg">
+          <label>Branch Access Code</label>
+          <input type="text" id="inp-code" placeholder="e.g. MKT-01"
+            style="text-transform:uppercase;letter-spacing:.1em;font-size:15px;text-align:center"
+            oninput="this.value=this.value.toUpperCase()"
+            onkeydown="if(event.key==='Enter')doLogin()">
+          <div class="fg-hint">Your branch code is on the audit notification letter (e.g. NCR-01, REG-03). Contact the audit team if you don't have it.</div>
+        </div>
+      </div>
+
+      <!-- PANEL: Link/QR -->
+      <div class="method-panel" id="panel-link">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:16px;text-align:center;margin-bottom:4px">
+          <div style="font-size:28px;margin-bottom:8px">📱</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px">Open via Link or QR Code</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7">
+            If the Internal Audit Division sent you a link or QR code, open that directly — your branch will be pre-selected automatically.<br><br>
+            Otherwise use the <strong style="color:var(--gold)">Select Branch</strong> or <strong style="color:var(--gold)">Access Code</strong> tabs above.
+          </div>
+        </div>
+      </div>
+
+      <!-- Common: Respondent Name -->
+      <div class="fg" style="margin-top:16px">
+        <label>Your Full Name &amp; Title</label>
+        <input type="text" id="inp-name" placeholder="e.g. Maria Santos — Branch Manager"
+          onkeydown="if(event.key==='Enter')doLogin()">
+        <div class="fg-hint">This will be recorded as the respondent on all your submissions.</div>
+      </div>
+
+      <button class="btn btn-primary" onclick="doLogin()" id="login-btn">
+        View My Audit Findings →
+      </button>
+
+      <div class="sec-note">
+        🔒 Read-only access · You can only view and respond to findings assigned to your branch.<br>
+        No access to the main audit system or any other branch's data.
+      </div>
+    </div>
+
+    <!-- AUDITOR TOOLS (hidden by default) -->
+    <div style="text-align:center;margin-top:14px">
+      <button class="btn btn-ghost" onclick="toggleAuditorTools()" style="font-size:10px;color:var(--muted)">⚙ Auditor Tools — QR Code Generator</button>
+    </div>
+    <div id="auditor-tools" style="display:none;margin-top:12px">
+      <div class="qr-panel">
+        <div class="qr-panel-title">✦ Generate Auditee Access Links &amp; QR Codes</div>
+        <div class="fg" style="text-align:left">
+          <label>Select Branch</label>
+          <select id="qr-branch-sel"><option value="">Select branch to generate QR…</option></select>
+        </div>
+        <button class="btn btn-violet" onclick="generateQR()" style="width:100%;margin-bottom:10px">📱 Generate QR Code &amp; Link</button>
+        <div id="qr-output" style="display:none">
+          <div id="qr-canvas-wrap"><div id="qr-canvas"></div></div>
+          <div class="qr-url" id="qr-link-text"></div>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="copyQRLink()">⎘ Copy Link</button>
+            <button class="btn btn-ghost" onclick="downloadQR()">⬇ Download PNG</button>
+            <button class="btn btn-ghost" onclick="printQR()">🖨 Print QR Sheet</button>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:10px">Share this QR code or link with the branch manager via email, Viber, or print it and post it at the branch.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 2 · FINDINGS                                    -->
+<!-- ====================================================== -->
+<div class="screen" id="screen-findings">
+  <div class="wrap">
+
+    <!-- Report header -->
+    <div class="rpt-hdr">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div style="flex:1">
+          <div id="h-branch" style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:5px"></div>
+          <div class="rpt-title" id="h-title">Audit Findings</div>
+          <div class="rpt-meta">
+            <span>📅 <span id="h-date"></span></span>
+            <span>👤 Auditor: <span id="h-auditor"></span></span>
+            <span>📋 <span id="h-eng"></span></span>
+          </div>
+          <div id="h-status" class="spill" style="margin-top:8px"></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div id="h-prog-text" style="font-size:11px;color:var(--text2);margin-bottom:5px"></div>
+          <div class="pbar-wrap" style="width:150px">
+            <div id="h-prog-bar" class="pbar" style="width:0%;background:var(--teal)"></div>
+          </div>
+          <div id="h-respondent" style="font-size:10px;color:var(--muted);margin-top:4px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:12px;color:var(--sky);line-height:1.7">
+      📋 <strong>Instructions:</strong> For each finding below, fill in your <strong>Management Response</strong> and <strong>Action Plan</strong>, set a target date and update the status, then click <strong>💾 Save Response</strong>. Your responses are saved directly to the audit system and visible to the auditors immediately.
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading">
+      <div class="spin">✦</div>
+      <div style="margin-top:12px;font-size:13px">Loading your findings…</div>
+    </div>
+
+    <!-- Findings list -->
+    <div id="findings-list" style="display:none"></div>
+
+    <!-- Empty -->
+    <div id="findings-empty" class="empty" style="display:none">
+      <div style="font-size:36px;margin-bottom:10px">✅</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">No Open Findings</div>
+      <div style="color:var(--text2);font-size:12px;line-height:1.7">No open audit findings were found for your branch.<br>All findings may already be closed or no reports have been issued yet.<br>Contact the Internal Audit Division if you think this is an error.</div>
+    </div>
+
+  </div>
+
+  <!-- Sticky footer -->
+  <div class="sfooter">
+    <div>
+      <div style="font-size:12px;font-weight:600;color:var(--text)" id="f-branch"></div>
+      <div style="font-size:11px;color:var(--muted)" id="f-status">Save responses individually or use Save All.</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost" onclick="doLogout()">🚪 Sign Out</button>
+      <button class="btn btn-save" onclick="saveAll()">💾 Save All Responses</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 3 · SUCCESS                                     -->
+<!-- ====================================================== -->
+<div class="screen" id="screen-success">
+  <div class="wrap" style="max-width:480px">
+    <div class="empty" style="margin-top:48px;padding:40px 28px">
+      <div style="font-size:44px;margin-bottom:12px">🎉</div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">Responses Submitted!</div>
+      <div style="color:var(--text2);font-size:12px;line-height:1.8">
+        Your management responses and action plans have been recorded.<br>
+        The Internal Audit Division will review your submissions and follow up as needed.<br><br>
+        <span style="color:var(--muted);font-size:11px">You may close this tab or go back to review your responses.</span>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="showScreen('screen-findings')">← Review Responses</button>
+        <button class="btn btn-ghost" onclick="doLogout()">🚪 Sign Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// CONFIG — same Supabase as main app
+// ================================================================
+const SUPA_URL = 'https://ieeffiwzbajftevutpnu.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllZWZmaXd6YmFqZnRldnV0cG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDUxNDgsImV4cCI6MjA4OTY4MTE0OH0.HhF2OB4pBzCCvC6hxIsvK_VX8ch42dvR9i2sY3f2UcI';
+const TABLE    = 'iad_appstate';
+
+// ================================================================
+// STATE
+// ================================================================
+let _branches   = [];
+let _reports    = [];
+let _findings   = [];
+let _edits      = {};
+let _branchName = '';
+let _branchCode = '';
+let _respondent = '';
+let _method     = 'dd'; // dd | code
+let _qrInst     = null;
+
+// ================================================================
+// SUPABASE
+// ================================================================
+async function supaLoad(key) {
+  const res = await fetch(
+    `${SUPA_URL}/rest/v1/${TABLE}?id=eq.${encodeURIComponent(key)}&select=value`,
+    { headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY } }
+  );
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const rows = await res.json();
+  return rows?.length && rows[0].value ? JSON.parse(rows[0].value) : null;
+}
+
+async function supaSave(key, data) {
+  const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal,resolution=merge-duplicates'
+    },
+    body: JSON.stringify([{ id: key, value: JSON.stringify(data), updated_at: new Date().toISOString() }])
+  });
+  if (!res.ok) throw new Error('Save failed: HTTP ' + res.status);
+}
+
+// ================================================================
+// UI HELPERS
+// ================================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function setMethod(m, el) {
+  _method = m;
+  document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.method-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + m).classList.add('active');
+}
+
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className   = 'alert alert-' + type;
+  el.style.display = 'block';
+}
+function hideAlert(id) { document.getElementById(id).style.display = 'none'; }
+
+function fstatus(msg) {
+  const el = document.getElementById('f-status');
+  if (el) el.textContent = msg;
+}
+
+function toggleAuditorTools() {
+  const el = document.getElementById('auditor-tools');
+  el.style.display = el.style.display === 'none' ? '' : 'none';
+  if (el.style.display !== 'none') populateQRDropdown();
+}
+
+// ================================================================
+// INIT — load branches, handle URL params
+// ================================================================
+async function init() {
+  try {
+    _branches = await supaLoad('branches') || [];
+    _reports  = await supaLoad('reports')  || [];
+
+    // Populate branch dropdown
+    const sel = document.getElementById('sel-branch');
+    const activeBranches = _branches.filter(b => !b.inactive);
+    sel.innerHTML = '<option value="">— Select your branch —</option>' +
+      activeBranches.map(b =>
+        `<option value="${escHtml(b.name)}" data-code="${escHtml(b.code||'')}">${escHtml(b.name)}${b.code ? ' (' + b.code + ')' : ''}</option>`
+      ).join('');
+
+    // Handle URL params (from shared link / QR code)
+    const params  = new URLSearchParams(window.location.search);
+    const urlCode = (params.get('branch') || params.get('code') || '').toUpperCase().trim();
+    const urlName = decodeURIComponent(params.get('name') || '').trim();
+
+    if (urlCode) {
+      const match = _branches.find(b => (b.code || '').toUpperCase() === urlCode);
+      if (match) {
+        sel.value = match.name;
+        _branchName = match.name;
+        _branchCode = match.code || urlCode;
+        showAlert('info-box', `✅ Branch "${match.name}" pre-selected from your link. Just enter your name and click the button.`, 'ok');
+      } else {
+        // Put code in code field and switch tab
+        document.getElementById('inp-code').value = urlCode;
+        setMethod('code', document.getElementById('tab-code'));
+        showAlert('info-box', `Branch code "${urlCode}" entered from your link.`, 'info');
+      }
+    }
+    if (urlName) document.getElementById('inp-name').value = urlName;
+
+  } catch(e) {
+    showAlert('info-box', 'ℹ Could not load branch list. Try using the Access Code tab instead.', 'warn');
+  }
+}
+
+function escHtml(str) { return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ================================================================
+// LOGIN
+// ================================================================
+async function doLogin() {
+  hideAlert('err-box');
+  const name = (document.getElementById('inp-name').value || '').trim();
+  if (!name) { showAlert('err-box', 'Please enter your full name and title.', 'err'); return; }
+
+  let branchName = '', branchCode = '';
+
+  if (_method === 'dd') {
+    const sel = document.getElementById('sel-branch');
+    branchName = sel.value;
+    const opt  = sel.options[sel.selectedIndex];
+    branchCode = opt?.dataset?.code || '';
+    if (!branchName) { showAlert('err-box', 'Please select your branch from the list.', 'err'); return; }
+
+  } else if (_method === 'code') {
+    const code = (document.getElementById('inp-code').value || '').trim().toUpperCase();
+    if (!code) { showAlert('err-box', 'Please enter your branch access code.', 'err'); return; }
+    if (!_branches.length) {
+      try { _branches = await supaLoad('branches') || []; } catch(e) {}
+    }
+    const match = _branches.find(b => (b.code || '').toUpperCase() === code);
+    if (!match) {
+      showAlert('err-box', `Branch code "${code}" not found. Please check with the Internal Audit Division.`, 'err');
+      return;
+    }
+    branchName = match.name;
+    branchCode = match.code || code;
+
+  } else {
+    showAlert('err-box', 'Please use the Select Branch or Access Code tab to identify your branch.', 'err');
+    return;
+  }
+
+  _branchName = branchName;
+  _branchCode = branchCode;
+  _respondent = name;
+
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = '⟳ Loading findings…';
+
+  try {
+    if (!_reports.length) _reports = await supaLoad('reports') || [];
+    buildFindings();
+    renderFindings();
+    document.getElementById('hdr-user').textContent = `${name.split('—')[0].trim()} · ${branchName}`;
+    document.getElementById('hdr-user').style.display = 'block';
+    showScreen('screen-findings');
+  } catch(e) {
+    showAlert('err-box', 'Connection error: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'View My Audit Findings →';
+  }
+}
+
+function doLogout() {
+  _branchName = ''; _branchCode = ''; _respondent = ''; _findings = []; _edits = {};
+  document.getElementById('hdr-user').style.display = 'none';
+  document.getElementById('hdr-user').textContent = '';
+  hideAlert('err-box'); hideAlert('info-box');
+  document.getElementById('login-btn').disabled = false;
+  document.getElementById('login-btn').textContent = 'View My Audit Findings →';
+  document.getElementById('inp-name').value = '';
+  document.getElementById('sel-branch').value = '';
+  showScreen('screen-login');
+}
+
+// ================================================================
+// BUILD FINDINGS from loaded reports
+// ================================================================
+function buildFindings() {
+  _findings = [];
+  _reports.forEach((report, rIdx) => {
+    if (report.inactive) return;
+    if ((report.branch || '').toLowerCase() !== _branchName.toLowerCase()) return;
+    (report.findingsList || []).forEach((f, fIdx) => {
+      if (f.status === 'Closed') return;
+      _findings.push({
+        key: `${rIdx}_${fIdx}`,
+        reportIdx: rIdx, findingIdx: fIdx,
+        f, // finding object
+        reportTitle:  report.title   || 'Audit Report',
+        reportDate:   report.date    || '',
+        auditor:      report.author  || '—',
+        engagement:   report.eng     || '—',
+        reportStatus: report.status  || '',
+      });
+    });
+  });
+}
+
+// ================================================================
+// RENDER FINDINGS
+// ================================================================
+const SC = {
+  'Open':           { bg:'rgba(248,113,113,.12)', c:'var(--rose)',  bd:'rgba(248,113,113,.3)'  },
+  'Ongoing':        { bg:'rgba(96,165,250,.12)',  c:'var(--sky)',   bd:'rgba(96,165,250,.3)'   },
+  'For Validation': { bg:'rgba(251,191,36,.12)',  c:'#fbbf24',     bd:'rgba(251,191,36,.3)'   },
+  'Closed':         { bg:'rgba(45,212,191,.12)',  c:'var(--teal)', bd:'rgba(45,212,191,.3)'   },
+  'Overdue':        { bg:'rgba(249,115,22,.12)',  c:'#f97316',     bd:'rgba(249,115,22,.3)'   },
+};
+function spill(st) {
+  const s = SC[st] || { bg:'rgba(74,85,104,.15)', c:'#94a3b8', bd:'rgba(74,85,104,.3)' };
+  return `<span class="spill" style="background:${s.bg};color:${s.c};border:1px solid ${s.bd}">${st}</span>`;
+}
+
+function renderFindings() {
+  const first = _findings[0];
+  document.getElementById('h-branch').textContent    = `Branch: ${_branchName}${_branchCode?' ('+_branchCode+')':''} · Respondent: ${_respondent}`;
+  document.getElementById('f-branch').textContent    = `${_branchName} — ${_respondent}`;
+  document.getElementById('h-respondent').textContent = 'Respondent: ' + _respondent;
+
+  if (first) {
+    document.getElementById('h-title').textContent   = first.reportTitle;
+    document.getElementById('h-date').textContent    = first.reportDate  || '—';
+    document.getElementById('h-auditor').textContent = first.auditor;
+    document.getElementById('h-eng').textContent     = first.engagement;
+    const rs = first.reportStatus;
+    const rc = rs === 'Final – Issued' ? 'var(--teal)'
+             : rs === 'Findings Raised'? 'var(--rose)'
+             : rs === 'Under Review'   ? 'var(--sky)' : 'var(--muted)';
+    const sp = document.getElementById('h-status');
+    sp.textContent = rs;
+    sp.style.cssText = `background:${rc}18;color:${rc};border:1px solid ${rc}44;margin-top:8px`;
+  }
+
+  updateProgress();
+  document.getElementById('loading').style.display = 'none';
+
+  if (!_findings.length) {
+    document.getElementById('findings-list').style.display  = 'none';
+    document.getElementById('findings-empty').style.display = '';
+    return;
+  }
+
+  document.getElementById('findings-list').style.display  = '';
+  document.getElementById('findings-empty').style.display = 'none';
+
+  document.getElementById('findings-list').innerHTML = _findings.map((item, i) => {
+    const f  = item.f;
+    const ed = _edits[item.key] || {};
+    const sc = SC[f.status] || SC['Open'];
+
+    const mgmt   = ed.mgmtResponse !== undefined ? ed.mgmtResponse : (f.mgmtResponse || '');
+    const plan   = ed.actionPlan   !== undefined ? ed.actionPlan   : (f.actionPlan   || '');
+    const tdate  = ed.targetDate   !== undefined ? ed.targetDate   : (f.deadline     || '');
+    const status = ed.status       !== undefined ? ed.status       : (f.status       || 'Open');
+    const saved  = !!ed._saved;
+    const hasPrev = (f.mgmtResponse || '').trim() || (f.actionPlan || '').trim();
+
+    return `
+    <div class="fcard" id="card-${item.key}">
+      <div class="fhead" onclick="toggleFinding('${item.key}')">
+        <div class="fnum" style="background:${sc.bg};color:${sc.c};border:1px solid ${sc.bd}">${i+1}</div>
+        <div class="fdesc">${escHtml(f.description || '(No description)')}</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+          ${spill(status)}
+          ${saved   ? `<span style="font-size:10px;color:var(--teal);font-weight:600;white-space:nowrap">✓ Saved</span>` : ''}
+          ${hasPrev && !saved ? `<span style="font-size:10px;color:var(--sky);font-weight:600;white-space:nowrap">✎ Draft</span>` : ''}
+          <span id="chev-${item.key}" style="color:var(--muted);font-size:13px;transition:transform .2s">▼</span>
+        </div>
+      </div>
+      <div id="body-${item.key}" class="fbody">
+
+        <!-- Read-only: Audit Finding -->
+        <div class="slabel">🔍 Audit Finding (read only)</div>
+        <div class="ftext">${escHtml(f.description || '—')}</div>
+
+        ${f.responsible || f.deadline ? `
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-size:11px;color:var(--text2);display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px">
+          ${f.responsible ? `<span>👤 <strong>Responsible:</strong> ${escHtml(f.responsible)}</span>` : ''}
+          ${f.deadline    ? `<span>📅 <strong>Original Deadline:</strong> ${escHtml(f.deadline)}</span>` : ''}
+        </div>` : ''}
+
+        ${hasPrev && !saved ? `
+        <div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:6px;padding:9px 12px;font-size:11px;color:var(--sky);margin-bottom:12px">
+          ℹ A previous response exists for this finding. Your new submission will overwrite it.
+        </div>` : ''}
+
+        <!-- Auditee Response Box -->
+        <div class="resp-box">
+          <div class="resp-label">✍ Your Management Response</div>
+
+          <div class="fg" style="margin-bottom:10px">
+            <label>Management Comment / Response</label>
+            <textarea id="mgmt-${item.key}" placeholder="Acknowledge the finding and provide management's comment or explanation…" oninput="trackEdit('${item.key}')">${escHtml(mgmt)}</textarea>
+          </div>
+
+          <div class="fg" style="margin-bottom:10px">
+            <label>Action Plan / Corrective Measures</label>
+            <textarea id="plan-${item.key}" placeholder="List the specific steps, controls, or corrective actions management will take…" oninput="trackEdit('${item.key}')">${escHtml(plan)}</textarea>
+          </div>
+
+          <div class="resp-row">
+            <div class="fg" style="margin:0">
+              <label>Target Completion Date</label>
+              <input type="date" id="date-${item.key}" value="${escHtml(tdate)}" onchange="trackEdit('${item.key}')">
+            </div>
+            <div class="fg" style="margin:0">
+              <label>Update Status</label>
+              <select id="stat-${item.key}" onchange="trackEdit('${item.key}')">
+                <option value="Open"           ${status==='Open'           ?'selected':''}>Open</option>
+                <option value="Ongoing"        ${status==='Ongoing'        ?'selected':''}>Ongoing — In Progress</option>
+                <option value="For Validation" ${status==='For Validation' ?'selected':''}>For Validation — Done</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:8px">
+            <div id="msg-${item.key}" style="font-size:11px;color:var(--muted)"></div>
+            <button class="btn btn-save" onclick="saveFinding('${item.key}')">💾 Save Response</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleFinding(key) {
+  const body = document.getElementById('body-'+key);
+  const chev = document.getElementById('chev-'+key);
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  chev.style.transform = open ? 'rotate(-90deg)' : '';
+}
+
+function trackEdit(key) {
+  if (!_edits[key]) _edits[key] = {};
+  _edits[key].mgmtResponse = document.getElementById('mgmt-'+key)?.value || '';
+  _edits[key].actionPlan   = document.getElementById('plan-'+key)?.value || '';
+  _edits[key].targetDate   = document.getElementById('date-'+key)?.value || '';
+  _edits[key].status       = document.getElementById('stat-'+key)?.value || 'Open';
+  _edits[key]._saved       = false;
+  updateProgress();
+}
+
+function updateProgress() {
+  const total    = _findings.length;
+  const answered = _findings.filter(item => {
+    const ed = _edits[item.key];
+    return ((ed?.mgmtResponse || item.f.mgmtResponse || '').trim().length > 0);
+  }).length;
+  const pct = total > 0 ? Math.round(answered / total * 100) : 0;
+  const pt  = document.getElementById('h-prog-text');
+  const pb  = document.getElementById('h-prog-bar');
+  if (pt) pt.textContent = `${answered} of ${total} finding${total!==1?'s':''} responded`;
+  if (pb) pb.style.width = pct + '%';
+}
+
+// ================================================================
+// SAVE
+// ================================================================
+async function saveFinding(key) {
+  const item  = _findings.find(f => f.key === key);
+  if (!item)  return;
+  const msgEl = document.getElementById('msg-'+key);
+
+  const mgmt   = (document.getElementById('mgmt-'+key)?.value || '').trim();
+  const plan   = (document.getElementById('plan-'+key)?.value || '').trim();
+  const tdate  = document.getElementById('date-'+key)?.value || '';
+  const status = document.getElementById('stat-'+key)?.value || 'Open';
+
+  if (!mgmt && !plan) {
+    if (msgEl) { msgEl.textContent = '⚠ Please fill in at least the Management Response.'; msgEl.style.color = 'var(--warn)'; }
+    return;
+  }
+  if (msgEl) { msgEl.textContent = '⟳ Saving…'; msgEl.style.color = 'var(--sky)'; }
+
+  try {
+    // Always reload from server to avoid overwriting other branches' data
+    const latest = await supaLoad('reports');
+    if (!latest) throw new Error('Could not load reports from server.');
+
+    const report  = latest[item.reportIdx];
+    if (!report?.findingsList) throw new Error('Report not found on server.');
+    const finding = report.findingsList[item.findingIdx];
+    if (!finding) throw new Error('Finding not found on server.');
+
+    finding.mgmtResponse = mgmt;
+    finding.actionPlan   = plan;
+    if (tdate) finding.deadline = tdate;
+    finding.status       = status;
+    finding.respondent   = _respondent;
+    finding.respondedAt  = new Date().toISOString();
+
+    await supaSave('reports', latest);
+    _reports = latest;
+
+    _edits[key] = { mgmtResponse: mgmt, actionPlan: plan, targetDate: tdate, status, _saved: true };
+    if (msgEl) { msgEl.textContent = '✅ Saved successfully!'; msgEl.style.color = 'var(--teal)'; }
+
+    // Update card header pills
+    const card = document.getElementById('card-'+key);
+    if (card) {
+      const sc = SC[status] || SC['Open'];
+      card.querySelectorAll('.spill').forEach(p => {
+        p.textContent = status;
+        Object.assign(p.style, { background: sc.bg, color: sc.c, border: `1px solid ${sc.bd}` });
+      });
+      // Add ✓ Saved badge if not present
+      let badge = card.querySelector('.saved-badge');
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'saved-badge';
+        badge.style.cssText = 'font-size:10px;color:var(--teal);font-weight:600;white-space:nowrap';
+        const chev = card.querySelector('[id^="chev-"]');
+        if (chev) chev.parentNode.insertBefore(badge, chev);
+      }
+      badge.textContent = '✓ Saved';
+      // Remove Draft badge
+      card.querySelectorAll('.fhead span').forEach(s => { if (s.textContent.includes('Draft')) s.remove(); });
+    }
+
+    updateProgress();
+    fstatus('✅ Response saved to the audit system.');
+    setTimeout(() => { if (msgEl && msgEl.textContent.startsWith('✅')) msgEl.textContent = ''; }, 5000);
+
+  } catch(e) {
+    if (msgEl) { msgEl.textContent = '❌ ' + e.message; msgEl.style.color = 'var(--rose)'; }
+    fstatus('❌ Save failed — check your internet connection.');
+  }
+}
+
+async function saveAll() {
+  fstatus('⟳ Saving all responses…');
+  let count = 0;
+  for (const item of _findings) {
+    const mgmt = (document.getElementById('mgmt-'+item.key)?.value || '').trim();
+    const plan = (document.getElementById('plan-'+item.key)?.value || '').trim();
+    if (!mgmt && !plan) continue;
+    await saveFinding(item.key);
+    count++;
+  }
+  if (count === 0) {
+    fstatus('ℹ Fill in at least one Management Response before saving.');
+  } else {
+    fstatus(`✅ ${count} response${count!==1?'s':''} saved!`);
+    setTimeout(() => showScreen('screen-success'), 900);
+  }
+}
+
+// ================================================================
+// QR CODE GENERATOR (Auditor tools)
+// ================================================================
+function getBaseURL() { return window.location.href.split('?')[0]; }
+
+function populateQRDropdown() {
+  const sel = document.getElementById('qr-branch-sel');
+  sel.innerHTML = '<option value="">Select branch to generate QR…</option>' +
+    _branches.filter(b => !b.inactive && b.code).map(b =>
+      `<option value="${escHtml(b.code)}" data-name="${escHtml(b.name)}">${escHtml(b.name)} (${escHtml(b.code)})</option>`
+    ).join('');
+}
+
+function generateQR() {
+  const sel  = document.getElementById('qr-branch-sel');
+  const code = sel.value;
+  if (!code) { alert('Please select a branch first.'); return; }
+
+  const link = `${getBaseURL()}?branch=${encodeURIComponent(code)}`;
+  document.getElementById('qr-link-text').textContent = link;
+  document.getElementById('qr-output').style.display = '';
+
+  const canvas = document.getElementById('qr-canvas');
+  canvas.innerHTML = '';
+  _qrInst = null;
+  try {
+    _qrInst = new QRCode(canvas, {
+      text: link, width: 180, height: 180,
+      colorDark: '#000000', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch(e) {
+    canvas.innerHTML = '<div style="color:#555;font-size:11px;padding:20px;text-align:center">QR library failed to load.<br>Copy the link below instead.</div>';
+  }
+}
+
+function copyQRLink() {
+  const link = document.getElementById('qr-link-text').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = event.currentTarget;
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = link; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+}
+
+function downloadQR() {
+  const cvs = document.getElementById('qr-canvas').querySelector('canvas');
+  if (!cvs) { alert('Generate a QR code first.'); return; }
+  const code = document.getElementById('qr-branch-sel').value;
+  const a = document.createElement('a');
+  a.href = cvs.toDataURL('image/png');
+  a.download = `MC-Precision-Auditee-QR-${code}.png`;
+  a.click();
+}
+
+function printQR() {
+  const code = document.getElementById('qr-branch-sel').value;
+  const sel  = document.getElementById('qr-branch-sel');
+  const opt  = sel.options[sel.selectedIndex];
+  const name = opt?.dataset?.name || code;
+  const link = document.getElementById('qr-link-text').textContent;
+  const cvs  = document.getElementById('qr-canvas').querySelector('canvas');
+  const img  = cvs ? cvs.toDataURL('image/png') : '';
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+  <title>Auditee QR — ${code}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    body{font-family:'Inter',sans-serif;background:#fff;color:#1a1a2e;margin:0;padding:0}
+    .page{max-width:420px;margin:0 auto;padding:40px 30px;text-align:center;border:1px solid #e2e8f0;min-height:540px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .logo{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#c9a84c;margin-bottom:4px}
+    h1{font-size:19px;font-weight:800;margin-bottom:2px}
+    .sub{font-size:12px;color:#64748b;margin-bottom:20px}
+    .qr-img{width:190px;height:190px;border:2px solid #e2e8f0;border-radius:10px;padding:10px;margin-bottom:14px}
+    .code-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+    .code{font-size:26px;font-weight:800;letter-spacing:.18em;color:#c9a84c;margin-bottom:4px}
+    .branch{font-size:14px;font-weight:700;margin-bottom:14px}
+    .url{font-size:10px;color:#3b82f6;word-break:break-all;background:#f0f9ff;padding:7px 10px;border-radius:6px;border:1px solid #bae6fd;margin-bottom:14px}
+    .instructions{font-size:12px;color:#475569;line-height:1.75;background:#f8fafc;border-radius:8px;padding:12px 14px;text-align:left}
+    .instructions strong{color:#1e293b}
+    .footer{font-size:10px;color:#94a3b8;margin-top:18px;padding-top:14px;border-top:1px solid #e2e8f0;width:100%}
+    @media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+  </style>
+  </head><body>
+  <div class="page">
+    <div class="logo">M.C. Precision · Internal Audit Division</div>
+    <h1>Auditee Response Portal</h1>
+    <div class="sub">Management Comment &amp; Action Plan</div>
+    ${img ? `<img class="qr-img" src="${img}" alt="QR Code">` : ''}
+    <div class="code-label">Branch Access Code</div>
+    <div class="code">${code}</div>
+    <div class="branch">${name}</div>
+    <div class="url">${link}</div>
+    <div class="instructions">
+      <strong>How to use:</strong><br>
+      1. Scan this QR code with your phone camera, <em>or</em> type the link above in your browser.<br>
+      2. Select your branch (pre-filled) and enter your name and title.<br>
+      3. Review each audit finding and fill in your <strong>Management Response</strong> and <strong>Action Plan</strong>.<br>
+      4. Set a target completion date and click <strong>Save Response</strong>.
+    </div>
+    <div class="footer">
+      M.C. Precision · Internal Audit Division · Confidential &amp; Restricted<br>
+      Responses are submitted directly to the audit management system.
+    </div>
+  </div>
+  <script>setTimeout(()=>{window.print();},400);<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+// ================================================================
+// BOOT
+// ================================================================
+init();
+</script>
+</body>
+</html>
