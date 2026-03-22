@@ -6,62 +6,40 @@
 <title>M.C. Precision — Auditee Response Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#070b14;--bg2:#0c1120;--surface:#0f1623;--surface2:#141d2e;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
-  --gold:#c9a84c;--teal:#2dd4bf;--sky:#60a5fa;--rose:#f87171;
-  --warn:#fbbf24;--violet:#a78bfa;--ok:#4ade80;
-  --text:#e2e8f0;--text2:#94a3b8;--muted:#4a5568;
-  --r:12px;--rsm:8px;--rlg:18px;
-  --font:'Inter',system-ui,sans-serif;--display:'Playfair Display',Georgia,serif;
-}
+:root{--bg:#070b14;--bg2:#0c1120;--surface:#0f1623;--surface2:#141d2e;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--gold:#c9a84c;--teal:#2dd4bf;--sky:#60a5fa;--rose:#f87171;--warn:#fbbf24;--violet:#a78bfa;--ok:#4ade80;--text:#e2e8f0;--text2:#94a3b8;--muted:#4a5568;--r:12px;--rsm:8px;--rlg:18px;--font:'Inter',system-ui,sans-serif;--display:'Playfair Display',Georgia,serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;min-height:100vh;-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:10px}
-
 .hdr{background:linear-gradient(135deg,#0d1525,#080e1c);border-bottom:1px solid var(--border);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--gold),transparent 60%);opacity:.4}
-.hdr-brand .label{font-size:9px;font-weight:700;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
-.hdr-brand .title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);margin-top:2px}
-.hdr-right{display:flex;align-items:center;gap:10px}
-.portal-badge{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.3);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600}
+.hdr-brand .lbl{font-size:9px;font-weight:700;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
+.hdr-brand .ttl{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);margin-top:2px}
+.badge{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.3);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600}
 .hdr-user{font-size:11px;color:var(--text2);display:none;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* NAV TABS */
-.nav-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:53px;z-index:40}
-.nav-tab{flex:1;padding:11px 8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .15s;max-width:200px}
+.nav-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:40}
+.nav-tab{flex:1;padding:11px 8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .15s;max-width:240px}
 .nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(201,168,76,.04)}
-.nav-tab:hover:not(.active){color:var(--text)}
-
-.screen{display:none;animation:fi .3s ease}
-.screen.active{display:block}
+.screen{display:none;animation:fi .3s ease}.screen.active{display:block}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.wrap{max-width:880px;margin:0 auto;padding:24px 16px}
-.wrap-sm{max-width:520px;margin:0 auto;padding:24px 16px}
-
+.wrap{max-width:880px;margin:0 auto;padding:24px 16px}.wrap-sm{max-width:520px;margin:0 auto;padding:24px 16px}
 .card{background:linear-gradient(135deg,rgba(15,22,35,.97),rgba(10,15,25,.99));border:1px solid rgba(201,168,76,.14);border-radius:var(--rlg);padding:28px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55)}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.45}
 .card-title{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:4px}
 .card-sub{font-size:12px;color:var(--text2);margin-bottom:22px;line-height:1.65}
-
 .method-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
 .method-tab{padding:10px 6px;border-radius:var(--rsm);border:2px solid var(--border);background:var(--surface2);cursor:pointer;text-align:center;transition:all .15s}
-.method-tab .tab-icon{font-size:20px;margin-bottom:4px}
-.method-tab .tab-label{font-size:11px;font-weight:600;color:var(--text2)}
-.method-tab .tab-hint{font-size:9px;color:var(--muted);margin-top:2px}
+.method-tab .ico{font-size:20px;margin-bottom:4px}
+.method-tab .lbl{font-size:11px;font-weight:600;color:var(--text2)}
+.method-tab .hnt{font-size:9px;color:var(--muted);margin-top:2px}
 .method-tab.active{border-color:var(--gold);background:rgba(201,168,76,.07)}
-.method-tab.active .tab-label{color:var(--gold)}
-.method-panel{display:none}
-.method-panel.active{display:block;animation:fi .2s ease}
-
+.method-tab.active .lbl{color:var(--gold)}
+.method-panel{display:none}.method-panel.active{display:block;animation:fi .2s ease}
 .fg{margin-bottom:14px}
 .fg label{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
 .fg input,.fg select,.fg textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:var(--rsm);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 13px;outline:none;transition:border-color .15s,box-shadow .15s}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
-.fg select option{background:#1a2535}
-.fg textarea{resize:vertical;min-height:82px;line-height:1.6}
+.fg select option{background:#1a2535}.fg textarea{resize:vertical;min-height:82px;line-height:1.6}
 .fg-hint{font-size:10px;color:var(--muted);margin-top:5px}
-
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:var(--rsm);font-family:var(--font);font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .18s;letter-spacing:.03em}
 .btn-primary{background:linear-gradient(135deg,var(--gold),#a8832a);color:#070b14;box-shadow:0 2px 12px rgba(201,168,76,.3);width:100%;padding:12px;font-size:13px}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,.45)}
@@ -72,18 +50,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(45,212,191,.3)}
 .btn-submit{background:linear-gradient(135deg,var(--violet),#7c3aed);color:#fff;font-weight:700;padding:10px 24px}
 .btn-submit:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(167,139,250,.4)}
-
 .alert{padding:10px 14px;border-radius:var(--rsm);font-size:12px;margin-bottom:14px;display:none}
 .alert-err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);color:var(--rose)}
 .alert-ok{background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.25);color:var(--teal)}
 .alert-info{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:var(--sky)}
 .alert-warn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);color:var(--warn)}
-
 .rpt-hdr{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:18px 20px;margin-bottom:14px}
 .rpt-title{font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:5px}
 .rpt-meta{color:var(--text2);font-size:12px;display:flex;flex-wrap:wrap;gap:14px}
 .spill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
-
 .fcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;transition:box-shadow .2s}
 .fcard:hover{box-shadow:0 4px 18px rgba(0,0,0,.3)}
 .fhead{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.015);cursor:pointer;user-select:none}
@@ -96,32 +71,30 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .resp-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
 .resp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 @media(max-width:540px){.resp-row{grid-template-columns:1fr}}
-
 .pbar-wrap{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden}
 .pbar{height:100%;border-radius:4px;transition:width .4s ease}
-
 .sfooter{position:sticky;bottom:0;background:rgba(7,11,20,.93);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:11px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;z-index:40}
-
-/* IQA SURVEY STYLES */
-.iqa-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
-.iqa-section-head{padding:13px 17px;background:rgba(167,139,250,.05);border-bottom:1px solid var(--border);font-family:var(--font);font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.1em}
-.iqa-section-body{padding:14px 17px}
-.rating-group{margin-bottom:16px}
-.rating-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.5}
-.rating-label span{font-size:10px;color:var(--muted);font-weight:400}
+/* IQA */
+.iqa-sect{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+.iqa-sect-head{padding:13px 17px;background:rgba(167,139,250,.05);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.1em}
+.iqa-sect-body{padding:14px 17px}
+.rg{margin-bottom:16px}
+.rg-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.5}
+.rg-label span{font-size:10px;color:var(--muted);font-weight:400}
 .star-row{display:flex;gap:4px;flex-wrap:wrap}
 .star-btn{width:36px;height:36px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:var(--font)}
 .star-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08)}
-.star-btn.selected{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold)}
-.star-btn.sel-low{background:rgba(248,113,113,.12);border-color:var(--rose);color:var(--rose)}
-.star-btn.sel-mid{background:rgba(251,191,36,.12);border-color:var(--warn);color:var(--warn)}
-.star-btn.sel-high{background:rgba(45,212,191,.12);border-color:var(--teal);color:var(--teal)}
-.rating-hint{font-size:10px;color:var(--muted);margin-top:5px}
-.overall-score{background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(96,165,250,.04));border:1px solid rgba(167,139,250,.2);border-radius:var(--r);padding:16px;margin-bottom:14px;text-align:center}
-.score-display{font-family:var(--display);font-size:48px;font-weight:700;color:var(--violet);margin:8px 0}
-.score-label{font-size:12px;color:var(--text2)}
-.score-desc{font-size:11px;margin-top:6px;font-weight:600}
-
+.star-btn.sl{background:rgba(248,113,113,.12);border-color:var(--rose);color:var(--rose)}
+.star-btn.sm{background:rgba(251,191,36,.12);border-color:var(--warn);color:var(--warn)}
+.star-btn.sh{background:rgba(45,212,191,.12);border-color:var(--teal);color:var(--teal)}
+.rg-hint{font-size:10px;color:var(--muted);margin-top:5px}
+.overall-box{background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(96,165,250,.04));border:1px solid rgba(167,139,250,.2);border-radius:var(--r);padding:16px;margin-bottom:14px;text-align:center}
+.score-num{font-family:var(--display);font-size:48px;font-weight:700;color:var(--violet);margin:8px 0}
+/* Past submissions */
+.sub-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.sub-card-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.sub-title{font-size:13px;font-weight:700;color:var(--text)}
+.sub-meta{font-size:11px;color:var(--text2)}
 .loading{text-align:center;padding:50px 20px;color:var(--muted)}
 .spin{font-size:28px;animation:sp 1s linear infinite;display:inline-block}
 @keyframes sp{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
@@ -131,303 +104,177 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-brand">
-    <div class="label">M.C. Precision</div>
-    <div class="title">Auditee Response Portal</div>
-  </div>
-  <div class="hdr-right">
+  <div class="hdr-brand"><div class="lbl">M.C. Precision</div><div class="ttl">Auditee Response Portal</div></div>
+  <div style="display:flex;align-items:center;gap:10px">
     <div class="hdr-user" id="hdr-user"></div>
-    <div class="portal-badge">Branch Access</div>
+    <div class="badge">Branch Access</div>
   </div>
 </div>
 
-<!-- ====================================================== -->
-<!-- SCREEN: LOGIN                                          -->
-<!-- ====================================================== -->
+<!-- LOGIN -->
 <div class="screen active" id="screen-login">
   <div class="wrap-sm">
     <div class="card" style="margin-top:36px">
       <div class="card-title">Access Your Findings</div>
-      <div class="card-sub">Select your branch and enter your name to view findings and submit your IQA review.</div>
-
+      <div class="card-sub">Select your branch and enter your name to view findings and submit your IQA rating.</div>
       <div id="err-box"  class="alert alert-err"></div>
       <div id="info-box" class="alert alert-info"></div>
-
       <div class="method-tabs">
-        <div class="method-tab active" id="tab-dd"   onclick="setMethod('dd',this)">
-          <div class="tab-icon">🏢</div>
-          <div class="tab-label">Select Branch</div>
-          <div class="tab-hint">From dropdown</div>
-        </div>
-        <div class="method-tab" id="tab-code" onclick="setMethod('code',this)">
-          <div class="tab-icon">🔑</div>
-          <div class="tab-label">Access Code</div>
-          <div class="tab-hint">Branch code</div>
-        </div>
-        <div class="method-tab" id="tab-link" onclick="setMethod('link',this)">
-          <div class="tab-icon">🔗</div>
-          <div class="tab-label">Link / QR</div>
-          <div class="tab-hint">From email/QR</div>
-        </div>
+        <div class="method-tab active" id="mt-dd"   onclick="setM('dd',this)"><div class="ico">🏢</div><div class="lbl">Select Branch</div><div class="hnt">From dropdown</div></div>
+        <div class="method-tab"        id="mt-code" onclick="setM('code',this)"><div class="ico">🔑</div><div class="lbl">Access Code</div><div class="hnt">Branch code</div></div>
+        <div class="method-tab"        id="mt-link" onclick="setM('link',this)"><div class="ico">🔗</div><div class="lbl">Link / QR</div><div class="hnt">From email/QR</div></div>
       </div>
-
-      <div class="method-panel active" id="panel-dd">
-        <div class="fg">
-          <label>Select Your Branch</label>
-          <select id="sel-branch">
-            <option value="">⟳ Loading branches…</option>
-          </select>
-          <div class="fg-hint">Select the branch you are responding on behalf of.</div>
-        </div>
+      <div class="method-panel active" id="mp-dd">
+        <div class="fg"><label>Select Your Branch</label><select id="sel-branch"><option value="">⟳ Loading…</option></select><div class="fg-hint">Select the branch you are responding for.</div></div>
       </div>
-
-      <div class="method-panel" id="panel-code">
-        <div class="fg">
-          <label>Branch Access Code</label>
-          <input type="text" id="inp-code" placeholder="e.g. MKT-01"
-            style="text-transform:uppercase;letter-spacing:.1em;font-size:15px;text-align:center"
-            oninput="this.value=this.value.toUpperCase()"
-            onkeydown="if(event.key==='Enter')doLogin()">
-          <div class="fg-hint">Your branch code is on the audit notification (e.g. NCR-01). Contact the audit team if you don't have it.</div>
-        </div>
+      <div class="method-panel" id="mp-code">
+        <div class="fg"><label>Branch Access Code</label><input type="text" id="inp-code" placeholder="e.g. MKT-01" style="text-transform:uppercase;letter-spacing:.1em;font-size:15px;text-align:center" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doLogin()"><div class="fg-hint">Your branch code is on the audit notification letter.</div></div>
       </div>
-
-      <div class="method-panel" id="panel-link">
+      <div class="method-panel" id="mp-link">
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:16px;text-align:center;margin-bottom:4px">
           <div style="font-size:28px;margin-bottom:8px">📱</div>
           <div style="font-size:13px;font-weight:600;margin-bottom:6px">Open via Link or QR Code</div>
-          <div style="font-size:12px;color:var(--text2);line-height:1.7">If the Internal Audit Division sent you a link or QR code, open that directly — your branch will be pre-selected.<br><br>Otherwise use the <strong style="color:var(--gold)">Select Branch</strong> or <strong style="color:var(--gold)">Access Code</strong> tabs.</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7">If the audit team sent you a link or QR code, open that — your branch will be pre-selected.<br>Otherwise use <strong style="color:var(--gold)">Select Branch</strong> or <strong style="color:var(--gold)">Access Code</strong>.</div>
         </div>
       </div>
-
-      <div class="fg" style="margin-top:16px">
-        <label>Your Full Name &amp; Title</label>
-        <input type="text" id="inp-name" placeholder="e.g. Maria Santos — Branch Manager"
-          onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-
-      <div class="fg">
-        <label>Email Address <span style="color:var(--muted);font-weight:400">(optional)</span></label>
-        <input type="email" id="inp-email" placeholder="For acknowledgment receipt">
-      </div>
-
-      <div class="fg">
-        <label>Mobile Number <span style="color:var(--muted);font-weight:400">(optional)</span></label>
-        <input type="text" id="inp-mobile" placeholder="+63 9XX XXX XXXX">
-      </div>
-
-      <button class="btn btn-primary" onclick="doLogin()" id="login-btn" style="margin-top:4px">
-        Access Portal →
-      </button>
-      <div class="sec-note">🔒 Read-only access · View &amp; respond to your branch's findings only · No access to main audit system</div>
+      <div class="fg" style="margin-top:16px"><label>Your Full Name &amp; Title</label><input type="text" id="inp-name" placeholder="e.g. Maria Santos — Branch Manager" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fg"><label>Email <span style="color:var(--muted);font-weight:400">(optional)</span></label><input type="email" id="inp-email" placeholder="For acknowledgment"></div>
+      <div class="fg"><label>Mobile Number <span style="color:var(--muted);font-weight:400">(optional)</span></label><input type="text" id="inp-mobile" placeholder="+63 9XX XXX XXXX"></div>
+      <button class="btn btn-primary" onclick="doLogin()" id="login-btn" style="margin-top:4px">Access Portal →</button>
+      <div class="sec-note">🔒 Read-only · View &amp; respond to your branch's findings only · No access to main audit system</div>
     </div>
   </div>
 </div>
 
-<!-- ====================================================== -->
-<!-- MAIN APP (after login) — 2 tabs                       -->
-<!-- ====================================================== -->
+<!-- MAIN (after login) -->
 <div class="screen" id="screen-main">
-
-  <!-- Tab navigation -->
   <div class="nav-tabs">
-    <div class="nav-tab active" id="maintab-findings" onclick="switchMainTab('findings',this)">📋 Audit Findings</div>
-    <div class="nav-tab" id="maintab-iqa" onclick="switchMainTab('iqa',this)">⭐ IQA Self Assessment</div>
+    <div class="nav-tab active" id="nt-findings" onclick="showTab('findings',this)">📋 Audit Findings</div>
+    <div class="nav-tab" id="nt-iqa" onclick="showTab('iqa',this)">⭐ IQA Assessment</div>
+    <div class="nav-tab" id="nt-history" onclick="showTab('history',this)">📜 My Submissions</div>
   </div>
 
-  <!-- ─── TAB 1: FINDINGS ─── -->
-  <div id="panel-findings" class="wrap">
-
+  <!-- TAB: FINDINGS -->
+  <div id="tab-findings" class="wrap">
     <div class="rpt-hdr">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
         <div style="flex:1">
           <div id="h-branch" style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:5px"></div>
           <div class="rpt-title" id="h-title">Audit Findings</div>
-          <div class="rpt-meta">
-            <span>📅 <span id="h-date"></span></span>
-            <span>👤 Auditor: <span id="h-auditor"></span></span>
-            <span>📋 <span id="h-eng"></span></span>
-          </div>
+          <div class="rpt-meta"><span>📅 <span id="h-date"></span></span><span>👤 Auditor: <span id="h-auditor"></span></span><span>📋 <span id="h-eng"></span></span></div>
           <div id="h-status" class="spill" style="margin-top:8px"></div>
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div id="h-prog-text" style="font-size:11px;color:var(--text2);margin-bottom:5px"></div>
-          <div class="pbar-wrap" style="width:150px">
-            <div id="h-prog-bar" class="pbar" style="width:0%;background:var(--teal)"></div>
-          </div>
-          <div id="h-respondent" style="font-size:10px;color:var(--muted);margin-top:4px"></div>
+          <div class="pbar-wrap" style="width:150px"><div id="h-prog-bar" class="pbar" style="width:0%;background:var(--teal)"></div></div>
+          <div id="h-resp" style="font-size:10px;color:var(--muted);margin-top:4px"></div>
         </div>
       </div>
     </div>
-
     <div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:12px;color:var(--sky)">
-      📋 <strong>Instructions:</strong> Review each finding, fill in your <strong>Management Response</strong> and <strong>Action Plan</strong>, then click <strong>💾 Save Response</strong>. After completing findings, please also fill in the <strong>⭐ IQA Self Assessment</strong> tab.
+      📋 <strong>Instructions:</strong> Fill in <strong>Management Response</strong> and <strong>Action Plan</strong> for each finding, then click <strong>💾 Save Response</strong>. After completing, please also fill in the <strong>⭐ IQA Assessment</strong> tab.
     </div>
-
-    <div id="loading-findings" class="loading">
-      <div class="spin">✦</div>
-      <div style="margin-top:12px;font-size:13px">Loading your findings…</div>
-    </div>
+    <div id="loading-f" class="loading"><div class="spin">✦</div><div style="margin-top:12px">Loading findings…</div></div>
     <div id="findings-list"  style="display:none"></div>
     <div id="findings-empty" class="empty" style="display:none">
       <div style="font-size:36px;margin-bottom:10px">✅</div>
       <div style="font-size:16px;font-weight:700;margin-bottom:6px">No Open Findings</div>
-      <div style="color:var(--text2);font-size:12px;line-height:1.7">No open audit findings found for your branch. All findings may already be closed, or no audit report has been issued yet.<br><br>Please proceed to the <strong style="color:var(--gold)">⭐ IQA Self Assessment</strong> tab to rate your audit experience.</div>
+      <div style="color:var(--text2);font-size:12px;line-height:1.7">No open findings for your branch. All may be closed or no report has been issued yet.<br>Please proceed to the <strong style="color:var(--gold)">⭐ IQA Assessment</strong> tab.</div>
     </div>
+    <div style="height:80px"></div>
   </div>
 
-  <!-- ─── TAB 2: IQA SURVEY ─── -->
-  <div id="panel-iqa" class="wrap" style="display:none">
-
-    <!-- IQA Header -->
-    <div style="background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(96,165,250,.04));border:1px solid rgba(167,139,250,.2);border-radius:var(--rlg);padding:18px 20px;margin-bottom:16px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);margin-bottom:5px">M.C. Precision · Internal Audit Division</div>
-      <div style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:8px">Internal Quality Audit (IQA) Self Assessment Review</div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.7">This form provides internal feedback and review response to the audit performance conducted by the Internal Auditor. <strong>This report is private and confidential</strong> and will only be submitted to the appropriate management of the company.</div>
-      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:var(--text2)">
-        <span>🏢 Branch: <strong id="iqa-branch-label" style="color:var(--text)"></strong></span>
-        <span>👤 Auditor: <strong id="iqa-auditor-label" style="color:var(--text)"></strong></span>
-        <span>📅 Audit Date: <strong id="iqa-date-label" style="color:var(--text)"></strong></span>
-      </div>
+  <!-- TAB: IQA -->
+  <div id="tab-iqa" class="wrap" style="display:none">
+    <div id="iqa-already-submitted" style="display:none;background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.25);border-radius:var(--r);padding:16px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;color:var(--teal);margin-bottom:4px">✅ You already submitted an IQA Assessment for this report</div>
+      <div style="font-size:12px;color:var(--text2)" id="iqa-submitted-info"></div>
+      <button class="btn btn-ghost" style="margin-top:10px;font-size:11px" onclick="viewMyHistory()">📜 View My Submission →</button>
     </div>
 
-    <!-- Rating scale info -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--text2);width:100%;margin-bottom:4px">Rating Scale:</div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="background:rgba(45,212,191,.12);color:var(--teal);border:1px solid rgba(45,212,191,.3);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700">8–10</span><span style="font-size:11px;color:var(--text2)">Extraordinary — Performs exceptional audit results</span></div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.3);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700">4–7</span><span style="font-size:11px;color:var(--text2)">Acceptable — Some areas need improvement</span></div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="background:rgba(248,113,113,.12);color:var(--rose);border:1px solid rgba(248,113,113,.3);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700">1–3</span><span style="font-size:11px;color:var(--text2)">Needs Improvement — In general, requires improvement</span></div>
-    </div>
-
-    <!-- SECTION 1: Audit Process -->
-    <div class="iqa-section">
-      <div class="iqa-section-head">📋 Section 1 — Audit Process &amp; Procedures</div>
-      <div class="iqa-section-body">
-        <div class="rating-group">
-          <div class="rating-label">1. The auditor clearly explained the purpose and scope of the audit. <span>(Communication &amp; Clarity)</span></div>
-          <div class="star-row" id="r-1"></div>
-          <div class="rating-hint" id="rh-1"></div>
-        </div>
-        <div class="rating-group">
-          <div class="rating-label">2. The audit procedures were conducted in an organized and systematic manner. <span>(Organization)</span></div>
-          <div class="star-row" id="r-2"></div>
-          <div class="rating-hint" id="rh-2"></div>
-        </div>
-        <div class="rating-group">
-          <div class="rating-label">3. The auditor was thorough and covered all relevant areas during the audit. <span>(Thoroughness)</span></div>
-          <div class="star-row" id="r-3"></div>
-          <div class="rating-hint" id="rh-3"></div>
-        </div>
-        <div class="rating-group">
-          <div class="rating-label">4. The audit was completed within the agreed timeframe. <span>(Timeliness)</span></div>
-          <div class="star-row" id="r-4"></div>
-          <div class="rating-hint" id="rh-4"></div>
+    <div id="iqa-form-wrap">
+      <div style="background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(96,165,250,.04));border:1px solid rgba(167,139,250,.2);border-radius:var(--rlg);padding:18px 20px;margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);margin-bottom:5px">M.C. Precision · Internal Audit Division</div>
+        <div style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:8px">IQA Self Assessment Review</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">Your feedback on the audit performance. This is private and confidential — submitted only to appropriate management.</div>
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:var(--text2)">
+          <span>🏢 Branch: <strong id="iqa-branch" style="color:var(--text)"></strong></span>
+          <span>👤 Auditor: <strong id="iqa-auditor" style="color:var(--text)"></strong></span>
+          <span>📋 Report: <strong id="iqa-report" style="color:var(--text)"></strong></span>
+          <span>📅 Date: <strong id="iqa-date" style="color:var(--text)"></strong></span>
         </div>
       </div>
-    </div>
 
-    <!-- SECTION 2: Auditor's Conduct -->
-    <div class="iqa-section">
-      <div class="iqa-section-head">🤝 Section 2 — Auditor's Conduct &amp; Professionalism</div>
-      <div class="iqa-section-body">
-        <div class="rating-group">
-          <div class="rating-label">5. The auditor demonstrated respect, courtesy, and professionalism throughout. <span>(Professionalism)</span></div>
-          <div class="star-row" id="r-5"></div>
-          <div class="rating-hint" id="rh-5"></div>
-        </div>
-        <div class="rating-group">
-          <div class="rating-label">6. The auditor was objective and fair in identifying and presenting findings. <span>(Objectivity &amp; Fairness)</span></div>
-          <div class="star-row" id="r-6"></div>
-          <div class="rating-hint" id="rh-6"></div>
-        </div>
-        <div class="rating-group">
-          <div class="rating-label">7. The auditor demonstrated sufficient knowledge and competence in the areas reviewed. <span>(Competence)</span></div>
-          <div class="star-row" id="r-7"></div>
-          <div class="rating-hint" id="rh-7"></div>
-        </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);width:100%;margin-bottom:4px">Rating Scale:</div>
+        <div style="display:flex;align-items:center;gap:6px"><span class="spill" style="background:rgba(45,212,191,.12);color:var(--teal);border:1px solid rgba(45,212,191,.3)">8–10</span><span style="font-size:11px;color:var(--text2)">Extraordinary</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><span class="spill" style="background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.3)">4–7</span><span style="font-size:11px;color:var(--text2)">Acceptable — Some areas for improvement</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><span class="spill" style="background:rgba(248,113,113,.12);color:var(--rose);border:1px solid rgba(248,113,113,.3)">1–3</span><span style="font-size:11px;color:var(--text2)">Needs Improvement</span></div>
       </div>
-    </div>
 
-    <!-- SECTION 3: Findings & Feedback -->
-    <div class="iqa-section">
-      <div class="iqa-section-head">🔍 Section 3 — Findings &amp; Recommendations</div>
-      <div class="iqa-section-body">
-        <div class="rating-group">
-          <div class="rating-label">8. The findings raised were accurate, relevant, and supported by sufficient evidence. <span>(Accuracy)</span></div>
-          <div class="star-row" id="r-8"></div>
-          <div class="rating-hint" id="rh-8"></div>
-        </div>
-        <div class="rating-group">
-          <div class="rating-label">9. The audit recommendations are practical and actionable for the branch. <span>(Usefulness)</span></div>
-          <div class="star-row" id="r-9"></div>
-          <div class="rating-hint" id="rh-9"></div>
-        </div>
-      </div>
-    </div>
+      <div class="iqa-sect"><div class="iqa-sect-head">📋 Section 1 — Audit Process &amp; Procedures</div><div class="iqa-sect-body">
+        <div class="rg"><div class="rg-label">1. Clearly explained the purpose and scope of the audit. <span>(Communication)</span></div><div class="star-row" id="r-1"></div><div class="rg-hint" id="rh-1"></div></div>
+        <div class="rg"><div class="rg-label">2. Conducted audit in an organized and systematic manner. <span>(Organization)</span></div><div class="star-row" id="r-2"></div><div class="rg-hint" id="rh-2"></div></div>
+        <div class="rg"><div class="rg-label">3. Thorough and covered all relevant areas. <span>(Thoroughness)</span></div><div class="star-row" id="r-3"></div><div class="rg-hint" id="rh-3"></div></div>
+        <div class="rg"><div class="rg-label">4. Completed within the agreed timeframe. <span>(Timeliness)</span></div><div class="star-row" id="r-4"></div><div class="rg-hint" id="rh-4"></div></div>
+      </div></div>
 
-    <!-- SECTION 4: Overall -->
-    <div class="iqa-section">
-      <div class="iqa-section-head">⭐ Section 4 — Overall Audit Experience</div>
-      <div class="iqa-section-body">
-        <div class="rating-group">
-          <div class="rating-label">10. Overall rating of the auditor's performance during this audit engagement. <span>(Overall Performance)</span></div>
-          <div class="star-row" id="r-10"></div>
-          <div class="rating-hint" id="rh-10"></div>
-        </div>
-        <!-- Overall score display -->
-        <div class="overall-score" id="overall-score-box" style="display:none">
+      <div class="iqa-sect"><div class="iqa-sect-head">🤝 Section 2 — Auditor Conduct &amp; Professionalism</div><div class="iqa-sect-body">
+        <div class="rg"><div class="rg-label">5. Demonstrated respect, courtesy, and professionalism. <span>(Professionalism)</span></div><div class="star-row" id="r-5"></div><div class="rg-hint" id="rh-5"></div></div>
+        <div class="rg"><div class="rg-label">6. Objective and fair in identifying and presenting findings. <span>(Objectivity)</span></div><div class="star-row" id="r-6"></div><div class="rg-hint" id="rh-6"></div></div>
+        <div class="rg"><div class="rg-label">7. Demonstrated sufficient knowledge and competence. <span>(Competence)</span></div><div class="star-row" id="r-7"></div><div class="rg-hint" id="rh-7"></div></div>
+      </div></div>
+
+      <div class="iqa-sect"><div class="iqa-sect-head">🔍 Section 3 — Findings &amp; Recommendations</div><div class="iqa-sect-body">
+        <div class="rg"><div class="rg-label">8. Findings were accurate, relevant, and evidence-based. <span>(Accuracy)</span></div><div class="star-row" id="r-8"></div><div class="rg-hint" id="rh-8"></div></div>
+        <div class="rg"><div class="rg-label">9. Recommendations are practical and actionable. <span>(Usefulness)</span></div><div class="star-row" id="r-9"></div><div class="rg-hint" id="rh-9"></div></div>
+      </div></div>
+
+      <div class="iqa-sect"><div class="iqa-sect-head">⭐ Section 4 — Overall Rating</div><div class="iqa-sect-body">
+        <div class="rg"><div class="rg-label">10. Overall rating of the auditor's performance. <span>(Overall)</span></div><div class="star-row" id="r-10"></div><div class="rg-hint" id="rh-10"></div></div>
+        <div class="overall-box" id="overall-box" style="display:none">
           <div style="font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.1em">Computed Overall Rating</div>
-          <div class="score-display" id="overall-score-val">—</div>
-          <div class="score-label" id="overall-score-label">out of 10</div>
-          <div class="score-desc" id="overall-score-desc"></div>
+          <div class="score-num" id="overall-val">—</div>
+          <div style="font-size:11px;color:var(--text2)">out of 10</div>
+          <div style="font-size:12px;font-weight:700;margin-top:6px" id="overall-grade"></div>
         </div>
-      </div>
-    </div>
+      </div></div>
 
-    <!-- SECTION 5: Open Comments -->
-    <div class="iqa-section" style="margin-bottom:16px">
-      <div class="iqa-section-head">💬 Section 5 — Feedback &amp; Suggestions</div>
-      <div class="iqa-section-body">
-        <div class="fg">
-          <label>Feedback and Suggestions During Audit Procedures</label>
-          <textarea id="iqa-feedback" placeholder="Please share any feedback, suggestions for improvement, or comments about the audit process or auditor's performance…" style="min-height:100px"></textarea>
-        </div>
-        <div class="fg" style="margin-bottom:0">
-          <label>Audit Review Type</label>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px" id="iqa-review-types">
-            <label class="review-type-opt" id="rt-1" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s" onclick="toggleReviewType('rt-1')">
-              <div id="rt-1-chk" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;transition:all .15s;background:transparent"></div>
-              <span style="font-size:12px;color:var(--text2)">Branch Operation Review</span>
-            </label>
-            <label class="review-type-opt" id="rt-2" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s" onclick="toggleReviewType('rt-2')">
-              <div id="rt-2-chk" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;transition:all .15s;background:transparent"></div>
-              <span style="font-size:12px;color:var(--text2)">Fieldwork / Work-with Assessment Review</span>
-            </label>
-            <label class="review-type-opt" id="rt-3" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s" onclick="toggleReviewType('rt-3')">
-              <div id="rt-3-chk" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;transition:all .15s;background:transparent"></div>
-              <span style="font-size:12px;color:var(--text2)">Sales / AR &amp; Collection Review</span>
-            </label>
-            <label class="review-type-opt" id="rt-4" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s" onclick="toggleReviewType('rt-4')">
-              <div id="rt-4-chk" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;transition:all .15s;background:transparent"></div>
-              <span style="font-size:12px;color:var(--text2)">Others (Petty Cash Fund, etc.)</span>
-            </label>
+      <div class="iqa-sect" style="margin-bottom:16px"><div class="iqa-sect-head">💬 Section 5 — Feedback &amp; Suggestions</div><div class="iqa-sect-body">
+        <div class="fg"><label>Feedback and Suggestions During Audit Procedures</label><textarea id="iqa-feedback" placeholder="Share any feedback, suggestions for improvement, or comments about the audit process…" style="min-height:100px"></textarea></div>
+        <div class="fg" style="margin-bottom:0"><label>Audit Review Type</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+            <div id="rt-1" onclick="toggleRT('rt-1')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s"><div id="rt-1-c" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;background:transparent;transition:all .15s"></div><span style="font-size:12px;color:var(--text2)">Branch Operation Review</span></div>
+            <div id="rt-2" onclick="toggleRT('rt-2')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s"><div id="rt-2-c" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;background:transparent;transition:all .15s"></div><span style="font-size:12px;color:var(--text2)">Fieldwork / Work-with Review</span></div>
+            <div id="rt-3" onclick="toggleRT('rt-3')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s"><div id="rt-3-c" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;background:transparent;transition:all .15s"></div><span style="font-size:12px;color:var(--text2)">Sales / AR &amp; Collection Review</span></div>
+            <div id="rt-4" onclick="toggleRT('rt-4')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s"><div id="rt-4-c" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;background:transparent;transition:all .15s"></div><span style="font-size:12px;color:var(--text2)">Others (Petty Cash Fund, etc.)</span></div>
           </div>
         </div>
+      </div></div>
+
+      <div id="iqa-err" class="alert alert-err"></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:80px">
+        <button class="btn btn-ghost" onclick="showTab('findings',document.getElementById('nt-findings'))">← Back to Findings</button>
+        <button class="btn btn-submit" id="iqa-submit-btn" onclick="submitIQA()">⭐ Submit IQA Assessment</button>
       </div>
-    </div>
-
-    <div id="iqa-err" class="alert alert-err"></div>
-    <div id="iqa-ok"  class="alert alert-ok"></div>
-
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:80px">
-      <button class="btn btn-ghost" onclick="switchMainTab('findings',document.getElementById('maintab-findings'))">← Back to Findings</button>
-      <button class="btn btn-submit" onclick="submitIQA()">⭐ Submit IQA Assessment</button>
     </div>
   </div>
 
-  <!-- Sticky footer (findings tab only) -->
+  <!-- TAB: HISTORY -->
+  <div id="tab-history" class="wrap" style="display:none">
+    <div style="font-family:var(--display);font-size:20px;font-weight:700;margin-bottom:4px">📜 My IQA Submissions</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:18px">IQA assessments you have submitted for this branch.</div>
+    <div id="history-loading" class="loading"><div class="spin">✦</div><div style="margin-top:10px">Loading…</div></div>
+    <div id="history-list" style="display:none"></div>
+    <div id="history-empty" class="empty" style="display:none">
+      <div style="font-size:32px;margin-bottom:10px">📋</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">No Submissions Yet</div>
+      <div style="color:var(--text2);font-size:12px">You haven't submitted any IQA assessments for this branch yet.</div>
+    </div>
+  </div>
+
+  <!-- Footer (findings tab) -->
   <div class="sfooter" id="findings-footer">
     <div>
       <div style="font-size:12px;font-weight:600;color:var(--text)" id="f-branch"></div>
@@ -435,22 +282,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-ghost" onclick="doLogout()">🚪 Sign Out</button>
-      <button class="btn btn-save"  onclick="saveAll()">💾 Save All Responses</button>
+      <button class="btn btn-save" onclick="saveAll()">💾 Save All Responses</button>
     </div>
   </div>
 </div>
 
-<!-- ====================================================== -->
-<!-- SCREEN: SUCCESS                                        -->
-<!-- ====================================================== -->
+<!-- SUCCESS -->
 <div class="screen" id="screen-success">
   <div class="wrap-sm">
     <div class="empty" style="margin-top:48px;padding:40px 28px">
       <div style="font-size:44px;margin-bottom:12px">🎉</div>
       <div style="font-size:18px;font-weight:700;margin-bottom:8px" id="success-title">Submitted!</div>
-      <div style="color:var(--text2);font-size:12px;line-height:1.8" id="success-msg">Your responses have been recorded.</div>
+      <div style="color:var(--text2);font-size:12px;line-height:1.8" id="success-msg"></div>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap">
-        <button class="btn btn-ghost" onclick="showScreen('screen-main')">← Go Back</button>
+        <button class="btn btn-ghost" onclick="viewMyHistory()">📜 View My Submissions</button>
         <button class="btn btn-ghost" onclick="doLogout()">🚪 Sign Out</button>
       </div>
     </div>
@@ -458,156 +303,99 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 </div>
 
 <script>
-// ============================================================
-// CONFIG
-// ============================================================
-const SUPA_URL = 'https://ieeffiwzbajftevutpnu.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllZWZmaXd6YmFqZnRldnV0cG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDUxNDgsImV4cCI6MjA4OTY4MTE0OH0.HhF2OB4pBzCCvC6hxIsvK_VX8ch42dvR9i2sY3f2UcI';
-const TABLE = 'iad_appstate';
+const SUPA_URL='https://ieeffiwzbajftevutpnu.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllZWZmaXd6YmFqZnRldnV0cG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDUxNDgsImV4cCI6MjA4OTY4MTE0OH0.HhF2OB4pBzCCvC6hxIsvK_VX8ch42dvR9i2sY3f2UcI';
+const TABLE='iad_appstate';
 
-// ============================================================
-// STATE
-// ============================================================
-let _branches=[], _reports=[], _findings=[], _edits={};
-let _branchName='', _branchCode='', _respondent='', _email='', _mobile='';
+let _branches=[],_reports=[],_findings=[],_edits={};
+let _branchName='',_branchCode='',_respondent='',_email='',_mobile='';
 let _method='dd';
-let _iqaRatings={};         // question key → score
-let _iqaReviewTypes=new Set();
-let _iqaSubmitted=false;
+let _ratings={},_reviewTypes=new Set();
+let _currentReportKey=''; // unique key per report per respondent for IQA
 
-// ============================================================
-// SUPABASE
-// ============================================================
-async function supaLoad(key) {
-  const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${encodeURIComponent(key)}&select=value`,
-    { headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY} });
-  if (!res.ok) throw new Error('HTTP '+res.status);
-  const rows = await res.json();
-  return rows?.length && rows[0].value ? JSON.parse(rows[0].value) : null;
+async function supaLoad(key){
+  const res=await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${encodeURIComponent(key)}&select=value`,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  const rows=await res.json();
+  return rows?.length&&rows[0].value?JSON.parse(rows[0].value):null;
 }
-async function supaSave(key,data) {
-  const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}`,{
-    method:'POST',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal,resolution=merge-duplicates'},
-    body:JSON.stringify([{id:key,value:JSON.stringify(data),updated_at:new Date().toISOString()}])
-  });
-  if (!res.ok) throw new Error('Save failed: HTTP '+res.status);
+async function supaSave(key,data){
+  const res=await fetch(`${SUPA_URL}/rest/v1/${TABLE}`,{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal,resolution=merge-duplicates'},body:JSON.stringify([{id:key,value:JSON.stringify(data),updated_at:new Date().toISOString()}])});
+  if(!res.ok)throw new Error('Save failed HTTP '+res.status);
 }
 
-// ============================================================
-// UI
-// ============================================================
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-}
-function setMethod(m,el) {
-  _method=m;
-  document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.method-panel').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('panel-'+m).classList.add('active');
-}
-function switchMainTab(tab,el) {
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function showTab(tab,el){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('panel-findings').style.display = tab==='findings'?'':'none';
-  document.getElementById('panel-iqa').style.display      = tab==='iqa'?'':'none';
-  document.getElementById('findings-footer').style.display= tab==='findings'?'':'none';
+  document.getElementById('tab-findings').style.display=tab==='findings'?'':'none';
+  document.getElementById('tab-iqa').style.display=tab==='iqa'?'':'none';
+  document.getElementById('tab-history').style.display=tab==='history'?'':'none';
+  document.getElementById('findings-footer').style.display=tab==='findings'?'':'none';
+  if(tab==='history')loadHistory();
 }
-function showAlert(id,msg,type) { const el=document.getElementById(id); el.textContent=msg; el.className='alert alert-'+type; el.style.display='block'; }
-function hideAlert(id) { document.getElementById(id).style.display='none'; }
-function fstatus(msg) { const el=document.getElementById('f-status'); if(el) el.textContent=msg; }
-function esc(str) { return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function setM(m,el){_method=m;document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.method-panel').forEach(p=>p.classList.remove('active'));el.classList.add('active');document.getElementById('mp-'+m).classList.add('active');}
+function showAlert(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className='alert alert-'+type;el.style.display='block';}
+function hideAlert(id){const el=document.getElementById(id);if(el)el.style.display='none';}
+function fstatus(msg){const el=document.getElementById('f-status');if(el)el.textContent=msg;}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function norm(s){return(s||'').toLowerCase().replace(/\s+/g,' ').trim();}
 
-// ============================================================
-// INIT
-// ============================================================
-async function init() {
-  try {
-    [_branches, _reports] = await Promise.all([supaLoad('branches'), supaLoad('reports')]);
-    _branches = _branches||[]; _reports = _reports||[];
-
-    const sel = document.getElementById('sel-branch');
-    sel.innerHTML = '<option value="">— Select your branch —</option>' +
-      _branches.filter(b=>!b.inactive).map(b=>
-        `<option value="${esc(b.name)}" data-code="${esc(b.code||'')}">${esc(b.name)}${b.code?' ('+b.code+')':''}</option>`
-      ).join('');
-
-    // URL params
-    const p = new URLSearchParams(window.location.search);
-    const urlCode = (p.get('branch')||p.get('code')||'').toUpperCase().trim();
-    const urlName = decodeURIComponent(p.get('name')||'').trim();
-    if (urlCode) {
-      const match = _branches.find(b=>(b.code||'').toUpperCase()===urlCode);
-      if (match) {
-        sel.value = match.name;
-        showAlert('info-box','✅ Branch "'+match.name+'" pre-selected from your link. Enter your name and click Access Portal.','ok');
-      } else {
-        document.getElementById('inp-code').value = urlCode;
-        setMethod('code',document.getElementById('tab-code'));
-      }
+async function init(){
+  try{
+    [_branches,_reports]=await Promise.all([supaLoad('branches'),supaLoad('reports')]);
+    _branches=_branches||[];_reports=_reports||[];
+    const sel=document.getElementById('sel-branch');
+    sel.innerHTML='<option value="">— Select your branch —</option>'+
+      _branches.filter(b=>!b.inactive).map(b=>`<option value="${esc(b.name)}" data-code="${esc(b.code||'')}">${esc(b.name)}${b.code?' ('+b.code+')':''}</option>`).join('');
+    const p=new URLSearchParams(window.location.search);
+    const urlCode=(p.get('branch')||p.get('code')||'').toUpperCase().trim();
+    const urlName=decodeURIComponent(p.get('name')||'').trim();
+    if(urlCode){
+      const match=_branches.find(b=>(b.code||'').toUpperCase()===urlCode);
+      if(match){sel.value=match.name;showAlert('info-box','✅ Branch "'+match.name+'" pre-selected. Enter your name and click Access Portal.','ok');}
+      else{document.getElementById('inp-code').value=urlCode;setM('code',document.getElementById('mt-code'));}
     }
-    if (urlName) document.getElementById('inp-name').value = urlName;
-  } catch(e) {
-    showAlert('info-box','ℹ Could not load branch list. Try the Access Code tab.','warn');
-  }
+    if(urlName)document.getElementById('inp-name').value=urlName;
+  }catch(e){showAlert('info-box','ℹ Could not load branch list. Try Access Code tab.','warn');}
 }
 
-// ============================================================
-// LOGIN — with robust branch matching
-// ============================================================
-async function doLogin() {
+async function doLogin(){
   hideAlert('err-box');
-  const name   = (document.getElementById('inp-name').value||'').trim();
-  const email  = (document.getElementById('inp-email').value||'').trim();
-  const mobile = (document.getElementById('inp-mobile').value||'').trim();
-  if (!name) { showAlert('err-box','Please enter your full name and title.','err'); return; }
-
-  let branchName='', branchCode='';
-
-  if (_method==='dd') {
-    const sel = document.getElementById('sel-branch');
-    branchName = sel.value;
-    const opt  = sel.options[sel.selectedIndex];
-    branchCode = opt?.dataset?.code||'';
-    if (!branchName) { showAlert('err-box','Please select your branch from the list.','err'); return; }
-
-  } else if (_method==='code') {
-    const code = (document.getElementById('inp-code').value||'').trim().toUpperCase();
-    if (!code) { showAlert('err-box','Please enter your branch access code.','err'); return; }
-    if (!_branches.length) try { _branches = await supaLoad('branches')||[]; } catch(e) {}
-    const match = _branches.find(b=>(b.code||'').toUpperCase()===code);
-    if (!match) { showAlert('err-box','Branch code "'+code+'" not found. Check with the audit team.','err'); return; }
-    branchName=match.name; branchCode=match.code||code;
-  } else {
-    showAlert('err-box','Use the Select Branch or Access Code tab to identify your branch.','err'); return;
-  }
-
-  _branchName=branchName; _branchCode=branchCode;
-  _respondent=name; _email=email; _mobile=mobile;
-
-  const btn = document.getElementById('login-btn');
-  btn.disabled=true; btn.textContent='⟳ Loading…';
-  try {
-    if (!_reports.length) _reports = await supaLoad('reports')||[];
-    buildFindings();
-    renderFindings();
-    populateIQAHeader();
-    buildRatingWidgets();
-    document.getElementById('hdr-user').textContent = name.split('—')[0].trim()+' · '+branchName;
-    document.getElementById('hdr-user').style.display = 'block';
+  const name=(document.getElementById('inp-name').value||'').trim();
+  const email=(document.getElementById('inp-email').value||'').trim();
+  const mobile=(document.getElementById('inp-mobile').value||'').trim();
+  if(!name){showAlert('err-box','Please enter your full name and title.','err');return;}
+  let branchName='',branchCode='';
+  if(_method==='dd'){
+    const sel=document.getElementById('sel-branch');
+    branchName=sel.value;branchCode=sel.options[sel.selectedIndex]?.dataset?.code||'';
+    if(!branchName){showAlert('err-box','Please select your branch.','err');return;}
+  }else if(_method==='code'){
+    const code=(document.getElementById('inp-code').value||'').trim().toUpperCase();
+    if(!code){showAlert('err-box','Please enter your branch access code.','err');return;}
+    if(!_branches.length)try{_branches=await supaLoad('branches')||[];}catch(e){}
+    const match=_branches.find(b=>(b.code||'').toUpperCase()===code);
+    if(!match){showAlert('err-box','Branch code "'+code+'" not found.','err');return;}
+    branchName=match.name;branchCode=match.code||code;
+  }else{showAlert('err-box','Use Select Branch or Access Code tab.','err');return;}
+  _branchName=branchName;_branchCode=branchCode;_respondent=name;_email=email;_mobile=mobile;
+  const btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='⟳ Loading…';
+  try{
+    if(!_reports.length)_reports=await supaLoad('reports')||[];
+    buildFindings();renderFindings();
+    populateIQAHeader();buildRatings();checkIQASubmitted();
+    document.getElementById('hdr-user').textContent=name.split('—')[0].trim()+' · '+branchName;
+    document.getElementById('hdr-user').style.display='block';
     showScreen('screen-main');
-  } catch(e) {
-    showAlert('err-box','Connection error: '+e.message,'err');
-  } finally { btn.disabled=false; btn.textContent='Access Portal →'; }
+  }catch(e){showAlert('err-box','Connection error: '+e.message,'err');}
+  finally{btn.disabled=false;btn.textContent='Access Portal →';}
 }
 
-function doLogout() {
-  _branchName='';_branchCode='';_respondent='';_findings=[];_edits={};_iqaRatings={};_iqaSubmitted=false;
+function doLogout(){
+  _branchName='';_branchCode='';_respondent='';_findings=[];_edits={};_ratings={};_reviewTypes=new Set();
   document.getElementById('hdr-user').style.display='none';
-  hideAlert('err-box'); hideAlert('info-box');
+  hideAlert('err-box');hideAlert('info-box');
   document.getElementById('login-btn').disabled=false;
   document.getElementById('login-btn').textContent='Access Portal →';
   ['inp-name','inp-email','inp-mobile'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -615,84 +403,65 @@ function doLogout() {
   showScreen('screen-login');
 }
 
-// ============================================================
-// FINDINGS — improved branch matching
-// ============================================================
-function normStr(s) { return (s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
-
-function buildFindings() {
+// FINDINGS
+function buildFindings(){
   _findings=[];
+  // Find all reports matching this branch
+  const matchedReports=[];
   _reports.forEach((report,rIdx)=>{
-    if (report.inactive) return;
-    // Robust matching: normalize both sides
-    const repBranch = normStr(report.branch);
-    const myBranch  = normStr(_branchName);
-    if (repBranch !== myBranch) return;
+    if(report.inactive)return;
+    // Robust: normalize branch names for comparison
+    if(norm(report.branch)!==norm(_branchName))return;
+    matchedReports.push({report,rIdx});
+  });
 
+  // Debug: log what we found
+  console.log('Branch:',_branchName,'Matched reports:',matchedReports.length,'Total reports:',_reports.length);
+  console.log('Report branches:',[..._reports.map(r=>r.branch)]);
+
+  matchedReports.forEach(({report,rIdx})=>{
     (report.findingsList||[]).forEach((f,fIdx)=>{
-      if (f.status==='Closed') return;
-      _findings.push({
-        key:`${rIdx}_${fIdx}`,
-        reportIdx:rIdx, findingIdx:fIdx, f,
-        reportTitle: report.title  || 'Audit Report',
-        reportDate:  report.date   || '',
-        auditor:     report.author || '—',
-        engagement:  report.eng    || '—',
-        reportStatus:report.status || '',
-      });
+      if(f.status==='Closed')return;
+      _findings.push({key:`${rIdx}_${fIdx}`,reportIdx:rIdx,findingIdx:fIdx,f,
+        reportTitle:report.title||'Audit Report',reportDate:report.date||'',
+        auditor:report.author||'—',engagement:report.eng||'—',reportStatus:report.status||''});
     });
   });
+  // Set current report key for IQA (1 per report per respondent)
+  if(matchedReports.length>0){
+    const first=matchedReports[0];
+    _currentReportKey='iqa::'+norm(_branchName)+'::'+norm(first.report.title)+'::'+norm(_respondent);
+  }
 }
 
-// ============================================================
-// RENDER FINDINGS
-// ============================================================
-const SC={
-  'Open':          {bg:'rgba(248,113,113,.12)',c:'var(--rose)', bd:'rgba(248,113,113,.3)'},
-  'Ongoing':       {bg:'rgba(96,165,250,.12)', c:'var(--sky)',  bd:'rgba(96,165,250,.3)'},
-  'For Validation':{bg:'rgba(251,191,36,.12)', c:'#fbbf24',    bd:'rgba(251,191,36,.3)'},
-  'Closed':        {bg:'rgba(45,212,191,.12)', c:'var(--teal)',bd:'rgba(45,212,191,.3)'},
-  'Overdue':       {bg:'rgba(249,115,22,.12)', c:'#f97316',    bd:'rgba(249,115,22,.3)'},
-};
+const SC={'Open':{bg:'rgba(248,113,113,.12)',c:'var(--rose)',bd:'rgba(248,113,113,.3)'},'Ongoing':{bg:'rgba(96,165,250,.12)',c:'var(--sky)',bd:'rgba(96,165,250,.3)'},'For Validation':{bg:'rgba(251,191,36,.12)',c:'#fbbf24',bd:'rgba(251,191,36,.3)'},'Closed':{bg:'rgba(45,212,191,.12)',c:'var(--teal)',bd:'rgba(45,212,191,.3)'},'Overdue':{bg:'rgba(249,115,22,.12)',c:'#f97316',bd:'rgba(249,115,22,.3)'}};
 function spill(st){const s=SC[st]||{bg:'rgba(74,85,104,.15)',c:'#94a3b8',bd:'rgba(74,85,104,.3)'};return`<span class="spill" style="background:${s.bg};color:${s.c};border:1px solid ${s.bd}">${st}</span>`;}
 
-function renderFindings() {
-  const first = _findings[0];
-  document.getElementById('h-branch').textContent    = `Branch: ${_branchName}${_branchCode?' ('+_branchCode+')':''} · ${_respondent}`;
-  document.getElementById('f-branch').textContent    = `${_branchName} — ${_respondent}`;
-  document.getElementById('h-respondent').textContent= 'Respondent: '+_respondent;
-
-  if (first) {
-    document.getElementById('h-title').textContent   = first.reportTitle;
-    document.getElementById('h-date').textContent    = first.reportDate||'—';
-    document.getElementById('h-auditor').textContent = first.auditor;
-    document.getElementById('h-eng').textContent     = first.engagement;
-    const rs=first.reportStatus;
-    const rc=rs==='Final – Issued'?'var(--teal)':rs==='Findings Raised'?'var(--rose)':rs==='Under Review'?'var(--sky)':'var(--muted)';
-    const sp=document.getElementById('h-status');
-    sp.textContent=rs; sp.style.cssText=`background:${rc}18;color:${rc};border:1px solid ${rc}44;margin-top:8px`;
+function renderFindings(){
+  const first=_findings[0];
+  document.getElementById('h-branch').textContent=`Branch: ${_branchName}${_branchCode?' ('+_branchCode+')':''} · ${_respondent}`;
+  document.getElementById('f-branch').textContent=`${_branchName} — ${_respondent}`;
+  document.getElementById('h-resp').textContent='Respondent: '+_respondent;
+  if(first){
+    document.getElementById('h-title').textContent=first.reportTitle;
+    document.getElementById('h-date').textContent=first.reportDate||'—';
+    document.getElementById('h-auditor').textContent=first.auditor;
+    document.getElementById('h-eng').textContent=first.engagement;
+    const rs=first.reportStatus,rc=rs==='Final – Issued'?'var(--teal)':rs==='Findings Raised'?'var(--rose)':rs==='Under Review'?'var(--sky)':'var(--muted)';
+    const sp=document.getElementById('h-status');sp.textContent=rs;sp.style.cssText=`background:${rc}18;color:${rc};border:1px solid ${rc}44;margin-top:8px`;
   }
-  updateProgress();
-  document.getElementById('loading-findings').style.display='none';
-
-  if (!_findings.length) {
-    document.getElementById('findings-list').style.display='none';
-    document.getElementById('findings-empty').style.display='';
-    return;
-  }
-  document.getElementById('findings-list').style.display='';
-  document.getElementById('findings-empty').style.display='none';
-
-  document.getElementById('findings-list').innerHTML = _findings.map((item,i)=>{
-    const f=item.f, ed=_edits[item.key]||{}, sc=SC[f.status]||SC['Open'];
-    const mgmt  = ed.mgmtResponse!==undefined?ed.mgmtResponse:(f.mgmtResponse||'');
-    const plan  = ed.actionPlan  !==undefined?ed.actionPlan  :(f.actionPlan  ||'');
-    const tdate = ed.targetDate  !==undefined?ed.targetDate  :(f.deadline    ||'');
-    const status= ed.status      !==undefined?ed.status      :(f.status      ||'Open');
-    const saved = !!ed._saved;
-    const hasPrev=(f.mgmtResponse||'').trim()||(f.actionPlan||'').trim();
-    return `
-    <div class="fcard" id="card-${item.key}">
+  updateProg();
+  document.getElementById('loading-f').style.display='none';
+  if(!_findings.length){document.getElementById('findings-list').style.display='none';document.getElementById('findings-empty').style.display='';return;}
+  document.getElementById('findings-list').style.display='';document.getElementById('findings-empty').style.display='none';
+  document.getElementById('findings-list').innerHTML=_findings.map((item,i)=>{
+    const f=item.f,ed=_edits[item.key]||{},sc=SC[f.status]||SC['Open'];
+    const mgmt=ed.mgmtResponse!==undefined?ed.mgmtResponse:(f.mgmtResponse||'');
+    const plan=ed.actionPlan!==undefined?ed.actionPlan:(f.actionPlan||'');
+    const tdate=ed.targetDate!==undefined?ed.targetDate:(f.deadline||'');
+    const status=ed.status!==undefined?ed.status:(f.status||'Open');
+    const saved=!!ed._saved,hasPrev=(f.mgmtResponse||'').trim()||(f.actionPlan||'').trim();
+    return`<div class="fcard" id="card-${item.key}">
       <div class="fhead" onclick="toggleF('${item.key}')">
         <div class="fnum" style="background:${sc.bg};color:${sc.c};border:1px solid ${sc.bd}">${i+1}</div>
         <div class="fdesc">${esc(f.description||'(No description)')}</div>
@@ -709,23 +478,11 @@ function renderFindings() {
         ${f.responsible||f.deadline?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-size:11px;color:var(--text2);display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px">${f.responsible?'<span>👤 <strong>Responsible:</strong> '+esc(f.responsible)+'</span>':''}${f.deadline?'<span>📅 <strong>Original Deadline:</strong> '+esc(f.deadline)+'</span>':''}</div>`:''}
         <div class="resp-box">
           <div class="resp-label">✍ Your Management Response</div>
-          <div class="fg" style="margin-bottom:10px">
-            <label>Management Comment / Response</label>
-            <textarea id="mgmt-${item.key}" placeholder="Acknowledge the finding and provide management's comment…" oninput="trackEdit('${item.key}')">${esc(mgmt)}</textarea>
-          </div>
-          <div class="fg" style="margin-bottom:10px">
-            <label>Action Plan / Corrective Measures</label>
-            <textarea id="plan-${item.key}" placeholder="List specific corrective steps management will take…" oninput="trackEdit('${item.key}')">${esc(plan)}</textarea>
-          </div>
+          <div class="fg" style="margin-bottom:10px"><label>Management Comment / Response</label><textarea id="mgmt-${item.key}" placeholder="Acknowledge the finding and provide management's comment…" oninput="trackEdit('${item.key}')">${esc(mgmt)}</textarea></div>
+          <div class="fg" style="margin-bottom:10px"><label>Action Plan / Corrective Measures</label><textarea id="plan-${item.key}" placeholder="List specific corrective steps management will take…" oninput="trackEdit('${item.key}')">${esc(plan)}</textarea></div>
           <div class="resp-row">
             <div class="fg" style="margin:0"><label>Target Completion Date</label><input type="date" id="date-${item.key}" value="${esc(tdate)}" onchange="trackEdit('${item.key}')"></div>
-            <div class="fg" style="margin:0"><label>Update Status</label>
-              <select id="stat-${item.key}" onchange="trackEdit('${item.key}')">
-                <option value="Open"           ${status==='Open'?'selected':''}>Open</option>
-                <option value="Ongoing"        ${status==='Ongoing'?'selected':''}>Ongoing — In Progress</option>
-                <option value="For Validation" ${status==='For Validation'?'selected':''}>For Validation — Done</option>
-              </select>
-            </div>
+            <div class="fg" style="margin:0"><label>Update Status</label><select id="stat-${item.key}" onchange="trackEdit('${item.key}')"><option value="Open" ${status==='Open'?'selected':''}>Open</option><option value="Ongoing" ${status==='Ongoing'?'selected':''}>Ongoing</option><option value="For Validation" ${status==='For Validation'?'selected':''}>For Validation — Done</option></select></div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:8px">
             <div id="msg-${item.key}" style="font-size:11px;color:var(--muted)"></div>
@@ -736,170 +493,158 @@ function renderFindings() {
     </div>`;
   }).join('');
 }
-
 function toggleF(key){const b=document.getElementById('body-'+key),c=document.getElementById('chev-'+key),o=b.style.display!=='none';b.style.display=o?'none':'';c.style.transform=o?'rotate(-90deg)':'';}
-function trackEdit(key){if(!_edits[key])_edits[key]={};_edits[key].mgmtResponse=document.getElementById('mgmt-'+key)?.value||'';_edits[key].actionPlan=document.getElementById('plan-'+key)?.value||'';_edits[key].targetDate=document.getElementById('date-'+key)?.value||'';_edits[key].status=document.getElementById('stat-'+key)?.value||'Open';_edits[key]._saved=false;updateProgress();}
-function updateProgress(){const total=_findings.length,answered=_findings.filter(item=>(((_edits[item.key]?.mgmtResponse)||item.f.mgmtResponse||'').trim().length>0)).length,pct=total>0?Math.round(answered/total*100):0;const pt=document.getElementById('h-prog-text'),pb=document.getElementById('h-prog-bar');if(pt)pt.textContent=`${answered} of ${total} finding${total!==1?'s':''} responded`;if(pb)pb.style.width=pct+'%';}
+function trackEdit(key){if(!_edits[key])_edits[key]={};_edits[key].mgmtResponse=document.getElementById('mgmt-'+key)?.value||'';_edits[key].actionPlan=document.getElementById('plan-'+key)?.value||'';_edits[key].targetDate=document.getElementById('date-'+key)?.value||'';_edits[key].status=document.getElementById('stat-'+key)?.value||'Open';_edits[key]._saved=false;updateProg();}
+function updateProg(){const total=_findings.length,answered=_findings.filter(i=>(((_edits[i.key]?.mgmtResponse)||i.f.mgmtResponse||'').trim().length>0)).length,pct=total>0?Math.round(answered/total*100):0;const pt=document.getElementById('h-prog-text'),pb=document.getElementById('h-prog-bar');if(pt)pt.textContent=`${answered} of ${total} finding${total!==1?'s':''} responded`;if(pb)pb.style.width=pct+'%';}
 
-// ============================================================
-// SAVE FINDINGS
-// ============================================================
-async function saveFinding(key) {
-  const item=_findings.find(f=>f.key===key); if(!item)return;
+async function saveFinding(key){
+  const item=_findings.find(f=>f.key===key);if(!item)return;
   const msgEl=document.getElementById('msg-'+key);
   const mgmt=(document.getElementById('mgmt-'+key)?.value||'').trim();
   const plan=(document.getElementById('plan-'+key)?.value||'').trim();
   const tdate=document.getElementById('date-'+key)?.value||'';
   const status=document.getElementById('stat-'+key)?.value||'Open';
-  if(!mgmt&&!plan){if(msgEl){msgEl.textContent='⚠ Fill in at least the Management Response.';msgEl.style.color='var(--warn)';}return;}
+  if(!mgmt&&!plan){if(msgEl){msgEl.textContent='⚠ Fill in Management Response first.';msgEl.style.color='var(--warn)';}return;}
   if(msgEl){msgEl.textContent='⟳ Saving…';msgEl.style.color='var(--sky)';}
-  try {
-    const latest=await supaLoad('reports');
-    if(!latest)throw new Error('Could not load reports.');
-    const report=latest[item.reportIdx];
-    if(!report?.findingsList)throw new Error('Report not found.');
-    const finding=report.findingsList[item.findingIdx];
-    if(!finding)throw new Error('Finding not found.');
-    finding.mgmtResponse=mgmt; finding.actionPlan=plan;
-    if(tdate)finding.deadline=tdate;
-    finding.status=status; finding.respondent=_respondent; finding.respondedAt=new Date().toISOString();
-    await supaSave('reports',latest);
-    _reports=latest;
+  try{
+    const latest=await supaLoad('reports');if(!latest)throw new Error('Could not load reports.');
+    const report=latest[item.reportIdx];if(!report?.findingsList)throw new Error('Report not found.');
+    const finding=report.findingsList[item.findingIdx];if(!finding)throw new Error('Finding not found.');
+    finding.mgmtResponse=mgmt;finding.actionPlan=plan;if(tdate)finding.deadline=tdate;
+    finding.status=status;finding.respondent=_respondent;finding.respondedAt=new Date().toISOString();
+    await supaSave('reports',latest);_reports=latest;
     _edits[key]={mgmtResponse:mgmt,actionPlan:plan,targetDate:tdate,status,_saved:true};
     if(msgEl){msgEl.textContent='✅ Saved!';msgEl.style.color='var(--teal)';}
-    // Update card
     const card=document.getElementById('card-'+key);
     if(card){const sc=SC[status]||SC['Open'];card.querySelectorAll('.spill').forEach(p=>{p.textContent=status;Object.assign(p.style,{background:sc.bg,color:sc.c,border:`1px solid ${sc.bd}`});});let badge=card.querySelector('.saved-badge');if(!badge){badge=document.createElement('span');badge.className='saved-badge';badge.style.cssText='font-size:10px;color:var(--teal);font-weight:600;white-space:nowrap';const chev=card.querySelector('[id^="chev-"]');if(chev)chev.parentNode.insertBefore(badge,chev);}badge.textContent='✓ Saved';card.querySelectorAll('.fhead span').forEach(s=>{if(s.textContent.includes('Draft'))s.remove();});}
-    updateProgress(); fstatus('✅ Saved to audit system.');
+    updateProg();fstatus('✅ Saved to audit system.');
     setTimeout(()=>{if(msgEl&&msgEl.textContent.startsWith('✅'))msgEl.textContent='';},5000);
-  } catch(e){if(msgEl){msgEl.textContent='❌ '+e.message;msgEl.style.color='var(--rose)';}fstatus('❌ Save failed.');}
+  }catch(e){if(msgEl){msgEl.textContent='❌ '+e.message;msgEl.style.color='var(--rose)';}fstatus('❌ Save failed.');}
 }
-
 async function saveAll(){fstatus('⟳ Saving all…');let c=0;for(const item of _findings){const mgmt=(document.getElementById('mgmt-'+item.key)?.value||'').trim(),plan=(document.getElementById('plan-'+item.key)?.value||'').trim();if(!mgmt&&!plan)continue;await saveFinding(item.key);c++;}fstatus(c===0?'ℹ Fill in at least one Management Response.':'✅ '+c+' response'+(c!==1?'s':'')+' saved!');}
 
-// ============================================================
-// IQA SURVEY
-// ============================================================
+// IQA
 function populateIQAHeader(){
   const first=_findings[0];
-  document.getElementById('iqa-branch-label').textContent  = _branchName||'—';
-  document.getElementById('iqa-auditor-label').textContent = first?.auditor||'—';
-  document.getElementById('iqa-date-label').textContent    = first?.reportDate||new Date().toISOString().slice(0,10);
+  document.getElementById('iqa-branch').textContent=_branchName||'—';
+  document.getElementById('iqa-auditor').textContent=first?.auditor||'—';
+  document.getElementById('iqa-report').textContent=first?.reportTitle||'—';
+  document.getElementById('iqa-date').textContent=first?.reportDate||new Date().toISOString().slice(0,10);
 }
 
-const RATING_HINTS = {
-  '1':'Performs unacceptable audit results. Major improvement needed.',
-  '2':'Well below expectations. Significant issues observed.',
-  '3':'Below expectations. Considerable improvement required.',
-  '4':'Marginally acceptable. Several areas need improvement.',
-  '5':'Acceptable with notable areas for improvement.',
-  '6':'Generally acceptable. Some minor improvements needed.',
-  '7':'Good performance. Minor enhancements would be beneficial.',
-  '8':'Very good. Meets expectations with above-average performance.',
-  '9':'Excellent. Consistently exceeds expectations.',
-  '10':'Extraordinary. Exceptional audit performance in all aspects.',
-};
-
-function buildRatingWidgets(){
-  for(let q=1;q<=10;q++){
-    const row=document.getElementById('r-'+q);
-    if(!row)continue;
-    row.innerHTML='';
-    for(let s=1;s<=10;s++){
-      const btn=document.createElement('button');
-      btn.className='star-btn';
-      btn.textContent=s;
-      btn.type='button';
-      btn.onclick=(()=>{const score=s,qNum=q;return()=>setRating(qNum,score);})(s);
-      row.appendChild(btn);
-    }
-  }
+async function checkIQASubmitted(){
+  if(!_currentReportKey)return;
+  try{
+    const all=await supaLoad('iqa_submissions')||[];
+    const mine=all.find(s=>norm(s.branch)===norm(_branchName)&&norm(s.respondent)===norm(_respondent)&&norm(s.reportTitle||'')===norm(_findings[0]?.reportTitle||''));
+    const box=document.getElementById('iqa-already-submitted');
+    const wrap=document.getElementById('iqa-form-wrap');
+    const submitBtn=document.getElementById('iqa-submit-btn');
+    if(mine){
+      box.style.display='';
+      document.getElementById('iqa-submitted-info').textContent=`Submitted on ${new Date(mine.submittedAt).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})} · Overall Rating: ${mine.overallAverage}/10 — ${mine.overallGrade}`;
+      if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='✅ Already Submitted';}
+    }else{box.style.display='none';if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='⭐ Submit IQA Assessment';}}
+  }catch(e){console.warn('IQA check failed',e);}
 }
+
+const HINTS={'1':'Unacceptable. Major improvement needed.','2':'Well below expectations.','3':'Below expectations. Considerable improvement required.','4':'Marginally acceptable.','5':'Acceptable with notable improvements needed.','6':'Generally acceptable. Minor improvements needed.','7':'Good. Minor enhancements beneficial.','8':'Very good. Above-average performance.','9':'Excellent. Consistently exceeds expectations.','10':'Extraordinary. Exceptional in all aspects.'};
+
+function buildRatings(){for(let q=1;q<=10;q++){const row=document.getElementById('r-'+q);if(!row)continue;row.innerHTML='';for(let s=1;s<=10;s++){const btn=document.createElement('button');btn.className='star-btn';btn.textContent=s;btn.type='button';btn.onclick=(()=>{const score=s,qn=q;return()=>setRating(qn,score);})(s);row.appendChild(btn);}}}
 
 function setRating(q,score){
-  _iqaRatings[q]=score;
-  const row=document.getElementById('r-'+q);
-  const hint=document.getElementById('rh-'+q);
+  _ratings[q]=score;
+  const row=document.getElementById('r-'+q),hint=document.getElementById('rh-'+q);
   if(!row)return;
-  // Color class
-  const cls=score<=3?'sel-low':score<=7?'sel-mid':'sel-high';
-  row.querySelectorAll('.star-btn').forEach((btn,i)=>{
-    btn.className='star-btn'+(i+1<=score?' '+cls:'');
-  });
-  if(hint){hint.textContent='Score: '+score+'/10 — '+RATING_HINTS[score];hint.style.color=score<=3?'var(--rose)':score<=7?'var(--warn)':'var(--teal)';}
-  updateOverallScore();
+  const cls=score<=3?'sl':score<=7?'sm':'sh';
+  row.querySelectorAll('.star-btn').forEach((btn,i)=>{btn.className='star-btn'+(i+1<=score?' '+cls:'');});
+  if(hint){hint.textContent='Score: '+score+'/10 — '+HINTS[score];hint.style.color=score<=3?'var(--rose)':score<=7?'var(--warn)':'var(--teal)';}
+  updateOverall();
 }
 
-function updateOverallScore(){
-  const vals=Object.values(_iqaRatings).filter(v=>v>0);
-  if(!vals.length)return;
-  const avg=(vals.reduce((a,b)=>a+b,0)/vals.length);
-  const box=document.getElementById('overall-score-box');
-  const val=document.getElementById('overall-score-val');
-  const desc=document.getElementById('overall-score-desc');
-  if(!box)return;
-  box.style.display='';
-  val.textContent=avg.toFixed(1);
-  val.style.color=avg<=3?'var(--rose)':avg<=7?'var(--warn)':'var(--teal)';
-  desc.textContent=avg>=8?'⭐ Extraordinary Performance':avg>=4?'✅ Acceptable Performance — Some Areas for Improvement':'⚠ Needs Improvement — General Enhancement Required';
-  desc.style.color=avg<=3?'var(--rose)':avg<=7?'var(--warn)':'var(--teal)';
+function updateOverall(){
+  const vals=Object.values(_ratings).filter(v=>v>0);if(!vals.length)return;
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const box=document.getElementById('overall-box'),val=document.getElementById('overall-val'),grade=document.getElementById('overall-grade');
+  if(!box)return;box.style.display='';
+  val.textContent=avg.toFixed(1);val.style.color=avg<=3?'var(--rose)':avg<=7?'var(--warn)':'var(--teal)';
+  grade.textContent=avg>=8?'⭐ Extraordinary Performance':avg>=4?'✅ Acceptable — Some Areas for Improvement':'⚠ Needs Improvement';
+  grade.style.color=avg<=3?'var(--rose)':avg<=7?'var(--warn)':'var(--teal)';
 }
 
-function toggleReviewType(id){
-  const el=document.getElementById(id),chk=document.getElementById(id+'-chk');
-  const active=_iqaReviewTypes.has(id);
-  if(active){_iqaReviewTypes.delete(id);el.style.borderColor='var(--border2)';chk.style.background='transparent';chk.style.borderColor='var(--border2)';}
-  else{_iqaReviewTypes.add(id);el.style.borderColor='var(--violet)';chk.style.background='var(--violet)';chk.style.borderColor='var(--violet)';chk.innerHTML='<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>';}
-}
+function toggleRT(id){const el=document.getElementById(id),chk=document.getElementById(id+'-c'),active=_reviewTypes.has(id);if(active){_reviewTypes.delete(id);el.style.borderColor='var(--border2)';chk.style.background='transparent';chk.style.borderColor='var(--border2)';chk.innerHTML='';}else{_reviewTypes.add(id);el.style.borderColor='var(--violet)';chk.style.background='var(--violet)';chk.style.borderColor='var(--violet)';chk.innerHTML='<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>';}}
 
-function getReviewTypeLabels(){
-  const map={'rt-1':'Branch Operation Review','rt-2':'Fieldwork / Work-with Assessment Review','rt-3':'Sales / AR & Collection Review','rt-4':'Others (Petty Cash Fund, etc.)'};
-  return [..._iqaReviewTypes].map(id=>map[id]||id);
-}
+const RT_LABELS={'rt-1':'Branch Operation Review','rt-2':'Fieldwork / Work-with Assessment Review','rt-3':'Sales / AR & Collection Review','rt-4':'Others (Petty Cash Fund, etc.)'};
 
 async function submitIQA(){
-  hideAlert('iqa-err'); hideAlert('iqa-ok');
-  const feedback=(document.getElementById('iqa-feedback').value||'').trim();
-  const answeredCount=Object.keys(_iqaRatings).filter(k=>_iqaRatings[k]>0).length;
-  if(answeredCount<5){showAlert('iqa-err','Please answer at least 5 rating questions before submitting.','err');return;}
-  const vals=Object.values(_iqaRatings).filter(v=>v>0);
+  hideAlert('iqa-err');
+  const answered=Object.keys(_ratings).filter(k=>_ratings[k]>0).length;
+  if(answered<5){showAlert('iqa-err','Please answer at least 5 rating questions before submitting.','err');return;}
+  const vals=Object.values(_ratings).filter(v=>v>0);
   const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+  const first=_findings[0];
   const submission={
-    branch:_branchName, branchCode:_branchCode,
-    respondent:_respondent, email:_email, mobile:_mobile,
-    auditor:_findings[0]?.auditor||'—',
-    auditDate:_findings[0]?.reportDate||new Date().toISOString().slice(0,10),
-    reportTitle:_findings[0]?.reportTitle||'—',
-    reviewTypes:getReviewTypeLabels(),
-    ratings:_iqaRatings,
-    overallAverage:parseFloat(avg.toFixed(2)),
+    branch:_branchName,branchCode:_branchCode,respondent:_respondent,email:_email,mobile:_mobile,
+    auditor:first?.auditor||'—',auditDate:first?.reportDate||new Date().toISOString().slice(0,10),
+    reportTitle:first?.reportTitle||'—',engagement:first?.engagement||'—',
+    reviewTypes:[..._reviewTypes].map(id=>RT_LABELS[id]||id),
+    ratings:_ratings,overallAverage:parseFloat(avg.toFixed(2)),
     overallGrade:avg>=8?'Extraordinary':avg>=4?'Acceptable':'Needs Improvement',
-    feedback,
+    feedback:(document.getElementById('iqa-feedback').value||'').trim(),
     submittedAt:new Date().toISOString(),
   };
-  const btn=document.querySelector('[onclick="submitIQA()"]');
+  const btn=document.getElementById('iqa-submit-btn');
   if(btn){btn.disabled=true;btn.textContent='⟳ Submitting…';}
-  try {
-    // Load existing IQA submissions
-    let existing=await supaLoad('iqa_submissions')||[];
-    existing.push(submission);
-    await supaSave('iqa_submissions',existing);
-    _iqaSubmitted=true;
+  try{
+    let all=await supaLoad('iqa_submissions')||[];
+    all.push(submission);
+    await supaSave('iqa_submissions',all);
     document.getElementById('success-title').textContent='IQA Assessment Submitted!';
-    document.getElementById('success-msg').innerHTML=`
-      Thank you, <strong>${_respondent}</strong>!<br><br>
-      Your IQA Self Assessment Review has been submitted successfully.<br>
-      Overall Rating: <strong style="color:${avg>=8?'#2dd4bf':avg>=4?'#fbbf24':'#f87171'}">${avg.toFixed(1)}/10 — ${submission.overallGrade}</strong><br><br>
-      The Internal Audit Division will review your submission. This report is private and confidential.`;
+    document.getElementById('success-msg').innerHTML=`Thank you, <strong>${_respondent}</strong>!<br><br>Your IQA Self Assessment has been recorded.<br>Overall Rating: <strong style="color:${avg>=8?'#2dd4bf':avg>=4?'#fbbf24':'#f87171'}">${avg.toFixed(1)}/10 — ${submission.overallGrade}</strong><br><br><span style="color:var(--muted);font-size:11px">This report is private and confidential.</span>`;
     showScreen('screen-success');
-  } catch(e){
-    showAlert('iqa-err','Submission failed: '+e.message,'err');
-  } finally {if(btn){btn.disabled=false;btn.textContent='⭐ Submit IQA Assessment';}}
+    // Update submit button state
+    if(btn){btn.disabled=true;btn.textContent='✅ Already Submitted';}
+  }catch(e){showAlert('iqa-err','Submission failed: '+e.message,'err');if(btn){btn.disabled=false;btn.textContent='⭐ Submit IQA Assessment';}}
 }
 
-// ============================================================
-// BOOT
-// ============================================================
+// HISTORY
+function viewMyHistory(){showScreen('screen-main');showTab('history',document.getElementById('nt-history'));}
+
+async function loadHistory(){
+  document.getElementById('history-loading').style.display='';
+  document.getElementById('history-list').style.display='none';
+  document.getElementById('history-empty').style.display='none';
+  try{
+    const all=await supaLoad('iqa_submissions')||[];
+    const mine=all.filter(s=>norm(s.branch)===norm(_branchName)&&norm(s.respondent)===norm(_respondent));
+    document.getElementById('history-loading').style.display='none';
+    if(!mine.length){document.getElementById('history-empty').style.display='';return;}
+    document.getElementById('history-list').style.display='';
+    document.getElementById('history-list').innerHTML=mine.sort((a,b)=>b.submittedAt>a.submittedAt?1:-1).map(s=>{
+      const avg=s.overallAverage,c=avg>=8?'var(--teal)':avg>=4?'var(--warn)':'var(--rose)';
+      return`<div class="sub-card">
+        <div class="sub-card-head">
+          <div>
+            <div class="sub-title">${esc(s.reportTitle||'Audit Report')}</div>
+            <div class="sub-meta">Auditor: ${esc(s.auditor)} · ${esc(s.auditDate)}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:var(--display);font-size:24px;font-weight:700;color:${c}">${avg.toFixed(1)}</div>
+            <div style="font-size:10px;color:var(--muted)">out of 10</div>
+            <div style="font-size:10px;font-weight:600;color:${c}">${s.overallGrade}</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Submitted: ${new Date(s.submittedAt).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        ${s.reviewTypes?.length?`<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Review type: ${s.reviewTypes.join(', ')}</div>`:''}
+        ${s.feedback?`<div style="font-size:12px;color:var(--text2);background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;line-height:1.7">"${esc(s.feedback)}"</div>`:''}
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
+          ${Object.entries(s.ratings||{}).map(([q,v])=>{const c2=v<=3?'var(--rose)':v<=7?'var(--warn)':'var(--teal)';return`<span style="background:${c2}14;color:${c2};border:1px solid ${c2}33;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700">Q${q}: ${v}/10</span>`;}).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){document.getElementById('history-loading').style.display='none';document.getElementById('history-empty').style.display='';console.warn(e);}
+}
+
 init();
 </script>
 </body>

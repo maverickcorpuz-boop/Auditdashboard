@@ -2765,16 +2765,16 @@ async function supaFetch(table, method='GET', body=null, query='') {
   return text ? JSON.parse(text) : null;
 }
 
-// Quick connectivity test — checks if Supabase is reachable at all
+// Quick connectivity test — accepts any non-network-error response
 async function testSupabaseReachable() {
   try {
     const url = `${SUPA_URL}/rest/v1/iad_appstate?limit=1&select=id`;
     const res = await fetch(url, {
-      method: 'GET',
-      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY },
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
     });
-    // 200, 404, 406 all mean Supabase is reachable — 406 = table doesn't exist yet
-    return res.status === 200 || res.status === 404 || res.status === 406 || res.ok;
+    // Any HTTP response (even 400/401/404) means Supabase is reachable
+    // Only a network error (fetch throws) means unreachable
+    return true;
   } catch(e) {
     return false;
   }
@@ -2815,13 +2815,13 @@ function dbSave(key, value) {
 function dbClear(key) { try { localStorage.removeItem(key); } catch(e){} }
 
 // ================================================================
-// VERSION STAMP — bump to force-clear old cached data
+// VERSION STAMP — bump only clears non-critical structural keys
 // ================================================================
-const DATA_VERSION = 'v6-datebar-2025';
+const DATA_VERSION = 'v7-stable-2025';
 if (localStorage.getItem('iad_data_version') !== DATA_VERSION) {
-  // Only clear core keys, NOT compliance/performance (they have separate keys)
-  ['iad_tasks','iad_fieldworks','iad_reports','iad_timeline',
-   'iad_schedules','iad_branches','iad_auditorProfiles','iad_auditTrail'].forEach(k => localStorage.removeItem(k));
+  // Only clear auditor profiles (structural) — keep all data keys intact
+  // Data will be refreshed from Supabase on next boot
+  ['iad_auditorProfiles'].forEach(k => localStorage.removeItem(k));
   localStorage.setItem('iad_data_version', DATA_VERSION);
 }
 
@@ -2858,6 +2858,7 @@ async function persist() {
       const results = await Promise.allSettled([
         syncBlobToSupabase('tasks',          tasks),
         syncBlobToSupabase('fieldworks',     fieldworks),
+        syncBlobToSupabase('reports',        reports),
         syncBlobToSupabase('timeline',       timelineEvents),
         syncBlobToSupabase('schedules',      schedules),
         syncBlobToSupabase('branches',       branches),
@@ -2901,7 +2902,7 @@ async function loadBlobFromSupabase(key) {
 async function loadFromSupabase() {
   showSaveIndicator('⟳ Connecting to cloud…', 'var(--accent2)');
 
-  // Test reachability first — prevents 9 failed fetch errors
+  // Test reachability first
   const reachable = await testSupabaseReachable();
   if (!reachable) {
     SUPA_CONNECTED = false;
@@ -2910,28 +2911,30 @@ async function loadFromSupabase() {
   }
 
   try {
-    // Load all blobs in parallel
-    const keys = ['tasks','fieldworks','timeline','schedules','branches','auditTrail','auditors','compliance','performance'];
+    // Load all blobs in parallel — 'reports' was missing, now included
+    const keys = ['tasks','fieldworks','reports','timeline','schedules','branches','auditTrail','auditors','compliance','performance'];
     const results = await Promise.allSettled(keys.map(k => loadBlobFromSupabase(k)));
 
-    const [t, fw, tl, sc, br, at, aud, cmp, perf] = results.map(r => r.status === 'fulfilled' ? r.value : null);
-    if (t)    tasks             = t;
-    if (fw)   fieldworks        = fw;
-    if (tl)   timelineEvents    = tl;
-    if (sc)   schedules         = sc;
-    if (br)   branches          = br;
-    if (at)   auditTrail        = at;
-    if (aud && aud.length)  auditorProfiles   = aud;
+    const [t, fw, rpt, tl, sc, br, at, aud, cmp, perf] = results.map(r => r.status === 'fulfilled' ? r.value : null);
+    if (t)   tasks           = t;
+    if (fw)  fieldworks      = fw;
+    if (rpt) reports         = rpt;
+    if (tl)  timelineEvents  = tl;
+    if (sc)  schedules       = sc;
+    if (br)  branches        = br;
+    if (at)  auditTrail      = at;
+    if (aud && aud.length) auditorProfiles = aud;
     if (cmp)  complianceRecords = cmp;
     if (perf) performanceEvals  = perf;
     // Sync all to localStorage cache
-    dbSave(DB_KEYS.tasks,         tasks);
-    dbSave(DB_KEYS.fieldworks,    fieldworks);
-    dbSave(DB_KEYS.timelineEvents,timelineEvents);
-    dbSave(DB_KEYS.schedules,     schedules);
-    dbSave(DB_KEYS.branches,      branches);
-    dbSave(DB_KEYS.auditTrail,    auditTrail);
-    dbSave(DB_KEYS.auditProfiles, auditorProfiles);
+    dbSave(DB_KEYS.tasks,          tasks);
+    dbSave(DB_KEYS.fieldworks,     fieldworks);
+    dbSave(DB_KEYS.reports,        reports);
+    dbSave(DB_KEYS.timelineEvents, timelineEvents);
+    dbSave(DB_KEYS.schedules,      schedules);
+    dbSave(DB_KEYS.branches,       branches);
+    dbSave(DB_KEYS.auditTrail,     auditTrail);
+    dbSave(DB_KEYS.auditProfiles,  auditorProfiles);
     try { localStorage.setItem(DB_KEYS_CMP,  JSON.stringify(complianceRecords)); } catch(e){}
     try { localStorage.setItem(DB_KEYS_PERF, JSON.stringify(performanceEvals));  } catch(e){}
     SUPA_CONNECTED = true;
@@ -5840,14 +5843,35 @@ function updateCloudBadge() {
     badge.style.background = 'rgba(45,212,191,0.1)';
     badge.style.color = 'var(--teal)';
     badge.style.border = '1px solid rgba(45,212,191,0.25)';
-    badge.title = 'Connected to Supabase — data shared across all users';
+    badge.title = 'Connected to Supabase — click to open sync panel';
   } else {
-    badge.textContent = '⚠ Cloud Error';
+    badge.textContent = '↺ Reconnect';
     badge.style.background = 'rgba(248,113,113,0.1)';
     badge.style.color = 'var(--rose)';
     badge.style.border = '1px solid rgba(248,113,113,0.25)';
-    badge.title = 'Supabase credentials set but connection failed';
+    badge.title = 'Not connected — click to retry';
+    badge.onclick = retrySupabaseConnection;
   }
+}
+
+async function retrySupabaseConnection() {
+  const badge = document.getElementById('cloud-status-badge');
+  if (badge) {
+    badge.textContent = '⟳ Connecting…';
+    badge.style.color = 'var(--sky)';
+    badge.onclick = null;
+  }
+  await loadFromSupabase();
+  // Re-render pages with fresh data
+  renderDashboard();
+  renderProfiles();
+  renderBranches();
+  updateAuditorDropdowns();
+  updateBranchDropdowns();
+  updateCloudBadge();
+  // Restore click handler
+  const b = document.getElementById('cloud-status-badge');
+  if (b) b.onclick = openSetupGuide;
 }
 
 async function testSupabaseConnection() {
@@ -5885,7 +5909,7 @@ function openSetupGuide() {
   if (statusEl) {
     if (!isConfigured) statusEl.innerHTML = '<span style="color:var(--warn)">⚠ Not configured — follow the steps above</span>';
     else if (SUPA_CONNECTED) statusEl.innerHTML = '<span style="color:var(--teal)">✅ Connected to Supabase — data is shared</span>';
-    else statusEl.innerHTML = '<span style="color:var(--rose)">❌ Credentials set but connection failed — check URL and key</span>';
+    else statusEl.innerHTML = '<span style="color:var(--rose)">⚠ Not connected yet — click <strong>⬆ Push My Local Data to Cloud Now</strong> below to connect and upload your data.</span>';
   }
   document.getElementById('push-status').textContent = '';
   openModal('setupguide');
@@ -5922,6 +5946,7 @@ async function forcePushToCloud() {
     const results = await Promise.allSettled([
       syncBlobToSupabase('tasks',       tasks),
       syncBlobToSupabase('fieldworks',  fieldworks),
+      syncBlobToSupabase('reports',     reports),
       syncBlobToSupabase('timeline',    timelineEvents),
       syncBlobToSupabase('schedules',   schedules),
       syncBlobToSupabase('branches',    branches),
