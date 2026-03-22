@@ -5,44 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>M.C. Precision — Auditee Response Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root {
-  --bg:#070b14; --bg2:#0c1120; --surface:#0f1623; --surface2:#141d2e;
-  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
-  --gold:#c9a84c; --teal:#2dd4bf; --sky:#60a5fa; --rose:#f87171;
-  --warn:#fbbf24; --violet:#a78bfa; --ok:#4ade80;
-  --text:#e2e8f0; --text2:#94a3b8; --muted:#4a5568;
-  --r:12px; --rsm:8px; --rlg:18px;
-  --font:'Inter',system-ui,sans-serif;
-  --display:'Playfair Display',Georgia,serif;
+  --bg:#070b14;--bg2:#0c1120;--surface:#0f1623;--surface2:#141d2e;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --gold:#c9a84c;--teal:#2dd4bf;--sky:#60a5fa;--rose:#f87171;
+  --warn:#fbbf24;--violet:#a78bfa;--ok:#4ade80;
+  --text:#e2e8f0;--text2:#94a3b8;--muted:#4a5568;
+  --r:12px;--rsm:8px;--rlg:18px;
+  --font:'Inter',system-ui,sans-serif;--display:'Playfair Display',Georgia,serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;min-height:100vh;-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:10px}
 
-/* HEADER */
 .hdr{background:linear-gradient(135deg,#0d1525,#080e1c);border-bottom:1px solid var(--border);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--gold),transparent 60%);opacity:.4}
 .hdr-brand .label{font-size:9px;font-weight:700;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
 .hdr-brand .title{font-family:var(--display);font-size:16px;font-weight:700;color:var(--text);margin-top:2px}
 .hdr-right{display:flex;align-items:center;gap:10px}
 .portal-badge{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.3);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600}
-.hdr-user{font-size:11px;color:var(--text2);display:none;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-user{font-size:11px;color:var(--text2);display:none;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* SCREENS */
+/* NAV TABS */
+.nav-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:53px;z-index:40}
+.nav-tab{flex:1;padding:11px 8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .15s;max-width:200px}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(201,168,76,.04)}
+.nav-tab:hover:not(.active){color:var(--text)}
+
 .screen{display:none;animation:fi .3s ease}
 .screen.active{display:block}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .wrap{max-width:880px;margin:0 auto;padding:24px 16px}
+.wrap-sm{max-width:520px;margin:0 auto;padding:24px 16px}
 
-/* CARD */
 .card{background:linear-gradient(135deg,rgba(15,22,35,.97),rgba(10,15,25,.99));border:1px solid rgba(201,168,76,.14);border-radius:var(--rlg);padding:28px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55)}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.45}
 .card-title{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:4px}
 .card-sub{font-size:12px;color:var(--text2);margin-bottom:22px;line-height:1.65}
 
-/* ACCESS METHOD TABS */
 .method-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
 .method-tab{padding:10px 6px;border-radius:var(--rsm);border:2px solid var(--border);background:var(--surface2);cursor:pointer;text-align:center;transition:all .15s}
 .method-tab .tab-icon{font-size:20px;margin-bottom:4px}
@@ -50,11 +51,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .method-tab .tab-hint{font-size:9px;color:var(--muted);margin-top:2px}
 .method-tab.active{border-color:var(--gold);background:rgba(201,168,76,.07)}
 .method-tab.active .tab-label{color:var(--gold)}
-.method-tab:hover:not(.active){border-color:var(--border2)}
 .method-panel{display:none}
 .method-panel.active{display:block;animation:fi .2s ease}
 
-/* FORM */
 .fg{margin-bottom:14px}
 .fg label{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
 .fg input,.fg select,.fg textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:var(--rsm);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 13px;outline:none;transition:border-color .15s,box-shadow .15s}
@@ -63,11 +62,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .fg textarea{resize:vertical;min-height:82px;line-height:1.6}
 .fg-hint{font-size:10px;color:var(--muted);margin-top:5px}
 
-/* DIVIDER */
-.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:11px}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:var(--rsm);font-family:var(--font);font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .18s;letter-spacing:.03em}
 .btn-primary{background:linear-gradient(135deg,var(--gold),#a8832a);color:#070b14;box-shadow:0 2px 12px rgba(201,168,76,.3);width:100%;padding:12px;font-size:13px}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,.45)}
@@ -76,23 +70,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .btn-ghost:hover{color:var(--text);background:rgba(255,255,255,.05)}
 .btn-save{background:linear-gradient(135deg,var(--teal),#1a9d8c);color:#070b14;font-weight:700;padding:8px 18px}
 .btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(45,212,191,.3)}
-.btn-violet{background:rgba(167,139,250,.1);color:var(--violet);border:1px solid rgba(167,139,250,.3);padding:6px 14px;font-size:11px}
-.btn-violet:hover{background:rgba(167,139,250,.18)}
+.btn-submit{background:linear-gradient(135deg,var(--violet),#7c3aed);color:#fff;font-weight:700;padding:10px 24px}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(167,139,250,.4)}
 
-/* ALERTS */
 .alert{padding:10px 14px;border-radius:var(--rsm);font-size:12px;margin-bottom:14px;display:none}
 .alert-err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);color:var(--rose)}
 .alert-ok{background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.25);color:var(--teal)}
 .alert-info{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:var(--sky)}
 .alert-warn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);color:var(--warn)}
 
-/* REPORT HEADER */
 .rpt-hdr{background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg);padding:18px 20px;margin-bottom:14px}
 .rpt-title{font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:5px}
 .rpt-meta{color:var(--text2);font-size:12px;display:flex;flex-wrap:wrap;gap:14px}
 .spill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
 
-/* FINDING CARD */
 .fcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;transition:box-shadow .2s}
 .fcard:hover{box-shadow:0 4px 18px rgba(0,0,0,.3)}
 .fhead{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.015);cursor:pointer;user-select:none}
@@ -106,26 +97,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .resp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 @media(max-width:540px){.resp-row{grid-template-columns:1fr}}
 
-/* PROGRESS */
 .pbar-wrap{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden}
 .pbar{height:100%;border-radius:4px;transition:width .4s ease}
 
-/* QR PANEL */
-.qr-panel{background:var(--surface);border:1px solid rgba(167,139,250,.2);border-radius:var(--r);padding:18px;margin-top:16px;text-align:center}
-.qr-panel-title{font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
-#qr-canvas-wrap{display:inline-block;background:#fff;padding:12px;border-radius:8px;margin-bottom:10px}
-.qr-url{font-size:10px;color:var(--sky);word-break:break-all;background:var(--bg2);padding:8px 10px;border-radius:6px;border:1px solid var(--border2);font-family:monospace;margin-bottom:10px;text-align:left}
+.sfooter{position:sticky;bottom:0;background:rgba(7,11,20,.93);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:11px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;z-index:40}
 
-/* LOADING/EMPTY */
+/* IQA SURVEY STYLES */
+.iqa-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+.iqa-section-head{padding:13px 17px;background:rgba(167,139,250,.05);border-bottom:1px solid var(--border);font-family:var(--font);font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.1em}
+.iqa-section-body{padding:14px 17px}
+.rating-group{margin-bottom:16px}
+.rating-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.5}
+.rating-label span{font-size:10px;color:var(--muted);font-weight:400}
+.star-row{display:flex;gap:4px;flex-wrap:wrap}
+.star-btn{width:36px;height:36px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:var(--font)}
+.star-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08)}
+.star-btn.selected{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold)}
+.star-btn.sel-low{background:rgba(248,113,113,.12);border-color:var(--rose);color:var(--rose)}
+.star-btn.sel-mid{background:rgba(251,191,36,.12);border-color:var(--warn);color:var(--warn)}
+.star-btn.sel-high{background:rgba(45,212,191,.12);border-color:var(--teal);color:var(--teal)}
+.rating-hint{font-size:10px;color:var(--muted);margin-top:5px}
+.overall-score{background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(96,165,250,.04));border:1px solid rgba(167,139,250,.2);border-radius:var(--r);padding:16px;margin-bottom:14px;text-align:center}
+.score-display{font-family:var(--display);font-size:48px;font-weight:700;color:var(--violet);margin:8px 0}
+.score-label{font-size:12px;color:var(--text2)}
+.score-desc{font-size:11px;margin-top:6px;font-weight:600}
+
 .loading{text-align:center;padding:50px 20px;color:var(--muted)}
 .spin{font-size:28px;animation:sp 1s linear infinite;display:inline-block}
 @keyframes sp{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .empty{text-align:center;padding:40px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rlg)}
-
-/* STICKY FOOTER */
-.sfooter{position:sticky;bottom:0;background:rgba(7,11,20,.93);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:11px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;z-index:40}
-
-/* SECURITY NOTE */
 .sec-note{font-size:10px;color:var(--muted);text-align:center;margin-top:14px;padding-top:13px;border-top:1px solid var(--border);line-height:1.7}
 </style>
 </head>
@@ -144,18 +144,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 </div>
 
 <!-- ====================================================== -->
-<!-- SCREEN 1 · LOGIN                                       -->
+<!-- SCREEN: LOGIN                                          -->
 <!-- ====================================================== -->
 <div class="screen active" id="screen-login">
-  <div class="wrap" style="max-width:520px">
-    <div class="card">
+  <div class="wrap-sm">
+    <div class="card" style="margin-top:36px">
       <div class="card-title">Access Your Findings</div>
-      <div class="card-sub">Choose how to identify your branch, then enter your name to view and respond to audit findings.</div>
+      <div class="card-sub">Select your branch and enter your name to view findings and submit your IQA review.</div>
 
       <div id="err-box"  class="alert alert-err"></div>
       <div id="info-box" class="alert alert-info"></div>
 
-      <!-- 3 ACCESS METHOD TABS -->
       <div class="method-tabs">
         <div class="method-tab active" id="tab-dd"   onclick="setMethod('dd',this)">
           <div class="tab-icon">🏢</div>
@@ -174,7 +173,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
         </div>
       </div>
 
-      <!-- PANEL: Dropdown -->
       <div class="method-panel active" id="panel-dd">
         <div class="fg">
           <label>Select Your Branch</label>
@@ -185,7 +183,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
         </div>
       </div>
 
-      <!-- PANEL: Access Code -->
       <div class="method-panel" id="panel-code">
         <div class="fg">
           <label>Branch Access Code</label>
@@ -193,74 +190,56 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
             style="text-transform:uppercase;letter-spacing:.1em;font-size:15px;text-align:center"
             oninput="this.value=this.value.toUpperCase()"
             onkeydown="if(event.key==='Enter')doLogin()">
-          <div class="fg-hint">Your branch code is on the audit notification letter (e.g. NCR-01, REG-03). Contact the audit team if you don't have it.</div>
+          <div class="fg-hint">Your branch code is on the audit notification (e.g. NCR-01). Contact the audit team if you don't have it.</div>
         </div>
       </div>
 
-      <!-- PANEL: Link/QR -->
       <div class="method-panel" id="panel-link">
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:16px;text-align:center;margin-bottom:4px">
           <div style="font-size:28px;margin-bottom:8px">📱</div>
           <div style="font-size:13px;font-weight:600;margin-bottom:6px">Open via Link or QR Code</div>
-          <div style="font-size:12px;color:var(--text2);line-height:1.7">
-            If the Internal Audit Division sent you a link or QR code, open that directly — your branch will be pre-selected automatically.<br><br>
-            Otherwise use the <strong style="color:var(--gold)">Select Branch</strong> or <strong style="color:var(--gold)">Access Code</strong> tabs above.
-          </div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7">If the Internal Audit Division sent you a link or QR code, open that directly — your branch will be pre-selected.<br><br>Otherwise use the <strong style="color:var(--gold)">Select Branch</strong> or <strong style="color:var(--gold)">Access Code</strong> tabs.</div>
         </div>
       </div>
 
-      <!-- Common: Respondent Name -->
       <div class="fg" style="margin-top:16px">
         <label>Your Full Name &amp; Title</label>
         <input type="text" id="inp-name" placeholder="e.g. Maria Santos — Branch Manager"
           onkeydown="if(event.key==='Enter')doLogin()">
-        <div class="fg-hint">This will be recorded as the respondent on all your submissions.</div>
       </div>
 
-      <button class="btn btn-primary" onclick="doLogin()" id="login-btn">
-        View My Audit Findings →
+      <div class="fg">
+        <label>Email Address <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+        <input type="email" id="inp-email" placeholder="For acknowledgment receipt">
+      </div>
+
+      <div class="fg">
+        <label>Mobile Number <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+        <input type="text" id="inp-mobile" placeholder="+63 9XX XXX XXXX">
+      </div>
+
+      <button class="btn btn-primary" onclick="doLogin()" id="login-btn" style="margin-top:4px">
+        Access Portal →
       </button>
-
-      <div class="sec-note">
-        🔒 Read-only access · You can only view and respond to findings assigned to your branch.<br>
-        No access to the main audit system or any other branch's data.
-      </div>
-    </div>
-
-    <!-- AUDITOR TOOLS (hidden by default) -->
-    <div style="text-align:center;margin-top:14px">
-      <button class="btn btn-ghost" onclick="toggleAuditorTools()" style="font-size:10px;color:var(--muted)">⚙ Auditor Tools — QR Code Generator</button>
-    </div>
-    <div id="auditor-tools" style="display:none;margin-top:12px">
-      <div class="qr-panel">
-        <div class="qr-panel-title">✦ Generate Auditee Access Links &amp; QR Codes</div>
-        <div class="fg" style="text-align:left">
-          <label>Select Branch</label>
-          <select id="qr-branch-sel"><option value="">Select branch to generate QR…</option></select>
-        </div>
-        <button class="btn btn-violet" onclick="generateQR()" style="width:100%;margin-bottom:10px">📱 Generate QR Code &amp; Link</button>
-        <div id="qr-output" style="display:none">
-          <div id="qr-canvas-wrap"><div id="qr-canvas"></div></div>
-          <div class="qr-url" id="qr-link-text"></div>
-          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-            <button class="btn btn-ghost" onclick="copyQRLink()">⎘ Copy Link</button>
-            <button class="btn btn-ghost" onclick="downloadQR()">⬇ Download PNG</button>
-            <button class="btn btn-ghost" onclick="printQR()">🖨 Print QR Sheet</button>
-          </div>
-          <div style="font-size:10px;color:var(--muted);margin-top:10px">Share this QR code or link with the branch manager via email, Viber, or print it and post it at the branch.</div>
-        </div>
-      </div>
+      <div class="sec-note">🔒 Read-only access · View &amp; respond to your branch's findings only · No access to main audit system</div>
     </div>
   </div>
 </div>
 
 <!-- ====================================================== -->
-<!-- SCREEN 2 · FINDINGS                                    -->
+<!-- MAIN APP (after login) — 2 tabs                       -->
 <!-- ====================================================== -->
-<div class="screen" id="screen-findings">
-  <div class="wrap">
+<div class="screen" id="screen-main">
 
-    <!-- Report header -->
+  <!-- Tab navigation -->
+  <div class="nav-tabs">
+    <div class="nav-tab active" id="maintab-findings" onclick="switchMainTab('findings',this)">📋 Audit Findings</div>
+    <div class="nav-tab" id="maintab-iqa" onclick="switchMainTab('iqa',this)">⭐ IQA Self Assessment</div>
+  </div>
+
+  <!-- ─── TAB 1: FINDINGS ─── -->
+  <div id="panel-findings" class="wrap">
+
     <div class="rpt-hdr">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
         <div style="flex:1">
@@ -283,57 +262,195 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       </div>
     </div>
 
-    <!-- Instructions -->
-    <div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:12px;color:var(--sky);line-height:1.7">
-      📋 <strong>Instructions:</strong> For each finding below, fill in your <strong>Management Response</strong> and <strong>Action Plan</strong>, set a target date and update the status, then click <strong>💾 Save Response</strong>. Your responses are saved directly to the audit system and visible to the auditors immediately.
+    <div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:12px;color:var(--sky)">
+      📋 <strong>Instructions:</strong> Review each finding, fill in your <strong>Management Response</strong> and <strong>Action Plan</strong>, then click <strong>💾 Save Response</strong>. After completing findings, please also fill in the <strong>⭐ IQA Self Assessment</strong> tab.
     </div>
 
-    <!-- Loading -->
-    <div id="loading" class="loading">
+    <div id="loading-findings" class="loading">
       <div class="spin">✦</div>
       <div style="margin-top:12px;font-size:13px">Loading your findings…</div>
     </div>
-
-    <!-- Findings list -->
-    <div id="findings-list" style="display:none"></div>
-
-    <!-- Empty -->
+    <div id="findings-list"  style="display:none"></div>
     <div id="findings-empty" class="empty" style="display:none">
       <div style="font-size:36px;margin-bottom:10px">✅</div>
       <div style="font-size:16px;font-weight:700;margin-bottom:6px">No Open Findings</div>
-      <div style="color:var(--text2);font-size:12px;line-height:1.7">No open audit findings were found for your branch.<br>All findings may already be closed or no reports have been issued yet.<br>Contact the Internal Audit Division if you think this is an error.</div>
+      <div style="color:var(--text2);font-size:12px;line-height:1.7">No open audit findings found for your branch. All findings may already be closed, or no audit report has been issued yet.<br><br>Please proceed to the <strong style="color:var(--gold)">⭐ IQA Self Assessment</strong> tab to rate your audit experience.</div>
     </div>
-
   </div>
 
-  <!-- Sticky footer -->
-  <div class="sfooter">
+  <!-- ─── TAB 2: IQA SURVEY ─── -->
+  <div id="panel-iqa" class="wrap" style="display:none">
+
+    <!-- IQA Header -->
+    <div style="background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(96,165,250,.04));border:1px solid rgba(167,139,250,.2);border-radius:var(--rlg);padding:18px 20px;margin-bottom:16px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);margin-bottom:5px">M.C. Precision · Internal Audit Division</div>
+      <div style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:8px">Internal Quality Audit (IQA) Self Assessment Review</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7">This form provides internal feedback and review response to the audit performance conducted by the Internal Auditor. <strong>This report is private and confidential</strong> and will only be submitted to the appropriate management of the company.</div>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:var(--text2)">
+        <span>🏢 Branch: <strong id="iqa-branch-label" style="color:var(--text)"></strong></span>
+        <span>👤 Auditor: <strong id="iqa-auditor-label" style="color:var(--text)"></strong></span>
+        <span>📅 Audit Date: <strong id="iqa-date-label" style="color:var(--text)"></strong></span>
+      </div>
+    </div>
+
+    <!-- Rating scale info -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);width:100%;margin-bottom:4px">Rating Scale:</div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="background:rgba(45,212,191,.12);color:var(--teal);border:1px solid rgba(45,212,191,.3);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700">8–10</span><span style="font-size:11px;color:var(--text2)">Extraordinary — Performs exceptional audit results</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.3);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700">4–7</span><span style="font-size:11px;color:var(--text2)">Acceptable — Some areas need improvement</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="background:rgba(248,113,113,.12);color:var(--rose);border:1px solid rgba(248,113,113,.3);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700">1–3</span><span style="font-size:11px;color:var(--text2)">Needs Improvement — In general, requires improvement</span></div>
+    </div>
+
+    <!-- SECTION 1: Audit Process -->
+    <div class="iqa-section">
+      <div class="iqa-section-head">📋 Section 1 — Audit Process &amp; Procedures</div>
+      <div class="iqa-section-body">
+        <div class="rating-group">
+          <div class="rating-label">1. The auditor clearly explained the purpose and scope of the audit. <span>(Communication &amp; Clarity)</span></div>
+          <div class="star-row" id="r-1"></div>
+          <div class="rating-hint" id="rh-1"></div>
+        </div>
+        <div class="rating-group">
+          <div class="rating-label">2. The audit procedures were conducted in an organized and systematic manner. <span>(Organization)</span></div>
+          <div class="star-row" id="r-2"></div>
+          <div class="rating-hint" id="rh-2"></div>
+        </div>
+        <div class="rating-group">
+          <div class="rating-label">3. The auditor was thorough and covered all relevant areas during the audit. <span>(Thoroughness)</span></div>
+          <div class="star-row" id="r-3"></div>
+          <div class="rating-hint" id="rh-3"></div>
+        </div>
+        <div class="rating-group">
+          <div class="rating-label">4. The audit was completed within the agreed timeframe. <span>(Timeliness)</span></div>
+          <div class="star-row" id="r-4"></div>
+          <div class="rating-hint" id="rh-4"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Auditor's Conduct -->
+    <div class="iqa-section">
+      <div class="iqa-section-head">🤝 Section 2 — Auditor's Conduct &amp; Professionalism</div>
+      <div class="iqa-section-body">
+        <div class="rating-group">
+          <div class="rating-label">5. The auditor demonstrated respect, courtesy, and professionalism throughout. <span>(Professionalism)</span></div>
+          <div class="star-row" id="r-5"></div>
+          <div class="rating-hint" id="rh-5"></div>
+        </div>
+        <div class="rating-group">
+          <div class="rating-label">6. The auditor was objective and fair in identifying and presenting findings. <span>(Objectivity &amp; Fairness)</span></div>
+          <div class="star-row" id="r-6"></div>
+          <div class="rating-hint" id="rh-6"></div>
+        </div>
+        <div class="rating-group">
+          <div class="rating-label">7. The auditor demonstrated sufficient knowledge and competence in the areas reviewed. <span>(Competence)</span></div>
+          <div class="star-row" id="r-7"></div>
+          <div class="rating-hint" id="rh-7"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Findings & Feedback -->
+    <div class="iqa-section">
+      <div class="iqa-section-head">🔍 Section 3 — Findings &amp; Recommendations</div>
+      <div class="iqa-section-body">
+        <div class="rating-group">
+          <div class="rating-label">8. The findings raised were accurate, relevant, and supported by sufficient evidence. <span>(Accuracy)</span></div>
+          <div class="star-row" id="r-8"></div>
+          <div class="rating-hint" id="rh-8"></div>
+        </div>
+        <div class="rating-group">
+          <div class="rating-label">9. The audit recommendations are practical and actionable for the branch. <span>(Usefulness)</span></div>
+          <div class="star-row" id="r-9"></div>
+          <div class="rating-hint" id="rh-9"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: Overall -->
+    <div class="iqa-section">
+      <div class="iqa-section-head">⭐ Section 4 — Overall Audit Experience</div>
+      <div class="iqa-section-body">
+        <div class="rating-group">
+          <div class="rating-label">10. Overall rating of the auditor's performance during this audit engagement. <span>(Overall Performance)</span></div>
+          <div class="star-row" id="r-10"></div>
+          <div class="rating-hint" id="rh-10"></div>
+        </div>
+        <!-- Overall score display -->
+        <div class="overall-score" id="overall-score-box" style="display:none">
+          <div style="font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.1em">Computed Overall Rating</div>
+          <div class="score-display" id="overall-score-val">—</div>
+          <div class="score-label" id="overall-score-label">out of 10</div>
+          <div class="score-desc" id="overall-score-desc"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5: Open Comments -->
+    <div class="iqa-section" style="margin-bottom:16px">
+      <div class="iqa-section-head">💬 Section 5 — Feedback &amp; Suggestions</div>
+      <div class="iqa-section-body">
+        <div class="fg">
+          <label>Feedback and Suggestions During Audit Procedures</label>
+          <textarea id="iqa-feedback" placeholder="Please share any feedback, suggestions for improvement, or comments about the audit process or auditor's performance…" style="min-height:100px"></textarea>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label>Audit Review Type</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px" id="iqa-review-types">
+            <label class="review-type-opt" id="rt-1" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s" onclick="toggleReviewType('rt-1')">
+              <div id="rt-1-chk" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;transition:all .15s;background:transparent"></div>
+              <span style="font-size:12px;color:var(--text2)">Branch Operation Review</span>
+            </label>
+            <label class="review-type-opt" id="rt-2" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s" onclick="toggleReviewType('rt-2')">
+              <div id="rt-2-chk" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;transition:all .15s;background:transparent"></div>
+              <span style="font-size:12px;color:var(--text2)">Fieldwork / Work-with Assessment Review</span>
+            </label>
+            <label class="review-type-opt" id="rt-3" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s" onclick="toggleReviewType('rt-3')">
+              <div id="rt-3-chk" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;transition:all .15s;background:transparent"></div>
+              <span style="font-size:12px;color:var(--text2)">Sales / AR &amp; Collection Review</span>
+            </label>
+            <label class="review-type-opt" id="rt-4" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--rsm);cursor:pointer;transition:all .15s" onclick="toggleReviewType('rt-4')">
+              <div id="rt-4-chk" style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;transition:all .15s;background:transparent"></div>
+              <span style="font-size:12px;color:var(--text2)">Others (Petty Cash Fund, etc.)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="iqa-err" class="alert alert-err"></div>
+    <div id="iqa-ok"  class="alert alert-ok"></div>
+
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:80px">
+      <button class="btn btn-ghost" onclick="switchMainTab('findings',document.getElementById('maintab-findings'))">← Back to Findings</button>
+      <button class="btn btn-submit" onclick="submitIQA()">⭐ Submit IQA Assessment</button>
+    </div>
+  </div>
+
+  <!-- Sticky footer (findings tab only) -->
+  <div class="sfooter" id="findings-footer">
     <div>
       <div style="font-size:12px;font-weight:600;color:var(--text)" id="f-branch"></div>
       <div style="font-size:11px;color:var(--muted)" id="f-status">Save responses individually or use Save All.</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-ghost" onclick="doLogout()">🚪 Sign Out</button>
-      <button class="btn btn-save" onclick="saveAll()">💾 Save All Responses</button>
+      <button class="btn btn-save"  onclick="saveAll()">💾 Save All Responses</button>
     </div>
   </div>
 </div>
 
 <!-- ====================================================== -->
-<!-- SCREEN 3 · SUCCESS                                     -->
+<!-- SCREEN: SUCCESS                                        -->
 <!-- ====================================================== -->
 <div class="screen" id="screen-success">
-  <div class="wrap" style="max-width:480px">
+  <div class="wrap-sm">
     <div class="empty" style="margin-top:48px;padding:40px 28px">
       <div style="font-size:44px;margin-bottom:12px">🎉</div>
-      <div style="font-size:18px;font-weight:700;margin-bottom:8px">Responses Submitted!</div>
-      <div style="color:var(--text2);font-size:12px;line-height:1.8">
-        Your management responses and action plans have been recorded.<br>
-        The Internal Audit Division will review your submissions and follow up as needed.<br><br>
-        <span style="color:var(--muted);font-size:11px">You may close this tab or go back to review your responses.</span>
-      </div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px" id="success-title">Submitted!</div>
+      <div style="color:var(--text2);font-size:12px;line-height:1.8" id="success-msg">Your responses have been recorded.</div>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap">
-        <button class="btn btn-ghost" onclick="showScreen('screen-findings')">← Review Responses</button>
+        <button class="btn btn-ghost" onclick="showScreen('screen-main')">← Go Back</button>
         <button class="btn btn-ghost" onclick="doLogout()">🚪 Sign Out</button>
       </div>
     </div>
@@ -341,342 +458,275 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 </div>
 
 <script>
-// ================================================================
-// CONFIG — same Supabase as main app
-// ================================================================
+// ============================================================
+// CONFIG
+// ============================================================
 const SUPA_URL = 'https://ieeffiwzbajftevutpnu.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllZWZmaXd6YmFqZnRldnV0cG51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDUxNDgsImV4cCI6MjA4OTY4MTE0OH0.HhF2OB4pBzCCvC6hxIsvK_VX8ch42dvR9i2sY3f2UcI';
-const TABLE    = 'iad_appstate';
+const TABLE = 'iad_appstate';
 
-// ================================================================
+// ============================================================
 // STATE
-// ================================================================
-let _branches   = [];
-let _reports    = [];
-let _findings   = [];
-let _edits      = {};
-let _branchName = '';
-let _branchCode = '';
-let _respondent = '';
-let _method     = 'dd'; // dd | code
-let _qrInst     = null;
+// ============================================================
+let _branches=[], _reports=[], _findings=[], _edits={};
+let _branchName='', _branchCode='', _respondent='', _email='', _mobile='';
+let _method='dd';
+let _iqaRatings={};         // question key → score
+let _iqaReviewTypes=new Set();
+let _iqaSubmitted=false;
 
-// ================================================================
+// ============================================================
 // SUPABASE
-// ================================================================
+// ============================================================
 async function supaLoad(key) {
-  const res = await fetch(
-    `${SUPA_URL}/rest/v1/${TABLE}?id=eq.${encodeURIComponent(key)}&select=value`,
-    { headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY } }
-  );
-  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${encodeURIComponent(key)}&select=value`,
+    { headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY} });
+  if (!res.ok) throw new Error('HTTP '+res.status);
   const rows = await res.json();
   return rows?.length && rows[0].value ? JSON.parse(rows[0].value) : null;
 }
-
-async function supaSave(key, data) {
-  const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}`, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal,resolution=merge-duplicates'
-    },
-    body: JSON.stringify([{ id: key, value: JSON.stringify(data), updated_at: new Date().toISOString() }])
+async function supaSave(key,data) {
+  const res = await fetch(`${SUPA_URL}/rest/v1/${TABLE}`,{
+    method:'POST',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal,resolution=merge-duplicates'},
+    body:JSON.stringify([{id:key,value:JSON.stringify(data),updated_at:new Date().toISOString()}])
   });
-  if (!res.ok) throw new Error('Save failed: HTTP ' + res.status);
+  if (!res.ok) throw new Error('Save failed: HTTP '+res.status);
 }
 
-// ================================================================
-// UI HELPERS
-// ================================================================
+// ============================================================
+// UI
+// ============================================================
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+  window.scrollTo(0,0);
 }
-
-function setMethod(m, el) {
-  _method = m;
-  document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.method-panel').forEach(p => p.classList.remove('active'));
+function setMethod(m,el) {
+  _method=m;
+  document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.method-panel').forEach(p=>p.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('panel-' + m).classList.add('active');
+  document.getElementById('panel-'+m).classList.add('active');
 }
-
-function showAlert(id, msg, type) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.className   = 'alert alert-' + type;
-  el.style.display = 'block';
+function switchMainTab(tab,el) {
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-findings').style.display = tab==='findings'?'':'none';
+  document.getElementById('panel-iqa').style.display      = tab==='iqa'?'':'none';
+  document.getElementById('findings-footer').style.display= tab==='findings'?'':'none';
 }
-function hideAlert(id) { document.getElementById(id).style.display = 'none'; }
+function showAlert(id,msg,type) { const el=document.getElementById(id); el.textContent=msg; el.className='alert alert-'+type; el.style.display='block'; }
+function hideAlert(id) { document.getElementById(id).style.display='none'; }
+function fstatus(msg) { const el=document.getElementById('f-status'); if(el) el.textContent=msg; }
+function esc(str) { return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-function fstatus(msg) {
-  const el = document.getElementById('f-status');
-  if (el) el.textContent = msg;
-}
-
-function toggleAuditorTools() {
-  const el = document.getElementById('auditor-tools');
-  el.style.display = el.style.display === 'none' ? '' : 'none';
-  if (el.style.display !== 'none') populateQRDropdown();
-}
-
-// ================================================================
-// INIT — load branches, handle URL params
-// ================================================================
+// ============================================================
+// INIT
+// ============================================================
 async function init() {
   try {
-    _branches = await supaLoad('branches') || [];
-    _reports  = await supaLoad('reports')  || [];
+    [_branches, _reports] = await Promise.all([supaLoad('branches'), supaLoad('reports')]);
+    _branches = _branches||[]; _reports = _reports||[];
 
-    // Populate branch dropdown
     const sel = document.getElementById('sel-branch');
-    const activeBranches = _branches.filter(b => !b.inactive);
     sel.innerHTML = '<option value="">— Select your branch —</option>' +
-      activeBranches.map(b =>
-        `<option value="${escHtml(b.name)}" data-code="${escHtml(b.code||'')}">${escHtml(b.name)}${b.code ? ' (' + b.code + ')' : ''}</option>`
+      _branches.filter(b=>!b.inactive).map(b=>
+        `<option value="${esc(b.name)}" data-code="${esc(b.code||'')}">${esc(b.name)}${b.code?' ('+b.code+')':''}</option>`
       ).join('');
 
-    // Handle URL params (from shared link / QR code)
-    const params  = new URLSearchParams(window.location.search);
-    const urlCode = (params.get('branch') || params.get('code') || '').toUpperCase().trim();
-    const urlName = decodeURIComponent(params.get('name') || '').trim();
-
+    // URL params
+    const p = new URLSearchParams(window.location.search);
+    const urlCode = (p.get('branch')||p.get('code')||'').toUpperCase().trim();
+    const urlName = decodeURIComponent(p.get('name')||'').trim();
     if (urlCode) {
-      const match = _branches.find(b => (b.code || '').toUpperCase() === urlCode);
+      const match = _branches.find(b=>(b.code||'').toUpperCase()===urlCode);
       if (match) {
         sel.value = match.name;
-        _branchName = match.name;
-        _branchCode = match.code || urlCode;
-        showAlert('info-box', `✅ Branch "${match.name}" pre-selected from your link. Just enter your name and click the button.`, 'ok');
+        showAlert('info-box','✅ Branch "'+match.name+'" pre-selected from your link. Enter your name and click Access Portal.','ok');
       } else {
-        // Put code in code field and switch tab
         document.getElementById('inp-code').value = urlCode;
-        setMethod('code', document.getElementById('tab-code'));
-        showAlert('info-box', `Branch code "${urlCode}" entered from your link.`, 'info');
+        setMethod('code',document.getElementById('tab-code'));
       }
     }
     if (urlName) document.getElementById('inp-name').value = urlName;
-
   } catch(e) {
-    showAlert('info-box', 'ℹ Could not load branch list. Try using the Access Code tab instead.', 'warn');
+    showAlert('info-box','ℹ Could not load branch list. Try the Access Code tab.','warn');
   }
 }
 
-function escHtml(str) { return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ================================================================
-// LOGIN
-// ================================================================
+// ============================================================
+// LOGIN — with robust branch matching
+// ============================================================
 async function doLogin() {
   hideAlert('err-box');
-  const name = (document.getElementById('inp-name').value || '').trim();
-  if (!name) { showAlert('err-box', 'Please enter your full name and title.', 'err'); return; }
+  const name   = (document.getElementById('inp-name').value||'').trim();
+  const email  = (document.getElementById('inp-email').value||'').trim();
+  const mobile = (document.getElementById('inp-mobile').value||'').trim();
+  if (!name) { showAlert('err-box','Please enter your full name and title.','err'); return; }
 
-  let branchName = '', branchCode = '';
+  let branchName='', branchCode='';
 
-  if (_method === 'dd') {
+  if (_method==='dd') {
     const sel = document.getElementById('sel-branch');
     branchName = sel.value;
     const opt  = sel.options[sel.selectedIndex];
-    branchCode = opt?.dataset?.code || '';
-    if (!branchName) { showAlert('err-box', 'Please select your branch from the list.', 'err'); return; }
+    branchCode = opt?.dataset?.code||'';
+    if (!branchName) { showAlert('err-box','Please select your branch from the list.','err'); return; }
 
-  } else if (_method === 'code') {
-    const code = (document.getElementById('inp-code').value || '').trim().toUpperCase();
-    if (!code) { showAlert('err-box', 'Please enter your branch access code.', 'err'); return; }
-    if (!_branches.length) {
-      try { _branches = await supaLoad('branches') || []; } catch(e) {}
-    }
-    const match = _branches.find(b => (b.code || '').toUpperCase() === code);
-    if (!match) {
-      showAlert('err-box', `Branch code "${code}" not found. Please check with the Internal Audit Division.`, 'err');
-      return;
-    }
-    branchName = match.name;
-    branchCode = match.code || code;
-
+  } else if (_method==='code') {
+    const code = (document.getElementById('inp-code').value||'').trim().toUpperCase();
+    if (!code) { showAlert('err-box','Please enter your branch access code.','err'); return; }
+    if (!_branches.length) try { _branches = await supaLoad('branches')||[]; } catch(e) {}
+    const match = _branches.find(b=>(b.code||'').toUpperCase()===code);
+    if (!match) { showAlert('err-box','Branch code "'+code+'" not found. Check with the audit team.','err'); return; }
+    branchName=match.name; branchCode=match.code||code;
   } else {
-    showAlert('err-box', 'Please use the Select Branch or Access Code tab to identify your branch.', 'err');
-    return;
+    showAlert('err-box','Use the Select Branch or Access Code tab to identify your branch.','err'); return;
   }
 
-  _branchName = branchName;
-  _branchCode = branchCode;
-  _respondent = name;
+  _branchName=branchName; _branchCode=branchCode;
+  _respondent=name; _email=email; _mobile=mobile;
 
   const btn = document.getElementById('login-btn');
-  btn.disabled = true; btn.textContent = '⟳ Loading findings…';
-
+  btn.disabled=true; btn.textContent='⟳ Loading…';
   try {
-    if (!_reports.length) _reports = await supaLoad('reports') || [];
+    if (!_reports.length) _reports = await supaLoad('reports')||[];
     buildFindings();
     renderFindings();
-    document.getElementById('hdr-user').textContent = `${name.split('—')[0].trim()} · ${branchName}`;
+    populateIQAHeader();
+    buildRatingWidgets();
+    document.getElementById('hdr-user').textContent = name.split('—')[0].trim()+' · '+branchName;
     document.getElementById('hdr-user').style.display = 'block';
-    showScreen('screen-findings');
+    showScreen('screen-main');
   } catch(e) {
-    showAlert('err-box', 'Connection error: ' + e.message, 'err');
-  } finally {
-    btn.disabled = false; btn.textContent = 'View My Audit Findings →';
-  }
+    showAlert('err-box','Connection error: '+e.message,'err');
+  } finally { btn.disabled=false; btn.textContent='Access Portal →'; }
 }
 
 function doLogout() {
-  _branchName = ''; _branchCode = ''; _respondent = ''; _findings = []; _edits = {};
-  document.getElementById('hdr-user').style.display = 'none';
-  document.getElementById('hdr-user').textContent = '';
+  _branchName='';_branchCode='';_respondent='';_findings=[];_edits={};_iqaRatings={};_iqaSubmitted=false;
+  document.getElementById('hdr-user').style.display='none';
   hideAlert('err-box'); hideAlert('info-box');
-  document.getElementById('login-btn').disabled = false;
-  document.getElementById('login-btn').textContent = 'View My Audit Findings →';
-  document.getElementById('inp-name').value = '';
-  document.getElementById('sel-branch').value = '';
+  document.getElementById('login-btn').disabled=false;
+  document.getElementById('login-btn').textContent='Access Portal →';
+  ['inp-name','inp-email','inp-mobile'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('sel-branch').value='';
   showScreen('screen-login');
 }
 
-// ================================================================
-// BUILD FINDINGS from loaded reports
-// ================================================================
+// ============================================================
+// FINDINGS — improved branch matching
+// ============================================================
+function normStr(s) { return (s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
+
 function buildFindings() {
-  _findings = [];
-  _reports.forEach((report, rIdx) => {
+  _findings=[];
+  _reports.forEach((report,rIdx)=>{
     if (report.inactive) return;
-    if ((report.branch || '').toLowerCase() !== _branchName.toLowerCase()) return;
-    (report.findingsList || []).forEach((f, fIdx) => {
-      if (f.status === 'Closed') return;
+    // Robust matching: normalize both sides
+    const repBranch = normStr(report.branch);
+    const myBranch  = normStr(_branchName);
+    if (repBranch !== myBranch) return;
+
+    (report.findingsList||[]).forEach((f,fIdx)=>{
+      if (f.status==='Closed') return;
       _findings.push({
-        key: `${rIdx}_${fIdx}`,
-        reportIdx: rIdx, findingIdx: fIdx,
-        f, // finding object
-        reportTitle:  report.title   || 'Audit Report',
-        reportDate:   report.date    || '',
-        auditor:      report.author  || '—',
-        engagement:   report.eng     || '—',
-        reportStatus: report.status  || '',
+        key:`${rIdx}_${fIdx}`,
+        reportIdx:rIdx, findingIdx:fIdx, f,
+        reportTitle: report.title  || 'Audit Report',
+        reportDate:  report.date   || '',
+        auditor:     report.author || '—',
+        engagement:  report.eng    || '—',
+        reportStatus:report.status || '',
       });
     });
   });
 }
 
-// ================================================================
+// ============================================================
 // RENDER FINDINGS
-// ================================================================
-const SC = {
-  'Open':           { bg:'rgba(248,113,113,.12)', c:'var(--rose)',  bd:'rgba(248,113,113,.3)'  },
-  'Ongoing':        { bg:'rgba(96,165,250,.12)',  c:'var(--sky)',   bd:'rgba(96,165,250,.3)'   },
-  'For Validation': { bg:'rgba(251,191,36,.12)',  c:'#fbbf24',     bd:'rgba(251,191,36,.3)'   },
-  'Closed':         { bg:'rgba(45,212,191,.12)',  c:'var(--teal)', bd:'rgba(45,212,191,.3)'   },
-  'Overdue':        { bg:'rgba(249,115,22,.12)',  c:'#f97316',     bd:'rgba(249,115,22,.3)'   },
+// ============================================================
+const SC={
+  'Open':          {bg:'rgba(248,113,113,.12)',c:'var(--rose)', bd:'rgba(248,113,113,.3)'},
+  'Ongoing':       {bg:'rgba(96,165,250,.12)', c:'var(--sky)',  bd:'rgba(96,165,250,.3)'},
+  'For Validation':{bg:'rgba(251,191,36,.12)', c:'#fbbf24',    bd:'rgba(251,191,36,.3)'},
+  'Closed':        {bg:'rgba(45,212,191,.12)', c:'var(--teal)',bd:'rgba(45,212,191,.3)'},
+  'Overdue':       {bg:'rgba(249,115,22,.12)', c:'#f97316',    bd:'rgba(249,115,22,.3)'},
 };
-function spill(st) {
-  const s = SC[st] || { bg:'rgba(74,85,104,.15)', c:'#94a3b8', bd:'rgba(74,85,104,.3)' };
-  return `<span class="spill" style="background:${s.bg};color:${s.c};border:1px solid ${s.bd}">${st}</span>`;
-}
+function spill(st){const s=SC[st]||{bg:'rgba(74,85,104,.15)',c:'#94a3b8',bd:'rgba(74,85,104,.3)'};return`<span class="spill" style="background:${s.bg};color:${s.c};border:1px solid ${s.bd}">${st}</span>`;}
 
 function renderFindings() {
   const first = _findings[0];
-  document.getElementById('h-branch').textContent    = `Branch: ${_branchName}${_branchCode?' ('+_branchCode+')':''} · Respondent: ${_respondent}`;
+  document.getElementById('h-branch').textContent    = `Branch: ${_branchName}${_branchCode?' ('+_branchCode+')':''} · ${_respondent}`;
   document.getElementById('f-branch').textContent    = `${_branchName} — ${_respondent}`;
-  document.getElementById('h-respondent').textContent = 'Respondent: ' + _respondent;
+  document.getElementById('h-respondent').textContent= 'Respondent: '+_respondent;
 
   if (first) {
     document.getElementById('h-title').textContent   = first.reportTitle;
-    document.getElementById('h-date').textContent    = first.reportDate  || '—';
+    document.getElementById('h-date').textContent    = first.reportDate||'—';
     document.getElementById('h-auditor').textContent = first.auditor;
     document.getElementById('h-eng').textContent     = first.engagement;
-    const rs = first.reportStatus;
-    const rc = rs === 'Final – Issued' ? 'var(--teal)'
-             : rs === 'Findings Raised'? 'var(--rose)'
-             : rs === 'Under Review'   ? 'var(--sky)' : 'var(--muted)';
-    const sp = document.getElementById('h-status');
-    sp.textContent = rs;
-    sp.style.cssText = `background:${rc}18;color:${rc};border:1px solid ${rc}44;margin-top:8px`;
+    const rs=first.reportStatus;
+    const rc=rs==='Final – Issued'?'var(--teal)':rs==='Findings Raised'?'var(--rose)':rs==='Under Review'?'var(--sky)':'var(--muted)';
+    const sp=document.getElementById('h-status');
+    sp.textContent=rs; sp.style.cssText=`background:${rc}18;color:${rc};border:1px solid ${rc}44;margin-top:8px`;
   }
-
   updateProgress();
-  document.getElementById('loading').style.display = 'none';
+  document.getElementById('loading-findings').style.display='none';
 
   if (!_findings.length) {
-    document.getElementById('findings-list').style.display  = 'none';
-    document.getElementById('findings-empty').style.display = '';
+    document.getElementById('findings-list').style.display='none';
+    document.getElementById('findings-empty').style.display='';
     return;
   }
+  document.getElementById('findings-list').style.display='';
+  document.getElementById('findings-empty').style.display='none';
 
-  document.getElementById('findings-list').style.display  = '';
-  document.getElementById('findings-empty').style.display = 'none';
-
-  document.getElementById('findings-list').innerHTML = _findings.map((item, i) => {
-    const f  = item.f;
-    const ed = _edits[item.key] || {};
-    const sc = SC[f.status] || SC['Open'];
-
-    const mgmt   = ed.mgmtResponse !== undefined ? ed.mgmtResponse : (f.mgmtResponse || '');
-    const plan   = ed.actionPlan   !== undefined ? ed.actionPlan   : (f.actionPlan   || '');
-    const tdate  = ed.targetDate   !== undefined ? ed.targetDate   : (f.deadline     || '');
-    const status = ed.status       !== undefined ? ed.status       : (f.status       || 'Open');
-    const saved  = !!ed._saved;
-    const hasPrev = (f.mgmtResponse || '').trim() || (f.actionPlan || '').trim();
-
+  document.getElementById('findings-list').innerHTML = _findings.map((item,i)=>{
+    const f=item.f, ed=_edits[item.key]||{}, sc=SC[f.status]||SC['Open'];
+    const mgmt  = ed.mgmtResponse!==undefined?ed.mgmtResponse:(f.mgmtResponse||'');
+    const plan  = ed.actionPlan  !==undefined?ed.actionPlan  :(f.actionPlan  ||'');
+    const tdate = ed.targetDate  !==undefined?ed.targetDate  :(f.deadline    ||'');
+    const status= ed.status      !==undefined?ed.status      :(f.status      ||'Open');
+    const saved = !!ed._saved;
+    const hasPrev=(f.mgmtResponse||'').trim()||(f.actionPlan||'').trim();
     return `
     <div class="fcard" id="card-${item.key}">
-      <div class="fhead" onclick="toggleFinding('${item.key}')">
+      <div class="fhead" onclick="toggleF('${item.key}')">
         <div class="fnum" style="background:${sc.bg};color:${sc.c};border:1px solid ${sc.bd}">${i+1}</div>
-        <div class="fdesc">${escHtml(f.description || '(No description)')}</div>
+        <div class="fdesc">${esc(f.description||'(No description)')}</div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
           ${spill(status)}
-          ${saved   ? `<span style="font-size:10px;color:var(--teal);font-weight:600;white-space:nowrap">✓ Saved</span>` : ''}
-          ${hasPrev && !saved ? `<span style="font-size:10px;color:var(--sky);font-weight:600;white-space:nowrap">✎ Draft</span>` : ''}
+          ${saved?'<span style="font-size:10px;color:var(--teal);font-weight:600;white-space:nowrap">✓ Saved</span>':''}
+          ${hasPrev&&!saved?'<span style="font-size:10px;color:var(--sky);font-weight:600;white-space:nowrap">✎ Draft</span>':''}
           <span id="chev-${item.key}" style="color:var(--muted);font-size:13px;transition:transform .2s">▼</span>
         </div>
       </div>
       <div id="body-${item.key}" class="fbody">
-
-        <!-- Read-only: Audit Finding -->
         <div class="slabel">🔍 Audit Finding (read only)</div>
-        <div class="ftext">${escHtml(f.description || '—')}</div>
-
-        ${f.responsible || f.deadline ? `
-        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-size:11px;color:var(--text2);display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px">
-          ${f.responsible ? `<span>👤 <strong>Responsible:</strong> ${escHtml(f.responsible)}</span>` : ''}
-          ${f.deadline    ? `<span>📅 <strong>Original Deadline:</strong> ${escHtml(f.deadline)}</span>` : ''}
-        </div>` : ''}
-
-        ${hasPrev && !saved ? `
-        <div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:6px;padding:9px 12px;font-size:11px;color:var(--sky);margin-bottom:12px">
-          ℹ A previous response exists for this finding. Your new submission will overwrite it.
-        </div>` : ''}
-
-        <!-- Auditee Response Box -->
+        <div class="ftext">${esc(f.description||'—')}</div>
+        ${f.responsible||f.deadline?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-size:11px;color:var(--text2);display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px">${f.responsible?'<span>👤 <strong>Responsible:</strong> '+esc(f.responsible)+'</span>':''}${f.deadline?'<span>📅 <strong>Original Deadline:</strong> '+esc(f.deadline)+'</span>':''}</div>`:''}
         <div class="resp-box">
           <div class="resp-label">✍ Your Management Response</div>
-
           <div class="fg" style="margin-bottom:10px">
             <label>Management Comment / Response</label>
-            <textarea id="mgmt-${item.key}" placeholder="Acknowledge the finding and provide management's comment or explanation…" oninput="trackEdit('${item.key}')">${escHtml(mgmt)}</textarea>
+            <textarea id="mgmt-${item.key}" placeholder="Acknowledge the finding and provide management's comment…" oninput="trackEdit('${item.key}')">${esc(mgmt)}</textarea>
           </div>
-
           <div class="fg" style="margin-bottom:10px">
             <label>Action Plan / Corrective Measures</label>
-            <textarea id="plan-${item.key}" placeholder="List the specific steps, controls, or corrective actions management will take…" oninput="trackEdit('${item.key}')">${escHtml(plan)}</textarea>
+            <textarea id="plan-${item.key}" placeholder="List specific corrective steps management will take…" oninput="trackEdit('${item.key}')">${esc(plan)}</textarea>
           </div>
-
           <div class="resp-row">
-            <div class="fg" style="margin:0">
-              <label>Target Completion Date</label>
-              <input type="date" id="date-${item.key}" value="${escHtml(tdate)}" onchange="trackEdit('${item.key}')">
-            </div>
-            <div class="fg" style="margin:0">
-              <label>Update Status</label>
+            <div class="fg" style="margin:0"><label>Target Completion Date</label><input type="date" id="date-${item.key}" value="${esc(tdate)}" onchange="trackEdit('${item.key}')"></div>
+            <div class="fg" style="margin:0"><label>Update Status</label>
               <select id="stat-${item.key}" onchange="trackEdit('${item.key}')">
-                <option value="Open"           ${status==='Open'           ?'selected':''}>Open</option>
-                <option value="Ongoing"        ${status==='Ongoing'        ?'selected':''}>Ongoing — In Progress</option>
-                <option value="For Validation" ${status==='For Validation' ?'selected':''}>For Validation — Done</option>
+                <option value="Open"           ${status==='Open'?'selected':''}>Open</option>
+                <option value="Ongoing"        ${status==='Ongoing'?'selected':''}>Ongoing — In Progress</option>
+                <option value="For Validation" ${status==='For Validation'?'selected':''}>For Validation — Done</option>
               </select>
             </div>
           </div>
-
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:8px">
             <div id="msg-${item.key}" style="font-size:11px;color:var(--muted)"></div>
             <button class="btn btn-save" onclick="saveFinding('${item.key}')">💾 Save Response</button>
@@ -687,248 +737,169 @@ function renderFindings() {
   }).join('');
 }
 
-function toggleFinding(key) {
-  const body = document.getElementById('body-'+key);
-  const chev = document.getElementById('chev-'+key);
-  const open = body.style.display !== 'none';
-  body.style.display = open ? 'none' : '';
-  chev.style.transform = open ? 'rotate(-90deg)' : '';
-}
+function toggleF(key){const b=document.getElementById('body-'+key),c=document.getElementById('chev-'+key),o=b.style.display!=='none';b.style.display=o?'none':'';c.style.transform=o?'rotate(-90deg)':'';}
+function trackEdit(key){if(!_edits[key])_edits[key]={};_edits[key].mgmtResponse=document.getElementById('mgmt-'+key)?.value||'';_edits[key].actionPlan=document.getElementById('plan-'+key)?.value||'';_edits[key].targetDate=document.getElementById('date-'+key)?.value||'';_edits[key].status=document.getElementById('stat-'+key)?.value||'Open';_edits[key]._saved=false;updateProgress();}
+function updateProgress(){const total=_findings.length,answered=_findings.filter(item=>(((_edits[item.key]?.mgmtResponse)||item.f.mgmtResponse||'').trim().length>0)).length,pct=total>0?Math.round(answered/total*100):0;const pt=document.getElementById('h-prog-text'),pb=document.getElementById('h-prog-bar');if(pt)pt.textContent=`${answered} of ${total} finding${total!==1?'s':''} responded`;if(pb)pb.style.width=pct+'%';}
 
-function trackEdit(key) {
-  if (!_edits[key]) _edits[key] = {};
-  _edits[key].mgmtResponse = document.getElementById('mgmt-'+key)?.value || '';
-  _edits[key].actionPlan   = document.getElementById('plan-'+key)?.value || '';
-  _edits[key].targetDate   = document.getElementById('date-'+key)?.value || '';
-  _edits[key].status       = document.getElementById('stat-'+key)?.value || 'Open';
-  _edits[key]._saved       = false;
-  updateProgress();
-}
-
-function updateProgress() {
-  const total    = _findings.length;
-  const answered = _findings.filter(item => {
-    const ed = _edits[item.key];
-    return ((ed?.mgmtResponse || item.f.mgmtResponse || '').trim().length > 0);
-  }).length;
-  const pct = total > 0 ? Math.round(answered / total * 100) : 0;
-  const pt  = document.getElementById('h-prog-text');
-  const pb  = document.getElementById('h-prog-bar');
-  if (pt) pt.textContent = `${answered} of ${total} finding${total!==1?'s':''} responded`;
-  if (pb) pb.style.width = pct + '%';
-}
-
-// ================================================================
-// SAVE
-// ================================================================
+// ============================================================
+// SAVE FINDINGS
+// ============================================================
 async function saveFinding(key) {
-  const item  = _findings.find(f => f.key === key);
-  if (!item)  return;
-  const msgEl = document.getElementById('msg-'+key);
-
-  const mgmt   = (document.getElementById('mgmt-'+key)?.value || '').trim();
-  const plan   = (document.getElementById('plan-'+key)?.value || '').trim();
-  const tdate  = document.getElementById('date-'+key)?.value || '';
-  const status = document.getElementById('stat-'+key)?.value || 'Open';
-
-  if (!mgmt && !plan) {
-    if (msgEl) { msgEl.textContent = '⚠ Please fill in at least the Management Response.'; msgEl.style.color = 'var(--warn)'; }
-    return;
-  }
-  if (msgEl) { msgEl.textContent = '⟳ Saving…'; msgEl.style.color = 'var(--sky)'; }
-
+  const item=_findings.find(f=>f.key===key); if(!item)return;
+  const msgEl=document.getElementById('msg-'+key);
+  const mgmt=(document.getElementById('mgmt-'+key)?.value||'').trim();
+  const plan=(document.getElementById('plan-'+key)?.value||'').trim();
+  const tdate=document.getElementById('date-'+key)?.value||'';
+  const status=document.getElementById('stat-'+key)?.value||'Open';
+  if(!mgmt&&!plan){if(msgEl){msgEl.textContent='⚠ Fill in at least the Management Response.';msgEl.style.color='var(--warn)';}return;}
+  if(msgEl){msgEl.textContent='⟳ Saving…';msgEl.style.color='var(--sky)';}
   try {
-    // Always reload from server to avoid overwriting other branches' data
-    const latest = await supaLoad('reports');
-    if (!latest) throw new Error('Could not load reports from server.');
+    const latest=await supaLoad('reports');
+    if(!latest)throw new Error('Could not load reports.');
+    const report=latest[item.reportIdx];
+    if(!report?.findingsList)throw new Error('Report not found.');
+    const finding=report.findingsList[item.findingIdx];
+    if(!finding)throw new Error('Finding not found.');
+    finding.mgmtResponse=mgmt; finding.actionPlan=plan;
+    if(tdate)finding.deadline=tdate;
+    finding.status=status; finding.respondent=_respondent; finding.respondedAt=new Date().toISOString();
+    await supaSave('reports',latest);
+    _reports=latest;
+    _edits[key]={mgmtResponse:mgmt,actionPlan:plan,targetDate:tdate,status,_saved:true};
+    if(msgEl){msgEl.textContent='✅ Saved!';msgEl.style.color='var(--teal)';}
+    // Update card
+    const card=document.getElementById('card-'+key);
+    if(card){const sc=SC[status]||SC['Open'];card.querySelectorAll('.spill').forEach(p=>{p.textContent=status;Object.assign(p.style,{background:sc.bg,color:sc.c,border:`1px solid ${sc.bd}`});});let badge=card.querySelector('.saved-badge');if(!badge){badge=document.createElement('span');badge.className='saved-badge';badge.style.cssText='font-size:10px;color:var(--teal);font-weight:600;white-space:nowrap';const chev=card.querySelector('[id^="chev-"]');if(chev)chev.parentNode.insertBefore(badge,chev);}badge.textContent='✓ Saved';card.querySelectorAll('.fhead span').forEach(s=>{if(s.textContent.includes('Draft'))s.remove();});}
+    updateProgress(); fstatus('✅ Saved to audit system.');
+    setTimeout(()=>{if(msgEl&&msgEl.textContent.startsWith('✅'))msgEl.textContent='';},5000);
+  } catch(e){if(msgEl){msgEl.textContent='❌ '+e.message;msgEl.style.color='var(--rose)';}fstatus('❌ Save failed.');}
+}
 
-    const report  = latest[item.reportIdx];
-    if (!report?.findingsList) throw new Error('Report not found on server.');
-    const finding = report.findingsList[item.findingIdx];
-    if (!finding) throw new Error('Finding not found on server.');
+async function saveAll(){fstatus('⟳ Saving all…');let c=0;for(const item of _findings){const mgmt=(document.getElementById('mgmt-'+item.key)?.value||'').trim(),plan=(document.getElementById('plan-'+item.key)?.value||'').trim();if(!mgmt&&!plan)continue;await saveFinding(item.key);c++;}fstatus(c===0?'ℹ Fill in at least one Management Response.':'✅ '+c+' response'+(c!==1?'s':'')+' saved!');}
 
-    finding.mgmtResponse = mgmt;
-    finding.actionPlan   = plan;
-    if (tdate) finding.deadline = tdate;
-    finding.status       = status;
-    finding.respondent   = _respondent;
-    finding.respondedAt  = new Date().toISOString();
+// ============================================================
+// IQA SURVEY
+// ============================================================
+function populateIQAHeader(){
+  const first=_findings[0];
+  document.getElementById('iqa-branch-label').textContent  = _branchName||'—';
+  document.getElementById('iqa-auditor-label').textContent = first?.auditor||'—';
+  document.getElementById('iqa-date-label').textContent    = first?.reportDate||new Date().toISOString().slice(0,10);
+}
 
-    await supaSave('reports', latest);
-    _reports = latest;
+const RATING_HINTS = {
+  '1':'Performs unacceptable audit results. Major improvement needed.',
+  '2':'Well below expectations. Significant issues observed.',
+  '3':'Below expectations. Considerable improvement required.',
+  '4':'Marginally acceptable. Several areas need improvement.',
+  '5':'Acceptable with notable areas for improvement.',
+  '6':'Generally acceptable. Some minor improvements needed.',
+  '7':'Good performance. Minor enhancements would be beneficial.',
+  '8':'Very good. Meets expectations with above-average performance.',
+  '9':'Excellent. Consistently exceeds expectations.',
+  '10':'Extraordinary. Exceptional audit performance in all aspects.',
+};
 
-    _edits[key] = { mgmtResponse: mgmt, actionPlan: plan, targetDate: tdate, status, _saved: true };
-    if (msgEl) { msgEl.textContent = '✅ Saved successfully!'; msgEl.style.color = 'var(--teal)'; }
-
-    // Update card header pills
-    const card = document.getElementById('card-'+key);
-    if (card) {
-      const sc = SC[status] || SC['Open'];
-      card.querySelectorAll('.spill').forEach(p => {
-        p.textContent = status;
-        Object.assign(p.style, { background: sc.bg, color: sc.c, border: `1px solid ${sc.bd}` });
-      });
-      // Add ✓ Saved badge if not present
-      let badge = card.querySelector('.saved-badge');
-      if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'saved-badge';
-        badge.style.cssText = 'font-size:10px;color:var(--teal);font-weight:600;white-space:nowrap';
-        const chev = card.querySelector('[id^="chev-"]');
-        if (chev) chev.parentNode.insertBefore(badge, chev);
-      }
-      badge.textContent = '✓ Saved';
-      // Remove Draft badge
-      card.querySelectorAll('.fhead span').forEach(s => { if (s.textContent.includes('Draft')) s.remove(); });
+function buildRatingWidgets(){
+  for(let q=1;q<=10;q++){
+    const row=document.getElementById('r-'+q);
+    if(!row)continue;
+    row.innerHTML='';
+    for(let s=1;s<=10;s++){
+      const btn=document.createElement('button');
+      btn.className='star-btn';
+      btn.textContent=s;
+      btn.type='button';
+      btn.onclick=(()=>{const score=s,qNum=q;return()=>setRating(qNum,score);})(s);
+      row.appendChild(btn);
     }
-
-    updateProgress();
-    fstatus('✅ Response saved to the audit system.');
-    setTimeout(() => { if (msgEl && msgEl.textContent.startsWith('✅')) msgEl.textContent = ''; }, 5000);
-
-  } catch(e) {
-    if (msgEl) { msgEl.textContent = '❌ ' + e.message; msgEl.style.color = 'var(--rose)'; }
-    fstatus('❌ Save failed — check your internet connection.');
   }
 }
 
-async function saveAll() {
-  fstatus('⟳ Saving all responses…');
-  let count = 0;
-  for (const item of _findings) {
-    const mgmt = (document.getElementById('mgmt-'+item.key)?.value || '').trim();
-    const plan = (document.getElementById('plan-'+item.key)?.value || '').trim();
-    if (!mgmt && !plan) continue;
-    await saveFinding(item.key);
-    count++;
-  }
-  if (count === 0) {
-    fstatus('ℹ Fill in at least one Management Response before saving.');
-  } else {
-    fstatus(`✅ ${count} response${count!==1?'s':''} saved!`);
-    setTimeout(() => showScreen('screen-success'), 900);
-  }
-}
-
-// ================================================================
-// QR CODE GENERATOR (Auditor tools)
-// ================================================================
-function getBaseURL() { return window.location.href.split('?')[0]; }
-
-function populateQRDropdown() {
-  const sel = document.getElementById('qr-branch-sel');
-  sel.innerHTML = '<option value="">Select branch to generate QR…</option>' +
-    _branches.filter(b => !b.inactive && b.code).map(b =>
-      `<option value="${escHtml(b.code)}" data-name="${escHtml(b.name)}">${escHtml(b.name)} (${escHtml(b.code)})</option>`
-    ).join('');
-}
-
-function generateQR() {
-  const sel  = document.getElementById('qr-branch-sel');
-  const code = sel.value;
-  if (!code) { alert('Please select a branch first.'); return; }
-
-  const link = `${getBaseURL()}?branch=${encodeURIComponent(code)}`;
-  document.getElementById('qr-link-text').textContent = link;
-  document.getElementById('qr-output').style.display = '';
-
-  const canvas = document.getElementById('qr-canvas');
-  canvas.innerHTML = '';
-  _qrInst = null;
-  try {
-    _qrInst = new QRCode(canvas, {
-      text: link, width: 180, height: 180,
-      colorDark: '#000000', colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
-    });
-  } catch(e) {
-    canvas.innerHTML = '<div style="color:#555;font-size:11px;padding:20px;text-align:center">QR library failed to load.<br>Copy the link below instead.</div>';
-  }
-}
-
-function copyQRLink() {
-  const link = document.getElementById('qr-link-text').textContent;
-  navigator.clipboard.writeText(link).then(() => {
-    const btn = event.currentTarget;
-    const orig = btn.textContent;
-    btn.textContent = '✅ Copied!';
-    setTimeout(() => btn.textContent = orig, 2000);
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = link; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
+function setRating(q,score){
+  _iqaRatings[q]=score;
+  const row=document.getElementById('r-'+q);
+  const hint=document.getElementById('rh-'+q);
+  if(!row)return;
+  // Color class
+  const cls=score<=3?'sel-low':score<=7?'sel-mid':'sel-high';
+  row.querySelectorAll('.star-btn').forEach((btn,i)=>{
+    btn.className='star-btn'+(i+1<=score?' '+cls:'');
   });
+  if(hint){hint.textContent='Score: '+score+'/10 — '+RATING_HINTS[score];hint.style.color=score<=3?'var(--rose)':score<=7?'var(--warn)':'var(--teal)';}
+  updateOverallScore();
 }
 
-function downloadQR() {
-  const cvs = document.getElementById('qr-canvas').querySelector('canvas');
-  if (!cvs) { alert('Generate a QR code first.'); return; }
-  const code = document.getElementById('qr-branch-sel').value;
-  const a = document.createElement('a');
-  a.href = cvs.toDataURL('image/png');
-  a.download = `MC-Precision-Auditee-QR-${code}.png`;
-  a.click();
+function updateOverallScore(){
+  const vals=Object.values(_iqaRatings).filter(v=>v>0);
+  if(!vals.length)return;
+  const avg=(vals.reduce((a,b)=>a+b,0)/vals.length);
+  const box=document.getElementById('overall-score-box');
+  const val=document.getElementById('overall-score-val');
+  const desc=document.getElementById('overall-score-desc');
+  if(!box)return;
+  box.style.display='';
+  val.textContent=avg.toFixed(1);
+  val.style.color=avg<=3?'var(--rose)':avg<=7?'var(--warn)':'var(--teal)';
+  desc.textContent=avg>=8?'⭐ Extraordinary Performance':avg>=4?'✅ Acceptable Performance — Some Areas for Improvement':'⚠ Needs Improvement — General Enhancement Required';
+  desc.style.color=avg<=3?'var(--rose)':avg<=7?'var(--warn)':'var(--teal)';
 }
 
-function printQR() {
-  const code = document.getElementById('qr-branch-sel').value;
-  const sel  = document.getElementById('qr-branch-sel');
-  const opt  = sel.options[sel.selectedIndex];
-  const name = opt?.dataset?.name || code;
-  const link = document.getElementById('qr-link-text').textContent;
-  const cvs  = document.getElementById('qr-canvas').querySelector('canvas');
-  const img  = cvs ? cvs.toDataURL('image/png') : '';
-
-  const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html><head>
-  <title>Auditee QR — ${code}</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-    body{font-family:'Inter',sans-serif;background:#fff;color:#1a1a2e;margin:0;padding:0}
-    .page{max-width:420px;margin:0 auto;padding:40px 30px;text-align:center;border:1px solid #e2e8f0;min-height:540px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-    .logo{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#c9a84c;margin-bottom:4px}
-    h1{font-size:19px;font-weight:800;margin-bottom:2px}
-    .sub{font-size:12px;color:#64748b;margin-bottom:20px}
-    .qr-img{width:190px;height:190px;border:2px solid #e2e8f0;border-radius:10px;padding:10px;margin-bottom:14px}
-    .code-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
-    .code{font-size:26px;font-weight:800;letter-spacing:.18em;color:#c9a84c;margin-bottom:4px}
-    .branch{font-size:14px;font-weight:700;margin-bottom:14px}
-    .url{font-size:10px;color:#3b82f6;word-break:break-all;background:#f0f9ff;padding:7px 10px;border-radius:6px;border:1px solid #bae6fd;margin-bottom:14px}
-    .instructions{font-size:12px;color:#475569;line-height:1.75;background:#f8fafc;border-radius:8px;padding:12px 14px;text-align:left}
-    .instructions strong{color:#1e293b}
-    .footer{font-size:10px;color:#94a3b8;margin-top:18px;padding-top:14px;border-top:1px solid #e2e8f0;width:100%}
-    @media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
-  </style>
-  </head><body>
-  <div class="page">
-    <div class="logo">M.C. Precision · Internal Audit Division</div>
-    <h1>Auditee Response Portal</h1>
-    <div class="sub">Management Comment &amp; Action Plan</div>
-    ${img ? `<img class="qr-img" src="${img}" alt="QR Code">` : ''}
-    <div class="code-label">Branch Access Code</div>
-    <div class="code">${code}</div>
-    <div class="branch">${name}</div>
-    <div class="url">${link}</div>
-    <div class="instructions">
-      <strong>How to use:</strong><br>
-      1. Scan this QR code with your phone camera, <em>or</em> type the link above in your browser.<br>
-      2. Select your branch (pre-filled) and enter your name and title.<br>
-      3. Review each audit finding and fill in your <strong>Management Response</strong> and <strong>Action Plan</strong>.<br>
-      4. Set a target completion date and click <strong>Save Response</strong>.
-    </div>
-    <div class="footer">
-      M.C. Precision · Internal Audit Division · Confidential &amp; Restricted<br>
-      Responses are submitted directly to the audit management system.
-    </div>
-  </div>
-  <script>setTimeout(()=>{window.print();},400);<\/script>
-  </body></html>`);
-  win.document.close();
+function toggleReviewType(id){
+  const el=document.getElementById(id),chk=document.getElementById(id+'-chk');
+  const active=_iqaReviewTypes.has(id);
+  if(active){_iqaReviewTypes.delete(id);el.style.borderColor='var(--border2)';chk.style.background='transparent';chk.style.borderColor='var(--border2)';}
+  else{_iqaReviewTypes.add(id);el.style.borderColor='var(--violet)';chk.style.background='var(--violet)';chk.style.borderColor='var(--violet)';chk.innerHTML='<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>';}
 }
 
-// ================================================================
+function getReviewTypeLabels(){
+  const map={'rt-1':'Branch Operation Review','rt-2':'Fieldwork / Work-with Assessment Review','rt-3':'Sales / AR & Collection Review','rt-4':'Others (Petty Cash Fund, etc.)'};
+  return [..._iqaReviewTypes].map(id=>map[id]||id);
+}
+
+async function submitIQA(){
+  hideAlert('iqa-err'); hideAlert('iqa-ok');
+  const feedback=(document.getElementById('iqa-feedback').value||'').trim();
+  const answeredCount=Object.keys(_iqaRatings).filter(k=>_iqaRatings[k]>0).length;
+  if(answeredCount<5){showAlert('iqa-err','Please answer at least 5 rating questions before submitting.','err');return;}
+  const vals=Object.values(_iqaRatings).filter(v=>v>0);
+  const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+  const submission={
+    branch:_branchName, branchCode:_branchCode,
+    respondent:_respondent, email:_email, mobile:_mobile,
+    auditor:_findings[0]?.auditor||'—',
+    auditDate:_findings[0]?.reportDate||new Date().toISOString().slice(0,10),
+    reportTitle:_findings[0]?.reportTitle||'—',
+    reviewTypes:getReviewTypeLabels(),
+    ratings:_iqaRatings,
+    overallAverage:parseFloat(avg.toFixed(2)),
+    overallGrade:avg>=8?'Extraordinary':avg>=4?'Acceptable':'Needs Improvement',
+    feedback,
+    submittedAt:new Date().toISOString(),
+  };
+  const btn=document.querySelector('[onclick="submitIQA()"]');
+  if(btn){btn.disabled=true;btn.textContent='⟳ Submitting…';}
+  try {
+    // Load existing IQA submissions
+    let existing=await supaLoad('iqa_submissions')||[];
+    existing.push(submission);
+    await supaSave('iqa_submissions',existing);
+    _iqaSubmitted=true;
+    document.getElementById('success-title').textContent='IQA Assessment Submitted!';
+    document.getElementById('success-msg').innerHTML=`
+      Thank you, <strong>${_respondent}</strong>!<br><br>
+      Your IQA Self Assessment Review has been submitted successfully.<br>
+      Overall Rating: <strong style="color:${avg>=8?'#2dd4bf':avg>=4?'#fbbf24':'#f87171'}">${avg.toFixed(1)}/10 — ${submission.overallGrade}</strong><br><br>
+      The Internal Audit Division will review your submission. This report is private and confidential.`;
+    showScreen('screen-success');
+  } catch(e){
+    showAlert('iqa-err','Submission failed: '+e.message,'err');
+  } finally {if(btn){btn.disabled=false;btn.textContent='⭐ Submit IQA Assessment';}}
+}
+
+// ============================================================
 // BOOT
-// ================================================================
+// ============================================================
 init();
 </script>
 </body>
